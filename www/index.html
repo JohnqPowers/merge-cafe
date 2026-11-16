@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#3B2A20">
+<title>Merge Café</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6EBDD; --board:#E6D2B8; --cell:#FFF8EE; --cell2:#FBF1E3;
+  --ink:#3B2A20; --muted:#8A7362; --accent:#C8553D; --accent2:#E07A5F;
+  --green:#4F9D69; --gold:#E8A93B; --blue:#3D7EA6;
+  --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Fredoka,ui-rounded,"SF Pro Rounded",system-ui,sans-serif;overscroll-behavior:none;overflow:hidden}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+#app{height:100%;display:flex;flex-direction:column;max-width:520px;margin:0 auto;
+  padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 8px)}
+/* Top bar */
+#top{display:flex;gap:6px;align-items:center}
+.lvl{display:flex;align-items:center;gap:6px;flex:1.2;min-width:0;background:#fff;border-radius:999px;padding:4px 10px 4px 4px;box-shadow:0 2px 0 rgba(59,42,32,.12)}
+.lvlnum{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
+.xpbar{flex:1;height:9px;background:#F0E2D0;border-radius:9px;overflow:hidden}
+#xpFill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--accent2));transition:width .4s}
+.res{display:flex;align-items:center;gap:3px;background:#fff;border-radius:999px;padding:6px 9px;font-size:14px;box-shadow:0 2px 0 rgba(59,42,32,.12);white-space:nowrap}
+.res b{font-weight:600}
+.res small{color:var(--muted);font-size:10px;margin-left:2px}
+#resEnergy,#resGems{cursor:pointer}
+/* Orders */
+#orders{display:flex;gap:8px;margin:10px 0 6px;overflow-x:auto;scrollbar-width:none;min-height:104px}
+#orders::-webkit-scrollbar{display:none}
+.order{flex:1 0 30%;min-width:104px;background:#fff;border-radius:var(--r);padding:7px;display:flex;flex-direction:column;gap:5px;box-shadow:0 3px 0 rgba(59,42,32,.12);position:relative;transition:transform .2s}
+.order.ready{box-shadow:inset 0 0 0 3px var(--green),0 3px 0 rgba(59,42,32,.12)}
+.order.leaving{transform:scale(.85);opacity:0}
+.order .who{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.order .who span{font-size:22px}
+.order .req{display:flex;gap:4px}
+.order .req div{flex:1;background:var(--cell2);border-radius:9px;font-size:24px;text-align:center;padding:3px 0;position:relative}
+.order .req div.ok::after{content:"✓";position:absolute;right:2px;bottom:0;font-size:11px;color:#fff;background:var(--green);border-radius:50%;width:14px;height:14px;line-height:14px}
+.order .rew{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.order button{background:var(--green);color:#fff;border-radius:9px;font-size:12px;font-weight:600;padding:4px 8px}
+.order button:disabled{background:#D8CBBB}
+/* Hint */
+#hint{min-height:22px;font-size:13px;text-align:center;color:var(--accent);font-weight:500;margin-bottom:4px}
+/* Board */
+#boardWrap{flex:1;display:flex;align-items:flex-end;justify-content:center;min-height:0}
+#board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--board);padding:6px;border-radius:18px;touch-action:none;
+  width:min(100%, calc((100dvh - 300px) * 7 / 8));aspect-ratio:7/8;box-shadow:inset 0 2px 6px rgba(59,42,32,.15)}
+.cell{background:var(--cell);border-radius:10px;display:grid;place-items:center;position:relative;container-type:size}
+.cell:nth-child(odd){background:var(--cell2)}
+.cell .it{font-size:min(62cqw,40px);line-height:1;transition:transform .12s;pointer-events:none}
+.cell.gen{background:linear-gradient(160deg,#FFE3B3,#F7C98B)}
+.cell.gen::after{content:"⚡";position:absolute;right:2px;top:1px;font-size:10px}
+.cell .tier{position:absolute;left:3px;bottom:1px;font-size:9px;color:var(--muted);font-weight:600;pointer-events:none}
+.cell.sel{box-shadow:0 0 0 3px var(--blue) inset}
+.cell.want{box-shadow:0 0 0 2px var(--green) inset}
+.cell.hover{box-shadow:0 0 0 3px var(--gold) inset}
+.cell.dragging .it{opacity:.25}
+.cell.pulse{animation:pulse 1s infinite}
+.cell.pop .it{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,85,61,.7) inset}50%{box-shadow:0 0 0 4px rgba(200,85,61,.9) inset}}
+#info{min-height:26px;text-align:center;font-size:13px;color:var(--muted);margin:6px 0 4px}
+/* Bottom */
+#bottom{display:flex;gap:6px}
+#bottom>*{flex:1;background:#fff;border-radius:var(--r);padding:6px 0;display:flex;flex-direction:column;align-items:center;font-size:22px;box-shadow:0 3px 0 rgba(59,42,32,.12);position:relative}
+#bottom span{font-size:11px;color:var(--muted);margin-top:1px}
+#trash{background:#F3E4D6 !important}
+#trash.hover{background:#F4C7BC !important}
+.dot{position:absolute;top:4px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+/* Ghost */
+#ghost{position:fixed;pointer-events:none;font-size:46px;transform:translate(-50%,-60%);z-index:50;display:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+/* Modal */
+#modal{position:fixed;inset:0;background:rgba(40,25,15,.45);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+#modal[hidden]{display:none}
+.sheet{background:var(--bg);width:100%;max-width:520px;max-height:82vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);position:relative;animation:up .25s}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+#modalClose{position:absolute;right:12px;top:10px;background:#fff;border-radius:50%;width:32px;height:32px;font-size:15px}
+.sheet h2{margin:0 0 12px;font-size:22px}
+.row{display:flex;align-items:center;gap:10px;background:#fff;border-radius:var(--r);padding:10px;margin-bottom:8px}
+.row .ic{font-size:30px;width:40px;text-align:center}
+.row .tx{flex:1;font-size:14px}
+.row .tx small{display:block;color:var(--muted);font-size:12px}
+.btn{background:var(--accent);color:#fff;border-radius:11px;padding:8px 12px;font-weight:600;font-size:14px;white-space:nowrap}
+.btn.g{background:var(--green)} .btn.b{background:var(--blue)}
+.btn:disabled{background:#D8CBBB}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px}
+.days div{background:#fff;border-radius:10px;padding:6px 2px;text-align:center;font-size:11px}
+.days div b{display:block;font-size:20px}
+.days div.done{background:#DCEEDD}
+.days div.today{outline:3px solid var(--gold)}
+.big{text-align:center;font-size:64px;margin:6px 0}
+.center{text-align:center}
+.chain{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;font-size:24px;margin:8px 0}
+.chain span.lock{filter:grayscale(1) brightness(.3);opacity:.35}
+/* Toast & ad */
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 14px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;max-width:90%;text-align:center}
+#toast.on{opacity:1}
+#adOverlay{position:fixed;inset:0;background:#111;color:#fff;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:18px}
+#adOverlay[hidden]{display:none}
+.fly{position:fixed;z-index:55;pointer-events:none;font-size:22px;transition:all .6s cubic-bezier(.5,-.3,.7,1)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div class="lvl" id="lvlBox"><div class="lvlnum" id="lvlNum">1</div><div class="xpbar"><div id="xpFill"></div></div></div>
+    <div class="res" id="resEnergy">⚡<b id="energy">100</b><small id="eTimer"></small></div>
+    <div class="res" id="resCoins">🪙<b id="coins">0</b></div>
+    <div class="res" id="resGems">💎<b id="gems">0</b></div>
+  </header>
+  <section id="orders"></section>
+  <div id="hint"></div>
+  <div id="boardWrap"><main id="board"></main></div>
+  <div id="info"></div>
+  <nav id="bottom">
+    <button data-open="shop">🛒<span data-t="shop"></span></button>
+    <button data-open="upgrades">🔧<span data-t="upgrades"></span></button>
+    <div id="trash">🗑️<span data-t="sell"></span></div>
+    <button data-open="daily" id="dailyBtn">🎁<span data-t="daily"></span></button>
+    <button data-open="settings">⚙️<span data-t="settings"></span></button>
+  </nav>
+</div>
+<div id="modal" hidden><div class="sheet"><button id="modalClose" aria-label="close">✕</button><div id="modalBody"></div></div></div>
+<div id="toast"></div>
+<div id="adOverlay" hidden><div>📺</div><div id="adText"></div></div>
+<div id="ghost"></div>
+
+<script>
+/* =====================================================================
+   Merge Café — v1.0.0
+   Single-file HTML5 game. Runs in browsers (web portals, PWA) and inside
+   Capacitor (Android/iOS). Native SDKs (AppsFlyer, AdMob, RevenueCat)
+   are used automatically when present; web falls back to demo stubs.
+   ===================================================================== */
+const CONFIG = {
+  version: '1.0.0',
+  appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
+  admob: { // Google test IDs — replace before release
+    rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
+    rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
+  },
+  revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY' },
+  energyRegenMs: 90 * 1000,
+  baseEnergy: 100
+};
+
+(() => {
+'use strict';
+const COLS = 7, ROWS = 8, N = COLS * ROWS;
+const LANG = (navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
+
+const STR = {
+  de: {
+    shop:'Shop', upgrades:'Ausbau', sell:'Verkaufen', daily:'Bonus', settings:'Optionen',
+    deliver:'Liefern', boardFull:'Das Brett ist voll – verschmelze oder verkaufe etwas.',
+    noEnergy:'Keine Energie! Warte kurz, schau Werbung oder nutze Diamanten.',
+    tut0:'Tippe auf die Teekanne 🫖, um Kaffeebohnen zu erzeugen.',
+    tut1:'Zieh eine Bohne auf eine gleiche Bohne, um sie zu verschmelzen.',
+    tut2:'Super! Liefere den Espresso an deinen ersten Gast.',
+    tutDone:'Tutorial geschafft! Erfülle Aufträge und steig im Level auf.',
+    tier:'Stufe', next:'nächste', maxed:'Höchste Stufe!', genTap:'Tippen: erzeugt', cost:'kostet 1 ⚡',
+    sold:'Verkauft für', levelUp:'Level', rewards:'Belohnung', unlocked:'Neu freigeschaltet',
+    cont:'Weiter', refill:'Energie auffüllen', watchAd:'Werbung ansehen', adsLeft:'heute noch',
+    free:'Gratis', buy:'Kaufen', onlyApp:'Käufe sind in der App-Version verfügbar.',
+    starter:'Starterpaket', gemsS:'Handvoll Diamanten', gemsM:'Truhe Diamanten', oneTime:'einmalig',
+    notEnough:'Nicht genug', upGen:'Bessere Maschinen', upGenD:'Mehr Chance auf Stufe 2 beim Erzeugen',
+    upBat:'Großer Akku', upBatD:'+20 maximale Energie', upSlots:'Mehr Kundschaft', upSlotsD:'+1 Auftragsplatz',
+    max:'MAX', dailyT:'Täglicher Bonus', claim:'Abholen', claimed:'Morgen wieder!', day:'Tag',
+    sound:'Ton', on:'An', off:'Aus', reset:'Fortschritt löschen', resetSure:'Wirklich? Nochmal tippen.',
+    privacy:'Datenschutz', collection:'Sammlung', adPlaying:'Werbung läuft …', adDemo:'(Demo-Werbung im Browser)',
+    energyFull:'Energie ist voll', welcome:'Willkommen zurück!', thanks:'Danke für deinen Kauf!',
+    purchaseFail:'Kauf abgebrochen.', adFail:'Gerade keine Werbung verfügbar.', limitAds:'Tageslimit erreicht',
+    nextE:'nächste ⚡ in'
+  },
+  en: {
+    shop:'Shop', upgrades:'Upgrades', sell:'Sell', daily:'Bonus', settings:'Options',
+    deliver:'Serve', boardFull:'Board is full – merge or sell something.',
+    noEnergy:'Out of energy! Wait a bit, watch an ad or use gems.',
+    tut0:'Tap the teapot 🫖 to make coffee beans.',
+    tut1:'Drag a bean onto a matching bean to merge them.',
+    tut2:'Great! Serve the espresso to your first guest.',
+    tutDone:'Tutorial complete! Fill orders and level up.',
+    tier:'Tier', next:'next', maxed:'Max tier!', genTap:'Tap: makes', cost:'costs 1 ⚡',
+    sold:'Sold for', levelUp:'Level', rewards:'Rewards', unlocked:'Newly unlocked',
+    cont:'Continue', refill:'Refill energy', watchAd:'Watch an ad', adsLeft:'left today',
+    free:'Free', buy:'Buy', onlyApp:'Purchases are available in the app version.',
+    starter:'Starter Pack', gemsS:'Handful of Gems', gemsM:'Chest of Gems', oneTime:'one-time',
+    notEnough:'Not enough', upGen:'Better Machines', upGenD:'Higher chance of tier 2 when producing',
+    upBat:'Big Battery', upBatD:'+20 max energy', upSlots:'More Customers', upSlotsD:'+1 order slot',
+    max:'MAX', dailyT:'Daily Bonus', claim:'Claim', claimed:'Come back tomorrow!', day:'Day',
+    sound:'Sound', on:'On', off:'Off', reset:'Reset progress', resetSure:'Sure? Tap again.',
+    privacy:'Privacy', collection:'Collection', adPlaying:'Ad playing …', adDemo:'(demo ad in browser)',
+    energyFull:'Energy is full', welcome:'Welcome back!', thanks:'Thanks for your purchase!',
+    purchaseFail:'Purchase cancelled.', adFail:'No ad available right now.', limitAds:'Daily limit reached',
+    nextE:'next ⚡ in'
+  }
+};
+const t = k => (STR[LANG][k] ?? STR.en[k] ?? k);
+
+const CHAINS = [
+  { gen:'🫖', genName:{de:'Teekanne',en:'Teapot'}, unlock:1,
+    items:['🫘','☕','🍵','🧋','🥤','🍹','🏆'],
+    de:['Kaffeebohne','Espresso','Matcha','Bubble Tea','Frappé','Mocktail','Barista-Pokal'],
+    en:['Coffee Bean','Espresso','Matcha','Bubble Tea','Frappé','Mocktail','Barista Trophy'] },
+  { gen:'🧺', genName:{de:'Brotkorb',en:'Bread Basket'}, unlock:2,
+    items:['🌾','🍞','🥐','🥨','🍩','🧁','🍰','🎂'],
+    de:['Weizen','Brot','Croissant','Brezel','Donut','Cupcake','Torte','Festtorte'],
+    en:['Wheat','Bread','Croissant','Pretzel','Donut','Cupcake','Cake','Party Cake'] },
+  { gen:'🐔', genName:{de:'Hühnerstall',en:'Hen House'}, unlock:4,
+    items:['🥚','🍳','🥞','🧇','🥪','🥗','🍱'],
+    de:['Ei','Spiegelei','Pancakes','Waffeln','Sandwich','Salat','Brunch-Box'],
+    en:['Egg','Fried Egg','Pancakes','Waffles','Sandwich','Salad','Brunch Box'] }
+];
+const CUSTOMERS = ['👩','👨','🧑','👵','👴','🧕','👩‍🦰','🧔','👩‍🎓','👨‍💼','👩‍🍳','🧑‍🎨'];
+const MILESTONES = [2,3,5,7,10,12,15,20,25,30,40,50];
+const DAILY = [{coins:50},{energy:20},{gems:5},{coins:120},{energy:40},{gems:10},{gems:25}];
+const SAVE_KEY = 'mergecafe_v1';
+
+/* ---------------- Platform adapter (native SDKs or web fallback) ---------------- */
+const Cap = () => window.Capacitor;
+const Plug = () => (window.Capacitor && window.Capacitor.Plugins) || {};
+const isNative = () => !!(Cap() && Cap().isNativePlatform && Cap().isNativePlatform());
+const osName = () => (Cap() && Cap().getPlatform && Cap().getPlatform()) || 'web';
+
+const Platform = {
+  async init() {
+    const P = Plug();
+    try {
+      if (P.AppsFlyer) await P.AppsFlyer.initSDK({ devKey: CONFIG.appsflyer.devKey, appID: CONFIG.appsflyer.iosAppId, isDebug: false, registerConversionListener: true, waitForATTUserAuthorization: 10 });
+    } catch (e) { console.warn('AppsFlyer init', e); }
+    try { if (P.AdMob) await P.AdMob.initialize({}); } catch (e) { console.warn('AdMob init', e); }
+    try {
+      if (P.Purchases) await P.Purchases.configure({ apiKey: osName() === 'ios' ? CONFIG.revenuecat.ios : CONFIG.revenuecat.android });
+    } catch (e) { console.warn('RevenueCat init', e); }
+  },
+  track(name, params = {}) {
+    try {
+      (window.__events = window.__events || []).push({ name, params, ts: Date.now() });
+      const P = Plug();
+      if (P.AppsFlyer) P.AppsFlyer.logEvent({ eventName: name, eventValue: params }).catch(()=>{});
+      if (P.FirebaseAnalytics) P.FirebaseAnalytics.logEvent({ name, params }).catch(()=>{});
+      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+      console.log('[event]', name, params);
+    } catch (e) {}
+  },
+  async showRewarded() {
+    const P = Plug();
+    if (P.AdMob) {
+      try {
+        const adId = osName() === 'ios' ? CONFIG.admob.rewardedIOS : CONFIG.admob.rewardedAndroid;
+        await P.AdMob.prepareRewardVideoAd({ adId });
+        const r = await P.AdMob.showRewardVideoAd();
+        return !!r;
+      } catch (e) { return false; }
+    }
+    return demoAd();
+  },
+  async purchase(sku) {
+    const P = Plug();
+    if (!P.Purchases) return null; // web: not available
+    try {
+      const { products } = await P.Purchases.getProducts({ productIdentifiers: [sku] });
+      if (!products || !products.length) return false;
+      await P.Purchases.purchaseStoreProduct({ product: products[0] });
+      return true;
+    } catch (e) { return false; }
+  }
+};
+function demoAd() {
+  return new Promise(res => {
+    const o = $('#adOverlay'); let s = 3;
+    o.hidden = false;
+    const upd = () => $('#adText').innerHTML = `${t('adPlaying')} ${s}s<br><small style="opacity:.6">${t('adDemo')}</small>`;
+    upd();
+    const iv = setInterval(() => { s--; upd(); if (s <= 0) { clearInterval(iv); o.hidden = true; res(true); } }, 1000);
+  });
+}
+
+/* ---------------- Helpers ---------------- */
+const $ = s => document.querySelector(s);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const today = () => new Date().toISOString().slice(0, 10);
+const fmt = n => n >= 10000 ? (n/1000).toFixed(1).replace('.0','') + 'k' : String(n);
+const itemName = it => it.g !== undefined ? CHAINS[it.g].genName[LANG] : CHAINS[it.c][LANG][it.t];
+const itemEmoji = it => it.g !== undefined ? CHAINS[it.g].gen : CHAINS[it.c].items[it.t];
+const maxTier = c => CHAINS[c].items.length - 1;
+
+/* ---------------- State ---------------- */
+let S;
+function fresh() {
+  const b = Array(N).fill(null);
+  b[3 + 7 * COLS] = { g: 0 };
+  return { v:1, b, energy:CONFIG.baseEnergy, eTs:Date.now(), coins:0, gems:10, xp:0, level:1, orders:[],
+    up:{ gen:0, bat:0, slots:0 }, tut:0, daily:{ last:'', streak:0 }, ads:{ day:'', n:0 },
+    stats:{ merges:0, orders:0, spawns:0, sessions:0 }, seen:{}, sound:true, ev:{}, starter:false, created:Date.now() };
+}
+function load() {
+  try { const raw = localStorage.getItem(SAVE_KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 1 && Array.isArray(s.b) && s.b.length === N) return Object.assign(fresh(), s); } } catch (e) {}
+  return fresh();
+}
+let saveT;
+function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }, 150); }
+
+const maxEnergy = () => CONFIG.baseEnergy + 20 * S.up.bat;
+const slots = () => 3 + S.up.slots;
+const xpNeed = L => Math.round(12 + 10 * (L - 1) + 2 * Math.pow(L - 1, 1.6));
+
+function once(name, params) { if (S.ev[name]) return; S.ev[name] = Date.now(); Platform.track(name, params); save(); }
+
+/* ---------------- Energy ---------------- */
+function tickEnergy() {
+  const now = Date.now(), m = maxEnergy();
+  if (S.energy >= m) { S.eTs = now; return; }
+  const g = Math.floor((now - S.eTs) / CONFIG.energyRegenMs);
+  if (g > 0) { S.energy = Math.min(m, S.energy + g); S.eTs += g * CONFIG.energyRegenMs; if (S.energy >= m) S.eTs = now; save(); }
+}
+function spendEnergy(n) {
+  if (S.energy < n) return false;
+  if (S.energy >= maxEnergy()) S.eTs = Date.now();
+  S.energy -= n; return true;
+}
+
+/* ---------------- Sound ---------------- */
+let ac;
+function beep(f, d = .08, type = 'sine', v = .07) {
+  if (!S.sound) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = f; g.gain.value = v;
+    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + d);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+  } catch (e) {}
+}
+const SFX = {
+  spawn: () => beep(520, .06, 'triangle'),
+  merge: tr => { beep(440 + tr * 70, .09); setTimeout(() => beep(660 + tr * 70, .12), 70); },
+  coin: () => { beep(880, .06, 'square', .035); setTimeout(() => beep(1320, .09, 'square', .035), 60); },
+  err: () => beep(150, .14, 'sawtooth', .04),
+  level: () => [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, .16, 'triangle'), i * 110))
+};
+function vibrate(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
+
+/* ---------------- Orders ---------------- */
+function unlockedChains() { return CHAINS.map((_, i) => i).filter(i => S.level >= CHAINS[i].unlock); }
+function reqMaxTier(c) { return Math.min(maxTier(c), 1 + Math.floor(S.level / 2)); }
+function makeOrder() {
+  const ch = unlockedChains();
+  const cnt = S.level < 3 ? 1 : (Math.random() < (S.level < 8 ? .45 : .6) ? 2 : 1);
+  const req = [];
+  for (let k = 0; k < cnt; k++) {
+    const c = pick(ch), mt = reqMaxTier(c), lo = Math.max(1, mt - 3);
+    req.push({ c, t: lo + Math.floor(Math.random() * (mt - lo + 1)) });
+  }
+  const coins = req.reduce((s, r) => s + Math.round(6 * Math.pow(2, r.t)), 0);
+  const xp = req.reduce((s, r) => s + (r.t + 1) * 2, 0);
+  return { id: Math.random().toString(36).slice(2), who: pick(CUSTOMERS), req, coins, xp };
+}
+function fillOrders() {
+  if (S.tut < 3 && S.orders.length === 0) S.orders.push({ id:'tut', who:'👩', req:[{ c:0, t:1 }], coins:15, xp:6 });
+  if (S.tut >= 3) while (S.orders.length < slots()) S.orders.push(makeOrder());
+}
+function findCells(order) {
+  const used = new Set(), cells = [];
+  for (const r of order.req) {
+    let f = -1;
+    for (let i = 0; i < N; i++) { const it = S.b[i]; if (it && it.g === undefined && it.c === r.c && it.t === r.t && !used.has(i)) { f = i; break; } }
+    cells.push(f); if (f >= 0) used.add(f);
+  }
+  return cells;
+}
+function deliver(idx) {
+  const o = S.orders[idx]; if (!o) return;
+  const cells = findCells(o); if (cells.some(c => c < 0)) return;
+  cells.forEach(c => S.b[c] = null);
+  S.coins += o.coins; S.stats.orders++;
+  SFX.coin(); vibrate(15);
+  flyFrom(document.querySelectorAll('.order')[idx], '🪙', '#resCoins');
+  Platform.track('order_complete', { level: S.level, coins: o.coins });
+  once('first_order');
+  if ([10, 25, 50, 100, 250, 500].includes(S.stats.orders)) once('orders_' + S.stats.orders);
+  S.orders.splice(idx, 1);
+  if (S.tut === 2) { S.tut = 3; once('tutorial_complete'); toast(t('tutDone')); }
+  addXP(o.xp);
+  setTimeout(() => { fillOrders(); render(); save(); }, 250);
+  render(); save();
+}
+
+/* ---------------- XP / Level ---------------- */
+function addXP(x) {
+  S.xp += x; const ups = [];
+  while (S.xp >= xpNeed(S.level)) { S.xp -= xpNeed(S.level); S.level++; ups.push(S.level); }
+  ups.forEach(onLevelUp);
+}
+function onLevelUp(L) {
+  const gems = 3 + Math.floor(L / 5) * 2;
+  S.gems += gems; S.energy = Math.max(S.energy, maxEnergy());
+  Platform.track('level_up', { level: L });
+  if (MILESTONES.includes(L)) once('level_' + L);
+  const newGens = [];
+  CHAINS.forEach((c, i) => { if (c.unlock === L && !S.b.some(it => it && it.g === i)) { const p = nearestEmpty(3 + 7 * COLS); if (p >= 0) { S.b[p] = { g: i }; newGens.push(i); } } });
+  SFX.level(); vibrate([20, 40, 20]);
+  const unl = newGens.map(i => `<div class="row"><div class="ic">${CHAINS[i].gen}</div><div class="tx">${CHAINS[i].genName[LANG]}<small>${CHAINS[i].items.join(' ')}</small></div></div>`).join('');
+  openModal(`<div class="center"><div class="big">🎉</div><h2>${t('levelUp')} ${L}!</h2>
+    <p>${t('rewards')}: 💎 ${gems} · ⚡ ${t('energyFull')}</p></div>
+    ${unl ? `<h3>${t('unlocked')}</h3>${unl}` : ''}
+    <div class="center"><button class="btn g" onclick="MC.close()">${t('cont')}</button></div>`);
+  save();
+}
+
+/* ---------------- Board logic ---------------- */
+const rc = i => [i % COLS, Math.floor(i / COLS)];
+function nearestEmpty(from) {
+  const [fx, fy] = rc(from); let best = -1, bd = 1e9;
+  for (let i = 0; i < N; i++) if (!S.b[i]) { const [x, y] = rc(i); const d = Math.abs(x - fx) + Math.abs(y - fy) + Math.random() * .1; if (d < bd) { bd = d; best = i; } }
+  return best;
+}
+function spawn(gi) {
+  const g = S.b[gi]; if (!g || g.g === undefined) return;
+  const p = nearestEmpty(gi);
+  if (p < 0) { toast(t('boardFull')); SFX.err(); return; }
+  if (!spendEnergy(1)) { toast(t('noEnergy')); SFX.err(); openShop(); return; }
+  const chance = .08 + .05 * S.up.gen;
+  S.b[p] = { c: g.g, t: Math.random() < chance ? 1 : 0 };
+  S.stats.spawns++;
+  if (S.tut === 0 && S.stats.spawns >= 2) S.tut = 1;
+  SFX.spawn(); vibrate(8);
+  render([p]); save();
+}
+function dropOn(from, to) {
+  if (from === to) return;
+  const a = S.b[from], b = S.b[to];
+  if (a && b && a.g === undefined && b.g === undefined && a.c === b.c && a.t === b.t && a.t < maxTier(a.c)) {
+    S.b[to] = { c: a.c, t: a.t + 1 }; S.b[from] = null;
+    S.stats.merges++;
+    const nt = a.t + 1;
+    SFX.merge(nt); vibrate(12);
+    addXP(nt >= 3 ? 1 : 0);
+    if (!S.seen[a.c + ':' + nt]) S.seen[a.c + ':' + nt] = 1;
+    if (nt === maxTier(a.c)) once('max_item_chain' + a.c);
+    if (S.stats.merges === 1) once('first_merge');
+    if (S.tut === 1) S.tut = 2;
+    render([to]); save(); return;
+  }
+  S.b[to] = a; S.b[from] = b || null;
+  render(); save();
+}
+function sell(i) {
+  const it = S.b[i]; if (!it || it.g !== undefined) { SFX.err(); return; }
+  const v = Math.max(1, Math.floor(Math.pow(2, it.t) / 2));
+  S.b[i] = null; S.coins += v; SFX.coin();
+  toast(`${t('sold')} ${v} 🪙`); render(); save();
+}
+
+/* ---------------- Rendering ---------------- */
+const boardEl = $('#board'); const cellEls = [];
+for (let i = 0; i < N; i++) { const d = document.createElement('div'); d.className = 'cell'; d.dataset.i = i; boardEl.appendChild(d); cellEls.push(d); }
+let selected = -1;
+
+function wantedSet() {
+  const w = new Set();
+  S.orders.forEach(o => findCells(o).forEach(c => c >= 0 && w.add(c)));
+  return w;
+}
+function render(popCells = []) {
+  tickEnergy();
+  const w = wantedSet();
+  for (let i = 0; i < N; i++) {
+    const it = S.b[i], el = cellEls[i];
+    let cls = 'cell';
+    if (it && it.g !== undefined) cls += ' gen';
+    if (i === selected) cls += ' sel';
+    if (w.has(i)) cls += ' want';
+    if (S.tut === 0 && it && it.g === 0) cls += ' pulse';
+    el.className = cls;
+    el.innerHTML = it ? `<span class="it">${itemEmoji(it)}</span>${it.g === undefined ? `<span class="tier">${it.t + 1}</span>` : ''}` : '';
+  }
+  popCells.forEach(i => { const el = cellEls[i]; el.classList.add('pop'); setTimeout(() => el.classList.remove('pop'), 360); });
+  // top
+  $('#lvlNum').textContent = S.level;
+  $('#xpFill').style.width = Math.min(100, 100 * S.xp / xpNeed(S.level)) + '%';
+  $('#energy').textContent = S.energy;
+  $('#coins').textContent = fmt(S.coins);
+  $('#gems').textContent = fmt(S.gems);
+  renderTimer();
+  // orders
+  const oc = $('#orders');
+  oc.innerHTML = S.orders.map((o, k) => {
+    const cells = findCells(o), ready = cells.every(c => c >= 0);
+    return `<div class="order ${ready ? 'ready' : ''}">
+      <div class="who"><span>${o.who}</span>+${o.xp} XP</div>
+      <div class="req">${o.req.map((r, j) => `<div class="${cells[j] >= 0 ? 'ok' : ''}">${CHAINS[r.c].items[r.t]}</div>`).join('')}</div>
+      <div class="rew">🪙${o.coins}<button data-deliver="${k}" ${ready ? '' : 'disabled'}>${t('deliver')}</button></div></div>`;
+  }).join('');
+  // hint
+  $('#hint').textContent = S.tut === 0 ? t('tut0') : S.tut === 1 ? t('tut1') : S.tut === 2 ? t('tut2') : '';
+  $('#dailyBtn').querySelector('.dot')?.remove();
+  if (S.daily.last !== today()) $('#dailyBtn').insertAdjacentHTML('beforeend', '<i class="dot"></i>');
+  renderInfo();
+}
+function renderTimer() {
+  const m = maxEnergy();
+  if (S.energy >= m) { $('#eTimer').textContent = ''; return; }
+  const left = Math.max(0, CONFIG.energyRegenMs - (Date.now() - S.eTs));
+  const s = Math.ceil(left / 1000);
+  $('#eTimer').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+function renderInfo() {
+  const it = S.b[selected];
+  if (!it) { $('#info').textContent = ''; return; }
+  if (it.g !== undefined) { $('#info').textContent = `${CHAINS[it.g].gen} ${itemName(it)} — ${t('genTap')} ${CHAINS[it.g].items[0]} (${t('cost')})`; return; }
+  const mt = maxTier(it.c);
+  $('#info').textContent = `${itemName(it)} · ${t('tier')} ${it.t + 1}/${mt + 1}` + (it.t < mt ? ` · ${t('next')}: ${CHAINS[it.c].items[it.t + 1]}` : ` · ${t('maxed')}`);
+}
+let toastT;
+function toast(msg) { const el = $('#toast'); el.textContent = msg; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2200); }
+function flyFrom(srcEl, emoji, targetSel) {
+  try {
+    const a = srcEl.getBoundingClientRect(), b = $(targetSel).getBoundingClientRect();
+    const f = document.createElement('div'); f.className = 'fly'; f.textContent = emoji;
+    f.style.left = a.left + a.width / 2 + 'px'; f.style.top = a.top + a.height / 2 + 'px';
+    document.body.appendChild(f);
+    requestAnimationFrame(() => { f.style.left = b.left + 14 + 'px'; f.style.top = b.top + 4 + 'px'; f.style.opacity = '.3'; });
+    setTimeout(() => f.remove(), 650);
+  } catch (e) {}
+}
+
+/* ---------------- Drag & drop ---------------- */
+const ghost = $('#ghost');
+let drag = null;
+function targetAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  if (el.closest('#trash')) return { trash: true };
+  const c = el.closest('.cell'); return c ? { cell: +c.dataset.i } : null;
+}
+let hoverEl = null;
+function setHover(el) { if (hoverEl === el) return; hoverEl && hoverEl.classList.remove('hover'); hoverEl = el; el && el.classList.add('hover'); }
+boardEl.addEventListener('pointerdown', e => {
+  const c = e.target.closest('.cell'); if (!c) return;
+  const i = +c.dataset.i; if (!S.b[i]) { selected = -1; renderInfo(); render(); return; }
+  drag = { i, x: e.clientX, y: e.clientY, moved: false };
+  try { boardEl.setPointerCapture(e.pointerId); } catch (_) {}
+});
+boardEl.addEventListener('pointermove', e => {
+  if (!drag) return;
+  if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 7) {
+    drag.moved = true; ghost.textContent = itemEmoji(S.b[drag.i]); ghost.style.display = 'block';
+    cellEls[drag.i].classList.add('dragging');
+  }
+  if (drag.moved) {
+    ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+    const tg = targetAt(e.clientX, e.clientY);
+    setHover(tg ? (tg.trash ? $('#trash') : cellEls[tg.cell]) : null);
+  }
+});
+function endDrag(e) {
+  if (!drag) return;
+  const d = drag; drag = null;
+  ghost.style.display = 'none'; setHover(null);
+  cellEls[d.i].classList.remove('dragging');
+  if (!d.moved) { // tap
+    const it = S.b[d.i];
+    if (it && it.g !== undefined) spawn(d.i);
+    selected = d.i; render(); return;
+  }
+  const tg = e.type === 'pointercancel' ? null : targetAt(e.clientX, e.clientY);
+  if (!tg) { render(); return; }
+  if (tg.trash) { sell(d.i); selected = -1; return; }
+  selected = tg.cell; dropOn(d.i, tg.cell);
+}
+boardEl.addEventListener('pointerup', endDrag);
+boardEl.addEventListener('pointercancel', endDrag);
+
+$('#orders').addEventListener('click', e => { const b = e.target.closest('[data-deliver]'); if (b) deliver(+b.dataset.deliver); });
+
+/* ---------------- Modals ---------------- */
+function openModal(html) { $('#modalBody').innerHTML = html; $('#modal').hidden = false; }
+function closeModal() { $('#modal').hidden = true; render(); }
+$('#modalClose').onclick = closeModal;
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+function openShop() {
+  if (S.ads.day !== today()) S.ads = { day: today(), n: 0 };
+  const adsLeft = 6 - S.ads.n;
+  const packs = [
+    !S.starter && { sku:'starter_pack', ic:'🎁', name:t('starter'), d:`💎100 + 🪙500 · ${t('oneTime')}`, price:'1,99 €' },
+    { sku:'gems_small', ic:'💎', name:t('gemsS'), d:'💎 60', price:'0,99 €' },
+    { sku:'gems_large', ic:'💰', name:t('gemsM'), d:'💎 400', price:'4,99 €' }
+  ].filter(Boolean);
+  openModal(`<h2>🛒 ${t('shop')}</h2>
+    <div class="row"><div class="ic">📺</div><div class="tx">${t('watchAd')}<small>+25 ⚡ · ${adsLeft} ${t('adsLeft')}</small></div>
+      <button class="btn b" data-act="ad" ${adsLeft <= 0 ? 'disabled' : ''}>${adsLeft > 0 ? t('free') : t('limitAds')}</button></div>
+    <div class="row"><div class="ic">⚡</div><div class="tx">${t('refill')}<small>${maxEnergy()} ⚡</small></div>
+      <button class="btn" data-act="refill">💎 15</button></div>
+    ${packs.map(p => `<div class="row"><div class="ic">${p.ic}</div><div class="tx">${p.name}<small>${p.d}</small></div><button class="btn g" data-buy="${p.sku}">${p.price}</button></div>`).join('')}
+    <h3>${t('collection')}</h3>
+    ${CHAINS.map((c, ci) => `<div class="chain">${c.items.map((e, ti) => `<span class="${S.seen[ci + ':' + ti] || ti === 0 ? '' : 'lock'}">${e}</span>`).join('')}</div>`).join('')}`);
+}
+const GRANTS = { starter_pack: { gems:100, coins:500 }, gems_small: { gems:60 }, gems_large: { gems:400 } };
+async function buy(sku) {
+  const r = await Platform.purchase(sku);
+  if (r === null) { toast(t('onlyApp')); return; }
+  if (!r) { toast(t('purchaseFail')); return; }
+  const g = GRANTS[sku]; S.gems += g.gems || 0; S.coins += g.coins || 0;
+  if (sku === 'starter_pack') S.starter = true;
+  Platform.track('purchase', { sku }); once('first_purchase', { sku });
+  SFX.coin(); toast(t('thanks')); save(); openShop(); render();
+}
+async function watchAd() {
+  if (S.ads.n >= 6) return;
+  const ok = await Platform.showRewarded();
+  if (!ok) { toast(t('adFail')); return; }
+  S.ads.n++; S.energy += 25; Platform.track('ad_rewarded', { placement: 'shop_energy' });
+  SFX.coin(); save(); openShop(); render();
+}
+function refill() {
+  if (S.energy >= maxEnergy()) { toast(t('energyFull')); return; }
+  if (S.gems < 15) { toast(`${t('notEnough')} 💎`); SFX.err(); return; }
+  S.gems -= 15; S.energy = maxEnergy(); S.eTs = Date.now();
+  Platform.track('spend_gems', { what: 'energy', amount: 15 }); SFX.coin(); save(); openShop(); render();
+}
+
+const UPS = [
+  { k:'gen', ic:'⚙️', n:'upGen', d:'upGenD', max:5, cost:l => 80 * Math.pow(2, l) },
+  { k:'bat', ic:'🔋', n:'upBat', d:'upBatD', max:5, cost:l => 150 * Math.pow(2, l) },
+  { k:'slots', ic:'🪑', n:'upSlots', d:'upSlotsD', max:2, cost:l => [600, 2500][l] }
+];
+function openUpgrades() {
+  openModal(`<h2>🔧 ${t('upgrades')}</h2>` + UPS.map(u => {
+    const l = S.up[u.k], maxed = l >= u.max, c = maxed ? 0 : u.cost(l);
+    return `<div class="row"><div class="ic">${u.ic}</div><div class="tx">${t(u.n)} <b>${l}/${u.max}</b><small>${t(u.d)}</small></div>
+      <button class="btn" data-up="${u.k}" ${maxed || S.coins < c ? 'disabled' : ''}>${maxed ? t('max') : '🪙 ' + fmt(c)}</button></div>`;
+  }).join(''));
+}
+function buyUp(k) {
+  const u = UPS.find(x => x.k === k), l = S.up[k];
+  if (l >= u.max) return; const c = u.cost(l);
+  if (S.coins < c) { SFX.err(); return; }
+  S.coins -= c; S.up[k]++;
+  Platform.track('upgrade', { type: k, level: S.up[k] }); once('first_upgrade');
+  if (k === 'slots') fillOrders();
+  SFX.coin(); save(); openUpgrades(); render();
+}
+
+function openDaily() {
+  const claimedToday = S.daily.last === today();
+  const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  const streak = claimedToday ? S.daily.streak : (S.daily.last === y ? S.daily.streak + 1 : 1);
+  const idx = (streak - 1) % 7;
+  openModal(`<h2>🎁 ${t('dailyT')}</h2><div class="days">${DAILY.map((r, i) => {
+    const lbl = r.coins ? `🪙<br>${r.coins}` : r.energy ? `⚡<br>${r.energy}` : `💎<br>${r.gems}`;
+    return `<div class="${i < idx || (claimedToday && i === idx) ? 'done' : ''} ${i === idx ? 'today' : ''}">${t('day')} ${i + 1}<b>${lbl.split('<br>')[0]}</b>${lbl.split('<br>')[1]}</div>`;
+  }).join('')}</div><div class="center"><button class="btn g" data-act="claim" ${claimedToday ? 'disabled' : ''}>${claimedToday ? t('claimed') : t('claim')}</button></div>`);
+}
+function claimDaily() {
+  if (S.daily.last === today()) return;
+  const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  S.daily.streak = S.daily.last === y ? S.daily.streak + 1 : 1;
+  S.daily.last = today();
+  const r = DAILY[(S.daily.streak - 1) % 7];
+  S.coins += r.coins || 0; S.gems += r.gems || 0; S.energy += r.energy || 0;
+  Platform.track('daily_claim', { streak: S.daily.streak });
+  if (S.daily.streak === 7) once('daily_streak_7');
+  SFX.coin(); save(); openDaily(); render();
+}
+
+let resetArm = false;
+function openSettings() {
+  resetArm = false;
+  openModal(`<h2>⚙️ ${t('settings')}</h2>
+    <div class="row"><div class="ic">🔊</div><div class="tx">${t('sound')}</div><button class="btn b" data-act="sound">${S.sound ? t('on') : t('off')}</button></div>
+    <div class="row"><div class="ic">🔒</div><div class="tx">${t('privacy')}<small>privacy.html</small></div><a class="btn b" style="text-decoration:none" href="privacy.html">↗</a></div>
+    <div class="row"><div class="ic">🗑️</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
+    <p class="center" style="color:var(--muted);font-size:12px">Merge Café v${CONFIG.version} · ${osName()}</p>`);
+}
+$('#modalBody').addEventListener('click', e => {
+  const a = e.target.closest('[data-act],[data-buy],[data-up]'); if (!a) return;
+  if (a.dataset.buy) return buy(a.dataset.buy);
+  if (a.dataset.up) return buyUp(a.dataset.up);
+  const act = a.dataset.act;
+  if (act === 'ad') watchAd();
+  else if (act === 'refill') refill();
+  else if (act === 'claim') claimDaily();
+  else if (act === 'sound') { S.sound = !S.sound; save(); openSettings(); }
+  else if (act === 'reset') {
+    if (!resetArm) { resetArm = true; a.textContent = t('resetSure'); return; }
+    S = fresh(); fillOrders(); save(); closeModal();
+  }
+});
+document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
+  ({ shop: openShop, upgrades: openUpgrades, daily: openDaily, settings: openSettings })[b.dataset.open]();
+}));
+$('#resEnergy').onclick = openShop; $('#resGems').onclick = openShop;
+document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+
+window.MC = { close: closeModal, events: () => window.__events || [], state: () => S };
+
+/* ---------------- Boot ---------------- */
+S = load();
+S.stats.sessions++;
+Platform.track('session_start', { level: S.level, n: S.stats.sessions });
+if (S.stats.sessions === 2) once('second_session');
+const daysSince = Math.floor((Date.now() - S.created) / 864e5);
+if (daysSince >= 1) once('retained_d1'); if (daysSince >= 7) once('retained_d7');
+fillOrders(); render(); save();
+Platform.init();
+setInterval(() => { const e = S.energy; tickEnergy(); if (S.energy !== e) render(); else renderTimer(); }, 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+try { if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.endsWith('claude.ai') && !location.hostname.includes('claudeusercontent')) navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+})();
+</script>
+</body>
+</html>

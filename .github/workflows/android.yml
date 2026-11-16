@@ -1,0 +1,78 @@
+name: Android-Build
+
+on:
+  push:
+    branches: [main]
+    paths: ['www/**', 'capacitor.config.json', 'package.json', 'assets/**', 'scripts/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Google-Play-Track (internal, alpha, beta, production)'
+        default: internal
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+      HAS_PLAY: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+      BUILD_NUMBER: ${{ github.run_number }}
+      APPSFLYER_DEV_KEY: ${{ secrets.APPSFLYER_DEV_KEY }}
+      REVENUECAT_ANDROID_KEY: ${{ secrets.REVENUECAT_ANDROID_KEY }}
+      ADMOB_APP_ID_ANDROID: ${{ secrets.ADMOB_APP_ID_ANDROID }}
+      ADMOB_REWARDED_ANDROID: ${{ secrets.ADMOB_REWARDED_ANDROID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+
+      - name: Abhängigkeiten
+        run: npm install
+      - name: Schlüssel einsetzen
+        run: node scripts/inject-config.js
+      - name: Android-Projekt erzeugen
+        run: |
+          npx cap add android
+          npx capacitor-assets generate --android --iconBackgroundColor "#C8553D" --iconBackgroundColorDark "#C8553D" --splashBackgroundColor "#F6EBDD" --splashBackgroundColorDark "#3B2A20"
+          node scripts/patch-android.js
+          npx cap sync android
+
+      - name: Test-APK bauen (zum direkten Installieren)
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: merge-cafe-test-apk-${{ github.run_number }}
+          path: android/app/build/outputs/apk/debug/*.apk
+
+      - name: Store-Datei (.aab) signiert bauen
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
+          npx cap build android \
+            --keystorepath "$RUNNER_TEMP/release.jks" \
+            --keystorepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            --keystorealias "${{ secrets.ANDROID_KEY_ALIAS }}" \
+            --keystorealiaspass "${{ secrets.ANDROID_KEY_PASSWORD }}" \
+            --androidreleasetype AAB
+          ls -la android/app/build/outputs/bundle/release/
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEYSTORE == 'true'
+        with:
+          name: merge-cafe-store-aab-${{ github.run_number }}
+          path: android/app/build/outputs/bundle/release/*.aab
+
+      - name: In Google Play hochladen
+        if: env.HAS_KEYSTORE == 'true' && env.HAS_PLAY == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: io.github.johnqpowers.mergecafe
+          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          track: ${{ github.event.inputs.track || 'internal' }}
+          status: ${{ vars.PLAY_RELEASE_STATUS || 'draft' }}
