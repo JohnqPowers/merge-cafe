@@ -11,7 +11,7 @@ on:
         default: internal
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -50,6 +50,15 @@ jobs:
         with:
           name: merge-cafe-test-apk-${{ github.run_number }}
           path: android/app/build/outputs/apk/debug/*.apk
+      - name: Test-APK als direkten Download veröffentlichen
+        if: github.ref == 'refs/heads/main'
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk merge-cafe-test.apk
+          gh release delete test-apk -y --cleanup-tag || true
+          gh release create test-apk merge-cafe-test.apk --prerelease \
+            --title "Test-APK (Build ${{ github.run_number }})" \
+            --notes "Automatisch gebaut. Zum Testen direkt aufs Handy laden und installieren."
 
       - name: Store-Datei (.aab) signiert bauen
         if: env.HAS_KEYSTORE == 'true'
