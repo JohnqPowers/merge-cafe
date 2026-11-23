@@ -4,7 +4,7 @@ Casual merge game (genre of top Freecash earners such as *Merge Restaurant*). On
 
 ```
 www/            the game (index.html = complete game, PWA files, icons)
-store/          app icon 1024, Play feature graphic, store screenshots
+store/          app icon 512, Play feature graphic, store screenshots
 docs/           LAUNCH_PLAN.md (Almedia), STORE_LISTING.md, EVENTS.md, PRIVACY.md
 package.json    Capacitor + SDKs (AppsFlyer, AdMob, RevenueCat)
 ```

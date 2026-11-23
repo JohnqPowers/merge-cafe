@@ -45,4 +45,4 @@ Download Merge Café and become a café legend!
 - Tags: merge, puzzle, café, casual, entspannt
 - Altersfreigabe: IARC-Fragebogen → erwartet „USK 0 / PEGI 3“ (keine Gewalt; In-App-Käufe und Werbung angeben)
 - Datensicherheit (Play): Geräte-IDs (AppsFlyer, AdMob) für Analyse & Werbung, Kaufverlauf (RevenueCat); keine Weitergabe zum Verkauf
-- Grafiken: `store/app-icon-1024.png` (Play: 512er Version verwenden), `store/feature-graphic-1024x500.png`, Screenshots `store/screenshot-*.png`
+- Grafiken: `store/app-icon-512.png` (Quelle: `assets/icon-only.png`, 1024 px), `store/feature-graphic-1024x500.png`, Screenshots `store/screenshot-*.png`
