@@ -30,7 +30,7 @@ Begründung: Freecash war 2026 zeitweise aus beiden Stores entfernt und ist bish
 | Spiel | HTML5, eine Datei, ohne Engine, offline-fähig | ✅ fertig |
 | Android/iOS | Capacitor-Wrapper | ✅ konfiguriert |
 | Attribution (Pflicht für Almedia) | AppsFlyer-Plugin, Events in `docs/EVENTS.md` | ✅ eingebaut, Dev Key eintragen |
-| Werbung | AdMob Rewarded (Energie +25, max. 6/Tag) | ✅ eingebaut, Test-IDs |
+| Werbung | AdMob Rewarded (Energie +25, max. 6/Tag; dazu freiwillige ×2-Angebote nach Lieferung/Geschenk/Tagesbonus, max. 8/Tag; Vorladen + EU-Einwilligung/UMP) | ✅ eingebaut, Test-IDs; GDPR-Nachricht in der AdMob-Konsole noch einzurichten (Eigentümer) |
 | Käufe | RevenueCat (Starterpaket 1,99 €, 0,99 €, 4,99 €) | ✅ eingebaut, Produkte anlegen |
 | Speicherstand | lokal auf dem Gerät | ✅ |
 | Web | PWA + ZIP für Portale | ✅ |
@@ -51,10 +51,12 @@ Begründung: Freecash war 2026 zeitweise aus beiden Stores entfernt und ist bish
 
 Genau diese Kurve (schnelle Erfolge, dann langer Weg) braucht eine Multi-Reward-Kampagne.
 
-**Roadmap nach Launch (Live-Ops):**
-- v1.1 (Woche 3–4): Cloud-Speicherstand, Push-Erinnerung „Energie voll“
-- v1.2 (Monat 2): 4. Kette (Desserts), Wochen-Event mit Bestenliste
-- v1.3 (Monat 3): Café-Dekoration als Münz-Senke (Meta-Ebene wie *Merge Mansion*)
+**Roadmap (Live-Ops) – Stand 23.11.2026:**
+- ✅ v1.5: „Candy-Glanz“-Design (Symbole statt Emoji im Menü, XP-Ring, 3D-Knöpfe), Start-Ruckler behoben, Diamanten-Erklärung + neue Senke „Zutaten kaufen“, Geschenk-Fach statt Zwangs-Popups, Level-Banner statt Vollbild, neue freiwillige Werbe-Angebote
+- v1.6: Tages-Aufgaben (3 pro Tag mit Truhe) + Glücksrad (1× gratis, Zusatzdrehung per Werbung)
+- v1.7: Sammelalbum (Stadt-Serien, Belohnung pro vollständiger Seite) + Katzen-Garderobe als Diamanten-Senke
+- v1.8: Winterzauber-Event ab 1.12. (Event-Namen vorher in `docs/EVENTS.md` festlegen!) + Push „Energie voll“
+- v1.9: Cloud-Speicherstand, Remote-Config für A/B-Tests (Energiekosten, Werbe-Angebote)
 
 ---
 

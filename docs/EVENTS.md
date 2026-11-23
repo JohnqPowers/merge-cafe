@@ -16,8 +16,15 @@ Alle Events werden über `Platform.track()` an AppsFlyer (und optional Firebase/
 | `first_upgrade` | ja | erstes Upgrade gekauft | – |
 | `daily_streak_7` | ja | 7 Tage Login-Bonus in Folge | Retention-Schritt |
 | `second_session`, `retained_d1`, `retained_d7` | ja | Rückkehr | Retention |
-| `ad_rewarded` | nein | Belohnte Werbung angesehen | ROAS (Werbeumsatz) |
+| `ad_request` (param `placement`) | nein | Spieler tippt ein Werbe-Angebot an (vor der Anzeige) – Annahmequote = `ad_rewarded` ÷ `ad_request` | Analyse |
+| `ad_rewarded` (param `placement`: `shop_energy`, `dbl_order`, `dbl_gift`, `dbl_daily`) | nein | Belohnte Werbung angesehen | ROAS (Werbeumsatz) |
+| `first_ad` | ja | erste belohnte Werbung | Analyse |
+| `spend_gems` (params `what`: `energy`, `order_items`; `amount`) | nein | Diamanten ausgegeben | Analyse |
+| `first_gem_spend` | ja | erste Diamanten-Ausgabe | Analyse |
+| `gift_open` (param `reward`) | nein | Geschenk aus dem Geschenk-Fach geöffnet | Analyse |
 | `purchase` (param `sku`) | nein | In-App-Kauf | ROAS |
 | `first_purchase` | ja | erster Kauf | **Kauf-Schritt** |
 
 Hinweis: Für Umsatz-Events in AppsFlyer zusätzlich `af_revenue` + `af_currency` mitsenden (RevenueCat kann Käufe auch serverseitig an AppsFlyer melden – empfohlen).
+
+Hinweis v1.5.0: Bestehende Event-Namen wurden nicht umbenannt; es kamen nur die Zeilen `ad_request`, `first_ad`, `first_gem_spend` (und neue Parameterwerte) hinzu.
