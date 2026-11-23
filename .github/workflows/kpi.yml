@@ -15,7 +15,7 @@ jobs:
       TOKEN: ${{ secrets.APPSFLYER_API_TOKEN }}
       APP_ID: io.github.johnqpowers.mergecafe
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Berichte der letzten 30 Tage laden
         if: env.TOKEN != ''
         run: |
