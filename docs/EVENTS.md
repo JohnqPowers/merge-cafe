@@ -12,6 +12,7 @@ Alle Events werden über `Platform.track()` an AppsFlyer (und optional Firebase/
 | `level_2`,`level_3`,`level_5`,`level_7`,`level_10`,`level_12`,`level_15`,`level_20`,`level_25`,`level_30`,`level_40`,`level_50` | ja | Level erreicht | **Schritte 2–10** |
 | `orders_10/25/50/100/250/500` | ja | Anzahl gelieferter Aufträge | Alternative Schritte |
 | `max_item_chain0/1/2` | ja | Höchststufe einer Kette | Bonus-Schritt |
+| `world_unlocked` (params `world`, `level`, `stop`) | nein | neue Stadt der Weltreise freigeschaltet (Postkarte) | Analyse – nicht für Almedia-Abrechnung |
 | `first_upgrade` | ja | erstes Upgrade gekauft | – |
 | `daily_streak_7` | ja | 7 Tage Login-Bonus in Folge | Retention-Schritt |
 | `second_session`, `retained_d1`, `retained_d7` | ja | Rückkehr | Retention |
