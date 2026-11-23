@@ -41,7 +41,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .res.bump{animation:bump .35s}
 @keyframes bump{40%{transform:scale(1.18)}}
 #resEnergy,#resGems{cursor:pointer}
-#orders{display:flex;gap:8px;margin:10px 0 6px;overflow-x:auto;scrollbar-width:none;min-height:108px;padding:2px}
+#orders{display:flex;gap:8px;margin:8px 0 4px;overflow-x:auto;scrollbar-width:none;min-height:100px;padding:2px}
 #orders::-webkit-scrollbar{display:none}
 .order{flex:1 0 30%;min-width:104px;background:#fff;border-radius:var(--r);padding:7px;display:flex;flex-direction:column;gap:5px;box-shadow:0 3px 0 rgba(59,42,32,.12);position:relative;transition:transform .25s,opacity .25s}
 .order.ready{box-shadow:inset 0 0 0 3px var(--green),0 3px 0 rgba(59,42,32,.12);animation:readyPulse 1.2s infinite;cursor:pointer}
@@ -58,10 +58,10 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .order .rew{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
 .order button{background:var(--green);color:#fff;border-radius:9px;font-size:12px;font-weight:600;padding:4px 8px}
 .order button:disabled{background:#D8CBBB}
-#hint{min-height:22px;font-size:13px;text-align:center;color:var(--accent);font-weight:500;margin-bottom:4px}
-#boardWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+#hint{min-height:0;font-size:13px;text-align:center;color:var(--accent);font-weight:500;margin-bottom:4px}
+#boardWrap{flex:1;display:flex;align-items:flex-end;justify-content:center;min-height:0;position:relative}
 #board{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--board);padding:6px;border-radius:18px;touch-action:none;
-  width:min(100%, calc((100dvh - 330px) * 7 / 8));aspect-ratio:7/8;box-shadow:inset 0 2px 6px rgba(59,42,32,.15),0 4px 0 rgba(59,42,32,.08)}
+  width:min(100%, calc((100dvh - 455px) * 7 / 8));aspect-ratio:7/8;box-shadow:inset 0 2px 6px rgba(59,42,32,.15),0 4px 0 rgba(59,42,32,.08)}
 .cell{background:var(--cell);border-radius:10px;display:grid;place-items:center;position:relative;container-type:size;transition:transform .12s}
 .cell:nth-child(odd){background:var(--cell2)}
 .cell .it{font-size:min(62cqw,40px);line-height:1;transition:transform .12s;pointer-events:none}
@@ -188,9 +188,88 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 #toast.on{opacity:1}
 #adOverlay{position:fixed;inset:0;background:#111;color:#fff;z-index:75;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:18px}
 #adOverlay[hidden]{display:none}
+/* ---------- Welten ---------- */
+#scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.sc-layer{position:absolute;inset:0;transition:opacity 1.6s ease}
+#scene .sc-layer svg{position:absolute;overflow:visible}
+.sc svg{width:100%;height:100%;display:block}
+#app{position:relative;z-index:1}
+#brand{background:rgba(255,255,255,.82);border-radius:999px;padding:3px 6px 3px 8px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 2px 0 rgba(0,0,0,.06)}
+#brand .ch{background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+#hint:not(:empty),#info:not(:empty){background:rgba(255,255,255,.85);border-radius:12px;padding:3px 10px;width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.order{background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#board{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#bottom>*{background:rgba(255,255,255,.92)}
+.wbanner{position:fixed;left:50%;top:30%;width:92vw;z-index:59;transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:wban 3.2s cubic-bezier(.3,1.4,.5,1) forwards}
+.wbanner b{display:block;font-size:84px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+.wbanner span{display:inline-block;font-size:24px;max-width:88vw;white-space:normal;font-weight:700;color:#FFE27A;-webkit-text-stroke:1.2px #A8432E;text-shadow:0 4px 0 #A8432E,0 8px 20px rgba(0,0,0,.35);background:rgba(40,22,12,.35);padding:6px 18px;border-radius:18px}
+@keyframes wban{0%{opacity:0;transform:translate(-50%,-30%) scale(.4)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}20%{transform:translate(-50%,-50%) scale(1)}82%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%) scale(1)}}
+.worlds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wcard{position:relative;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.1);text-align:left;padding:0;cursor:pointer}
+.wcard .wprev{height:132px;position:relative;overflow:hidden}
+.wcard .wprev svg{position:absolute;left:0;top:0;width:100%;height:auto;aspect-ratio:400/900;transform:translateY(-14.5%)}
+.wcard .wt{padding:6px 10px 8px;font-size:14px;font-weight:600}
+.wcard .wt small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.wcard.locked .wprev{filter:grayscale(1) brightness(.55)}
+.wcard.locked .wprev::after{content:"🔒";position:absolute;inset:0;display:grid;place-items:center;font-size:34px}
+.wcard.on{outline:3px solid var(--accent)}
+.wcard .here{position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;border-radius:999px;font-size:11px;padding:2px 8px;font-weight:600}
+.sp-scene{position:absolute;inset:0;opacity:.9}
+#splash::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 30%,rgba(255,216,184,.35),rgba(122,59,42,.75));z-index:0}
+#splash>*:not(.sp-scene){position:relative;z-index:1}
+#splash .rays{position:absolute;z-index:1}
+/* Szenen-Animationen */
+.sc .a-drift{animation:aDrift var(--dur,60s) linear infinite}
+.sc .a-drift-r{animation:aDriftR var(--dur,60s) linear infinite}
+.sc .a-walk{animation:aDrift var(--dur,28s) linear infinite}
+@keyframes aDrift{from{transform:translateX(-160px)}to{transform:translateX(470px)}}
+@keyframes aDriftR{from{transform:translateX(470px)}to{transform:translateX(-160px)}}
+.sc .a-sway{transform-box:fill-box;transform-origin:50% 100%;animation:aSway var(--dur,4s) ease-in-out infinite alternate}
+@keyframes aSway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.sc .a-swing2{transform-box:fill-box;transform-origin:50% 0;animation:aSway2 3s ease-in-out infinite alternate}
+@keyframes aSway2{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.sc .a-swing{transform-box:view-box;transform-origin:200px 0;animation:aSway2 6s ease-in-out infinite alternate}
+.sc .a-bob{animation:aBob 3.6s ease-in-out infinite}
+@keyframes aBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(5px) rotate(2deg)}}
+.sc .a-tw{animation:aTw var(--dur,2.5s) ease-in-out infinite}
+@keyframes aTw{0%,100%{opacity:1}50%{opacity:.2}}
+.sc .a-glow{animation:aGlow 2.4s ease-in-out infinite alternate}
+@keyframes aGlow{from{opacity:.55}to{opacity:1}}
+.sc .a-flick{animation:aFlick 3.5s infinite}
+@keyframes aFlick{0%,18%,22%,60%,64%,100%{opacity:1}20%,62%{opacity:.35}}
+.sc .a-fall{animation:aFall var(--dur,10s) linear infinite}
+@keyframes aFall{from{transform:translate(0,-40px) rotate(0)}to{transform:translate(var(--dx,40px),940px) rotate(600deg)}}
+.sc .a-up{animation:aUp var(--dur,14s) linear infinite}
+@keyframes aUp{from{transform:translateY(920px);opacity:0}10%{opacity:.9}to{transform:translateY(-40px);opacity:0}}
+.sc .a-rise{animation:aRise 4.2s ease-out infinite}
+@keyframes aRise{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.75}100%{transform:translate(16px,-70px) scale(1.7);opacity:0}}
+.sc .a-wave{animation:aWave var(--dur,6s) linear infinite}
+@keyframes aWave{from{transform:translateX(0)}to{transform:translateX(-80px)}}
+.sc .a-dash{animation:aDash 1.2s linear infinite}
+@keyframes aDash{from{transform:translateX(0)}to{transform:translateX(-40px)}}
+.sc .a-spin{animation:aSpin 40s linear infinite}
+@keyframes aSpin{to{transform:rotate(360deg)}}
+.sc .a-beam{transform-box:view-box;transform-origin:345px 180px;animation:aBeam 7s ease-in-out infinite alternate}
+@keyframes aBeam{from{transform:rotate(-14deg)}to{transform:rotate(22deg)}}
+.sc .a-flap{transform-box:fill-box;transform-origin:50% 100%;animation:aFlap .32s ease-in-out infinite alternate}
+@keyframes aFlap{to{transform:scaleY(-.4)}}
+.sc .a-flapx{transform-box:fill-box;transform-origin:50% 50%;animation:aFlapX .18s ease-in-out infinite alternate}
+@keyframes aFlapX{to{transform:scaleX(.25)}}
+.sc .a-pace{transform-box:fill-box;transform-origin:50% 50%;animation:aPace 16s ease-in-out infinite}
+@keyframes aPace{0%{transform:translateX(0) scaleX(1)}46%{transform:translateX(90px) scaleX(1)}50%{transform:translateX(90px) scaleX(-1)}96%{transform:translateX(0) scaleX(-1)}100%{transform:translateX(0) scaleX(1)}}
+.sc .a-bounce{animation:aBounce .9s cubic-bezier(.3,.6,.6,1) infinite alternate}
+@keyframes aBounce{to{transform:translateY(-28px)}}
+.sc .a-ripple{transform-box:fill-box;transform-origin:50% 50%;animation:aRipple 3s ease-out infinite}
+@keyframes aRipple{from{transform:scale(.5);opacity:.8}to{transform:scale(1.15);opacity:0}}
+.sc .a-floaty{animation:aFloaty 9s ease-in-out infinite alternate}
+@keyframes aFloaty{from{transform:translate(0,10px)}to{transform:translate(30px,-40px)}}
+.sc .a-shoot{opacity:0;animation:aShoot 7.5s ease-in infinite}
+@keyframes aShoot{0%,84%{opacity:0;transform:translate(0,0)}86%{opacity:1}97%{opacity:0;transform:translate(-220px,110px)}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.sc *{animation:none!important}}
 </style>
 </head>
 <body>
+<div id="scene" class="sc"></div>
 <div id="app">
   <div id="brand"><span class="av" id="bAv">🧑‍🍳</span><b id="bCafe">Merge Café</b><span class="rk" id="bRank"></span><span class="ch" id="bChap"></span></div>
   <header id="top">
@@ -219,6 +298,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 <div id="adOverlay" hidden><div>📺</div><div id="adText"></div></div>
 <div id="ghost"></div>
 <div id="splash">
+  <div class="sc sp-scene" id="spScene"></div>
   <div class="rays"></div>
   <div class="sp-logo"><div class="steam"><i></i><i></i><i></i></div>☕</div>
   <h1 class="sp-title" id="spTitle">Merge Café</h1>
@@ -230,14 +310,14 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 
 <script>
 /* =====================================================================
-   Merge Café — v1.1.0
+   Merge Café — v1.2.0
    Single-file HTML5 game. Runs in browsers (web portals, PWA) and inside
    Capacitor (Android/iOS). Native SDKs (AppsFlyer, AdMob, RevenueCat)
    are used automatically when present; web falls back to demo stubs.
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.1.0',
+  version: '1.2.0',
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -281,7 +361,7 @@ const STR = {
     cafeName:'Wie soll dein Café heißen?', cafePh:'Name deines Cafés', pickAv:'Wähle deine Figur', letsGo:'Los geht’s!',
     profile:'Profil & Café', edit:'Ändern', defName:'Chef', defCafe:'Mein Café',
     newFound:'Neu entdeckt!', great:'Super!', gift:'Überraschung!', tapOpen:'Tippe auf das Geschenk!',
-    giftGot:'Du bekommst', chapterNew:'Dein Café zieht um', thanksName:'Danke, {n}!', level:'LEVEL'
+    giftGot:'Du bekommst', chapterNew:'Dein Café zieht um', worlds:'Deine Café-Welten', here:'Du bist hier', fromLv:'ab Level', welcomeW:'Willkommen {w}!', pickWorld:'Tippe auf eine freigespielte Welt, um dorthin umzuziehen.', thanksName:'Danke, {n}!', level:'LEVEL'
   },
   en: {
     shop:'Shop', upgrades:'Upgrades', sell:'Sell', daily:'Bonus', settings:'Options',
@@ -310,7 +390,7 @@ const STR = {
     cafeName:'What should your café be called?', cafePh:'Your café’s name', pickAv:'Pick your character', letsGo:'Let’s go!',
     profile:'Profile & Café', edit:'Edit', defName:'Chef', defCafe:'My Café',
     newFound:'New discovery!', great:'Great!', gift:'Surprise!', tapOpen:'Tap the gift!',
-    giftGot:'You get', chapterNew:'Your café is moving', thanksName:'Thanks, {n}!', level:'LEVEL'
+    giftGot:'You get', chapterNew:'Your café is moving', worlds:'Your café worlds', here:'You are here', fromLv:'from level', welcomeW:'Welcome to the {w}!', pickWorld:'Tap an unlocked world to move your café there.', thanksName:'Thanks, {n}!', level:'LEVEL'
   }
 };
 const t = (k, v = {}) => String(STR[LANG][k] ?? STR.en[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? '');
@@ -330,14 +410,14 @@ const CHAINS = [
     en:['Egg','Fried Egg','Pancakes','Waffles','Sandwich','Salad','Brunch Box'] }
 ];
 const CHAPTERS = [
-  { lv:1,  ic:'🏡', de:'Hinterhof', en:'Backyard', bg1:'#FBF1E3', bg2:'#F3E0C8' },
-  { lv:5,  ic:'🏛️', de:'Altstadt', en:'Old Town', bg1:'#FFEBDD', bg2:'#F5C9AE' },
-  { lv:10, ic:'⚓', de:'Hafen', en:'Harbour', bg1:'#E8F2F6', bg2:'#C6DDE8' },
-  { lv:15, ic:'🌳', de:'Stadtpark', en:'City Park', bg1:'#EDF6E6', bg2:'#CDE5C0' },
-  { lv:20, ic:'🌆', de:'Boulevard', en:'Boulevard', bg1:'#F1EAF8', bg2:'#D8CAEB' },
-  { lv:25, ic:'🏖️', de:'Strandpromenade', en:'Beach Promenade', bg1:'#E6F7F4', bg2:'#F5E3C3' },
-  { lv:30, ic:'🌇', de:'Dachterrasse', en:'Rooftop', bg1:'#FFE9DF', bg2:'#F3C2C8' },
-  { lv:40, ic:'⭐', de:'Sternecafé', en:'Star Café', bg1:'#FFF7DC', bg2:'#F1D98F' }
+  { lv:1,  ic:'🏡', de:'Hinterhof', en:'Backyard', wde:'im Hinterhof', ui:['rgba(201,154,107,.55)','rgba(255,248,238,.86)','rgba(251,241,227,.8)'] },
+  { lv:5,  ic:'🏛️', de:'Altstadt', en:'Old Town', wde:'in der Altstadt', ui:['rgba(120,96,80,.5)','rgba(255,244,232,.86)','rgba(250,236,220,.8)'] },
+  { lv:10, ic:'⚓', de:'Hafen', en:'Harbour', wde:'am Hafen', ui:['rgba(46,98,140,.45)','rgba(240,248,255,.86)','rgba(226,240,250,.8)'] },
+  { lv:15, ic:'🌳', de:'Stadtpark', en:'City Park', wde:'im Stadtpark', ui:['rgba(80,130,70,.42)','rgba(246,255,240,.86)','rgba(234,248,226,.8)'] },
+  { lv:20, ic:'🌆', de:'Boulevard', en:'Boulevard', wde:'auf dem Boulevard', ui:['rgba(25,18,55,.55)','rgba(255,255,255,.88)','rgba(240,236,255,.82)'] },
+  { lv:25, ic:'🏖️', de:'Strandpromenade', en:'Beach Promenade', wde:'an der Strandpromenade', ui:['rgba(210,170,100,.45)','rgba(255,252,240,.88)','rgba(252,244,224,.82)'] },
+  { lv:30, ic:'🌇', de:'Dachterrasse', en:'Rooftop', wde:'auf der Dachterrasse', ui:['rgba(140,60,60,.45)','rgba(255,242,234,.88)','rgba(252,230,222,.82)'] },
+  { lv:40, ic:'⭐', de:'Sternecafé', en:'Star Café', wde:'im Sternecafé', ui:['rgba(15,18,50,.6)','rgba(255,250,235,.9)','rgba(248,240,220,.84)'] }
 ];
 const RANKS = [
   { lv:1, de:'Lehrling', en:'Apprentice' }, { lv:5, de:'Barista', en:'Barista' }, { lv:10, de:'Patissier', en:'Pâtissier' },
@@ -427,7 +507,7 @@ function fresh() {
   return { v:1, b, energy:CONFIG.baseEnergy, eTs:Date.now(), coins:0, gems:10, xp:0, level:1, orders:[],
     up:{ gen:0, bat:0, slots:0 }, tut:0, daily:{ last:'', streak:0 }, ads:{ day:'', n:0 },
     stats:{ merges:0, orders:0, spawns:0, sessions:0 }, seen:{}, sound:true, music:true, vib:true, ev:{}, starter:false,
-    profile:{ name:'', cafe:'', avatar:'🧑‍🍳', done:false }, created:Date.now() };
+    profile:{ name:'', cafe:'', avatar:'🧑‍🍳', done:false }, worldPick:null, created:Date.now() };
 }
 function load() {
   try {
@@ -456,6 +536,224 @@ function spendEnergy(n) {
   if (S.energy >= maxEnergy()) S.eTs = Date.now();
   S.energy -= n; return true;
 }
+
+/* =====================================================================
+   WELTEN — 8 animierte Café-Szenen (reines SVG + CSS-Animationen)
+   ===================================================================== */
+const Scenes = (() => {
+  const G = 330;
+  const rng = s => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let q = Math.imul(s ^ s >>> 15, 1 | s); q = q + Math.imul(q ^ q >>> 7, 61 | q) ^ q; return ((q ^ q >>> 14) >>> 0) / 4294967296; };
+  const f1 = n => n.toFixed(1);
+  const lg = (id, st, h) => `<linearGradient id="${id}" x1="0" y1="0" x2="${h ? 1 : 0}" y2="${h ? 0 : 1}">${st.map(([o, c, a]) => `<stop offset="${o}" stop-color="${c}" stop-opacity="${a ?? 1}"/>`).join('')}</linearGradient>`;
+  const at = (x, y, inner, s = 1) => `<g transform="translate(${f1(x)},${f1(y)}) scale(${s})">${inner}</g>`;
+  const an = (c, inner, st = '') => `<g class="${c}" style="${st}">${inner}</g>`;
+  const cloud = (s = 1, fill = '#fff', op = .9) => `<g transform="scale(${s})" opacity="${op}"><ellipse rx="34" ry="13" fill="${fill}"/><ellipse cx="-15" cy="-8" rx="17" ry="13" fill="${fill}"/><ellipse cx="11" cy="-12" rx="19" ry="15" fill="${fill}"/></g>`;
+  const drift = (y, inner, dur, off, c = 'a-drift') => `<g transform="translate(0,${y})">${an(c, inner, `--dur:${dur}s;animation-delay:-${off}s`)}</g>`;
+  const bird = (col = '#3b3b4f', s = 1) => `<g transform="scale(${s})">${an('a-flap', `<path d="M-9 0Q-4.5-6 0 0Q4.5-6 9 0" stroke="${col}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`)}</g>`;
+  const tw = (R, a = 1.6, b = 3.5) => `--dur:${f1(a + R() * (b - a))}s;animation-delay:-${f1(R() * 4)}s`;
+  function lights(x0, y0, x1, y1, sag, n, cols, R, r = 4.5) {
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + sag * 2;
+    let s = `<path d="M${x0} ${y0}Q${mx} ${my} ${x1} ${y1}" stroke="#4a3a30" stroke-width="1.5" fill="none" opacity=".7"/>`;
+    for (let i = 1; i < n; i++) {
+      const t = i / n, x = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * mx + t * t * x1, y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * my + t * t * y1 + 5, c = cols[i % cols.length];
+      s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r * 2.6}" fill="${c}" opacity=".18"/><circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${c}" class="a-tw" style="${tw(R)}"/>`;
+    }
+    return s;
+  }
+  function fall(n, cols, R, kind = 'leaf') {
+    let s = '';
+    for (let i = 0; i < n; i++) {
+      const dur = 8 + R() * 8, c = cols[Math.floor(R() * cols.length)];
+      const sh = kind === 'leaf' ? `<ellipse rx="6" ry="3" fill="${c}"/>` : kind === 'petal' ? `<ellipse rx="4" ry="2.4" fill="${c}"/>` : `<circle r="2" fill="${c}"/>`;
+      s += `<g transform="translate(${f1(R() * 400)},0)">${an('a-fall', sh, `--dur:${f1(dur)}s;--dx:${Math.round(R() * 140 - 50)}px;animation-delay:-${f1(R() * dur)}s`)}</g>`;
+    }
+    return s;
+  }
+  function stars(n, R, ymax, col = '#fff') {
+    let s = '';
+    for (let i = 0; i < n; i++) s += `<circle cx="${f1(R() * 400)}" cy="${f1(R() * ymax)}" r="${f1(.6 + R() * 1.6)}" fill="${col}" class="a-tw" style="${tw(R, 1.5, 5)}"/>`;
+    return s;
+  }
+  const sparkle = (s = 1, c = '#FFE27A') => `<path transform="scale(${s})" d="M0-8Q0 0 8 0Q0 0 0 8Q0 0-8 0Q0 0 0-8Z" fill="${c}"/>`;
+  const tree = (x, y, s, gs, R) => at(x, y, an('a-sway', `<rect x="-4" y="-40" width="8" height="42" fill="#7a5236"/><circle cy="-58" r="26" fill="${gs[0]}"/><circle cx="-16" cy="-46" r="18" fill="${gs[1]}"/><circle cx="16" cy="-48" r="19" fill="${gs[1]}"/><circle cx="4" cy="-74" r="16" fill="${gs[2]}"/>`, `--dur:${f1(3 + R() * 2)}s`), s);
+  const pot = (x, s, R, leaf = '#5DAA5A') => at(x, G, `<path d="M-14-22H14L10 0H-10Z" fill="#B5603F"/><rect x="-16" y="-26" width="32" height="6" rx="2" fill="#9A4E33"/>` +
+    an('a-sway', `<g transform="translate(0,-26)"><path d="M0 0Q-18-20-14-44Q-4-26 0 0Z" fill="${leaf}"/><path d="M0 0Q16-24 12-48Q2-28 0 0Z" fill="#4C9A4A"/><path d="M0 0Q-2-30 4-56Q8-28 0 0Z" fill="#6BBF66"/></g>`, `--dur:${f1(3 + R() * 2)}s`), s);
+  const lamp = (x, glow = '#FFE6A0') => at(x, G, `<rect x="-2.5" y="-110" width="5" height="110" fill="#2d2a33"/><path d="M-12-118H12L8-104H-8Z" fill="#2d2a33"/><circle cy="-108" r="34" fill="${glow}" opacity=".35" class="a-glow"/><circle cy="-110" r="7" fill="${glow}"/>`);
+  const cat = `<g fill="#3a2e2a"><ellipse cy="-12" rx="16" ry="8"/><circle cx="16" cy="-20" r="7"/><path d="M11-25l2-7 4 5zM18-26l3-7 3 6z"/><path d="M-15-14q-14-4-12-20" stroke="#3a2e2a" stroke-width="3.5" fill="none" stroke-linecap="round"/><rect x="-11" y="-6" width="3" height="6"/><rect x="8" y="-6" width="3" height="6"/></g><circle cx="19" cy="-21" r="1.3" fill="#9CE37D"/>`;
+  const wave = (y, col, w = 2.5, op = .6) => { let d = `M-80 ${y}`; for (let i = 0; i < 14; i++) d += i ? ' t40 0' : ' q20 -7 40 0'; return `<path d="${d}" stroke="${col}" stroke-width="${w}" fill="none" opacity="${op}"/>`; };
+  const waveFill = (y, col, op) => { let d = `M-80 ${y}`; for (let i = 0; i < 14; i++) d += i ? ' t40 0' : ' q20 -6 40 0'; return `<path d="${d} V${y + 40} H-80Z" fill="${col}" opacity="${op}"/>`; };
+  const car = (body, flip) => `<g transform="scale(${flip ? -1 : 1},1)"><rect x="-20" y="-12" width="40" height="11" rx="4" fill="${body}"/><path d="M-11-12l5-8h14l5 8z" fill="${body}"/><path d="M-8-13l3-5h10l3 5z" fill="#9ec7ff" opacity=".7"/><circle cx="-11" cy="0" r="4" fill="#111"/><circle cx="11" cy="0" r="4" fill="#111"/><circle cx="20" cy="-7" r="2.6" fill="#FFF3A6"/><path d="M22-7l40-8v16z" fill="#FFF3A6" opacity=".22"/><circle cx="-20" cy="-7" r="2" fill="#ff4d4d"/></g>`;
+
+  const W = [];
+  /* 0 · Hinterhof — Backsteinmauer, Lichterkette, Katze, Holzdeck */
+  W[0] = (u, R) => `<defs>${lg(u + 's', [[0, '#A9DCF2'], [.34, '#FBEBD6']])}
+    <pattern id="${u}b" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#C46A4E"/><path d="M0 0H40M0 10H40M10 0V10M30 10V20" stroke="#A85640" stroke-width="2"/></pattern>
+    <pattern id="${u}p" width="130" height="26" patternUnits="userSpaceOnUse"><rect width="130" height="26" fill="#CFA171"/><path d="M0 25H130M90 0V25" stroke="#B58757" stroke-width="2"/></pattern></defs>
+    <rect width="400" height="900" fill="url(#${u}s)"/>
+    ${drift(70, cloud(1.2), 70, 10)}${drift(130, cloud(.8, '#fff', .8), 95, 55)}${drift(40, cloud(.9), 80, 32)}
+    ${lights(0, 105, 400, 105, 40, 14, ['#FFE27A', '#FF8FA3', '#8EC5FF', '#7BD389'], R)}
+    <rect y="205" width="400" height="125" fill="url(#${u}b)"/><rect y="198" width="400" height="10" fill="#8E4A36"/>
+    ${[60, 280].map(x => `<rect x="${x}" y="232" width="60" height="58" rx="4" fill="#6b4a35"/><rect x="${x + 5}" y="237" width="50" height="48" fill="#FFE7A3" class="a-glow"/><path d="M${x + 30} 237V285M${x + 5} 261H${x + 55}" stroke="#6b4a35" stroke-width="4"/>`).join('')}
+    ${at(200, 210, an('a-swing2', `<path d="M-14 0V14M14 0V14" stroke="#6b4a35" stroke-width="2"/><rect x="-30" y="14" width="60" height="24" rx="6" fill="#6b4a35"/><text y="31" text-anchor="middle" font-size="13" font-weight="700" font-family="Fredoka,sans-serif" fill="#FFE7A3">CAFÉ</text>`))}
+    ${at(0, 205, an('a-sway', `<circle cx="12" cy="10" r="16" fill="#5DAA5A"/><circle cx="30" cy="28" r="13" fill="#4C9A4A"/><circle cx="10" cy="46" r="15" fill="#6BBF66"/><circle cx="26" cy="70" r="12" fill="#5DAA5A"/><circle cx="8" cy="92" r="13" fill="#4C9A4A"/>`, '--dur:5s'))}
+    ${drift(198, cat, 30, 6, 'a-walk')}
+    ${pot(30, 1, R)}${pot(370, 1.15, R)}
+    <rect y="${G}" width="400" height="570" fill="url(#${u}p)"/>
+    ${fall(6, ['#FFB3C6', '#FFD1DC'], R, 'petal')}`;
+
+  /* 1 · Altstadt — Fachwerkhäuser, Rauch, Tauben, Herbstlaub, Kopfsteinpflaster */
+  W[1] = (u, R) => {
+    let houses = '', x = -12;
+    const cols = ['#F2C7A5', '#E9A77F', '#F6E3C3', '#D98F6C', '#F0D2A0', '#E7B79A'], roofs = ['#8E3B2E', '#A0503A', '#7A3426'];
+    while (x < 410) {
+      const w = 62 + R() * 28, h = 115 + R() * 65, top = G - h, c = cols[Math.floor(R() * cols.length)], rf = roofs[Math.floor(R() * roofs.length)];
+      houses += `<rect x="${f1(x)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="${c}"/>`;
+      houses += `<path d="M${f1(x - 5)} ${f1(top)}L${f1(x + w / 2)} ${f1(top - 40)}L${f1(x + w + 5)} ${f1(top)}Z" fill="${rf}"/>`;
+      if (R() < .6) { const cx = x + w * .7; houses += `<rect x="${f1(cx)}" y="${f1(top - 34)}" width="9" height="20" fill="#6d3a2c"/>`; for (let k = 0; k < 3; k++) houses += `<g transform="translate(${f1(cx + 4)},${f1(top - 36)})">${an('a-rise', `<circle r="6" fill="#fff" opacity=".7"/>`, `animation-delay:-${k * 1.4}s`)}</g>`; }
+      houses += `<path d="M${f1(x)} ${f1(top + h * .45)}H${f1(x + w)}M${f1(x + w * .33)} ${f1(top)}V${f1(top + h * .45)}M${f1(x + w * .66)} ${f1(top)}V${f1(top + h * .45)}M${f1(x)} ${f1(top)}L${f1(x + w * .33)} ${f1(top + h * .45)}M${f1(x + w)} ${f1(top)}L${f1(x + w * .66)} ${f1(top + h * .45)}" stroke="#5B3A29" stroke-width="3.5"/>`;
+      for (let fl = 0; fl < 2; fl++) for (let k = 0; k < 2; k++) {
+        const wx = x + w * (.18 + k * .5), wy = top + 14 + fl * h * .48, lit = R() < .5;
+        houses += `<rect x="${f1(wx)}" y="${f1(wy)}" width="13" height="17" rx="2" fill="${lit ? '#FFE7A3' : '#7b5a48'}" ${lit ? `class="a-tw" style="${tw(R, 5, 11)}"` : ''}/>`;
+      }
+      x += w + 3;
+    }
+    return `<defs>${lg(u + 's', [[0, '#FFC99A'], [.2, '#FFDDB5'], [.36, '#F9EAD5']])}
+      <pattern id="${u}c" width="28" height="16" patternUnits="userSpaceOnUse"><rect width="28" height="16" fill="#8f7b6a"/><rect x="1" y="1" width="12" height="6" rx="3" fill="#A89482"/><rect x="15" y="1" width="12" height="6" rx="3" fill="#B29D8A"/><rect x="-6" y="9" width="12" height="6" rx="3" fill="#B29D8A"/><rect x="8" y="9" width="12" height="6" rx="3" fill="#A89482"/><rect x="22" y="9" width="12" height="6" rx="3" fill="#A89482"/></pattern></defs>
+      <rect width="400" height="900" fill="url(#${u}s)"/>
+      <circle cx="318" cy="110" r="80" fill="#FFE3A8" opacity=".35"/><circle cx="318" cy="110" r="40" fill="#FFE1A0"/>
+      <path d="M60 330V150L80 92L100 150V330Z" fill="#E7B095"/><rect x="72" y="160" width="16" height="22" rx="8" fill="#C98F74"/>
+      ${drift(70, bird('#5a4a48'), 34, 4)}${drift(92, bird('#5a4a48', .8), 40, 21)}${drift(120, bird('#5a4a48', .7), 46, 9)}
+      ${houses}${lamp(32)}${lamp(368)}
+      <rect y="${G}" width="400" height="570" fill="url(#${u}c)"/>
+      ${fall(16, ['#E07A3F', '#F2B33D', '#C8553D', '#D99A3C'], R)}`;
+  };
+
+  /* 2 · Hafen — Meer mit Wellen, Leuchtturm, Segelboot, Möwen, Steg */
+  W[2] = (u, R) => `<defs>${lg(u + 's', [[0, '#86C9EE'], [.33, '#DDF1FA']])}${lg(u + 'w', [[0, '#4A9CCB'], [1, '#235E89']])}${lg(u + 'l', [[0, '#FFF3B0', .75], [1, '#FFF3B0', 0]], true)}
+    <pattern id="${u}p" width="400" height="24" patternUnits="userSpaceOnUse"><rect width="400" height="24" fill="#8C6A4F"/><path d="M0 23H400M70 0V23M230 0V23M340 0V23" stroke="#6E513C" stroke-width="2"/></pattern></defs>
+    <rect width="400" height="900" fill="url(#${u}s)"/>
+    ${drift(60, cloud(1.1), 75, 20)}${drift(120, cloud(.7, '#fff', .8), 100, 70)}
+    <path d="M-10 292Q60 262 130 286Q170 276 210 292Z" fill="#7FAFC2"/>
+    ${drift(284, `<path d="M-16 0H16L12 6H-12Z" fill="#3d4f63"/><rect x="-6" y="-8" width="12" height="8" fill="#e8eef2"/><rect x="-2" y="-14" width="3" height="6" fill="#c0392b"/>`, 150, 40)}
+    <rect y="290" width="400" height="190" fill="url(#${u}w)"/>
+    ${[0, 1, 2, 3, 4].map(k => `<g transform="translate(0,${300 + k * 36})">${an('a-wave', wave(0, '#ffffff', 2.4, .45 - k * .05), `--dur:${5 + k * 1.5}s${k % 2 ? ';animation-direction:reverse' : ''}`)}</g>`).join('')}
+    ${Array.from({ length: 12 }, () => `<rect x="${f1(R() * 400)}" y="${f1(300 + R() * 160)}" width="8" height="2" rx="1" fill="#fff" class="a-tw" style="${tw(R, 1, 3)}"/>`).join('')}
+    ${at(90, 302, an('a-bob', `<path d="M-30 0H30L22 14H-22Z" fill="#B5603F"/><rect x="-1.5" y="-62" width="3" height="62" fill="#5a4636"/><path d="M2-60L30-6H2Z" fill="#fff"/><path d="M-2-50L-24-6H-2Z" fill="#F4E6CF"/><path d="M0-62l12 4-12 4z" fill="#C8553D"/>`))}
+    <ellipse cx="345" cy="302" rx="44" ry="12" fill="#5c6b73"/>
+    <path d="M330 300H360L355 188H335Z" fill="#fff"/><path d="M332 270H358L357 252H333ZM334 230H356L355 212H335Z" fill="#D9463B"/>
+    <rect x="332" y="172" width="26" height="16" fill="#333"/><rect x="336" y="175" width="18" height="10" fill="#FFE9A3" class="a-glow"/><path d="M329 172L345 156L361 172Z" fill="#D9463B"/>
+    ${an('a-beam', `<path d="M345 180L120 140V222Z" fill="url(#${u}l)"/>`)}
+    ${drift(80, bird('#4a5560'), 30, 3)}${drift(105, bird('#4a5560', .8), 38, 17)}${drift(150, bird('#4a5560', .9), 44, 30, 'a-drift-r')}
+    <rect y="472" width="400" height="428" fill="url(#${u}p)"/>
+    ${[20, 120, 280, 380].map(x => `<rect x="${x - 6}" y="455" width="12" height="30" rx="3" fill="#5c4332"/>`).join('')}`;
+
+  /* 3 · Stadtpark — Hügel, wiegende Bäume, Teich mit Ente, Schmetterlinge */
+  W[3] = (u, R) => {
+    const greens = [['#5DAA5A', '#4C9A4A', '#6BBF66'], ['#7BC46A', '#5DAA5A', '#93D07E'], ['#4F9D69', '#3F8A58', '#66B57E']];
+    const fly = (y, c, dur, off) => drift(y, an('a-bob', `<g>${an('a-flapx', `<ellipse cx="-5" rx="6" ry="4" fill="${c}"/><ellipse cx="5" rx="6" ry="4" fill="${c}"/>`)}<rect x="-1" y="-4" width="2" height="8" rx="1" fill="#3a2e2a"/></g>`), dur, off);
+    let flowers = ''; for (let i = 0; i < 36; i++) flowers += `<circle cx="${f1(R() * 400)}" cy="${f1(300 + R() * 60)}" r="${f1(1.5 + R() * 1.8)}" fill="${['#FF8FA3', '#fff', '#FFE27A', '#B39DFF'][i % 4]}"/>`;
+    return `<defs>${lg(u + 's', [[0, '#BDE5FF'], [.34, '#EEF8E6']])}</defs>
+      <rect width="400" height="900" fill="url(#${u}s)"/>
+      ${at(62, 80, `${an('a-spin', Array.from({ length: 10 }, (_, i) => `<rect x="-2" y="-46" width="4" height="12" rx="2" fill="#FFD45A" transform="rotate(${i * 36})"/>`).join(''))}<circle r="26" fill="#FFE07A"/>`)}
+      ${drift(60, cloud(1), 80, 40)}${drift(110, cloud(.75), 95, 5)}
+      <path d="M0 300Q100 236 200 288T400 276V900H0Z" fill="#A8D58E"/>
+      ${tree(110, 280, .8, greens[1], R)}${tree(300, 285, .9, greens[2], R)}
+      <path d="M0 336Q120 300 240 330T400 320V900H0Z" fill="#8CC473"/>
+      ${flowers}
+      ${tree(38, 318, 1.15, greens[0], R)}${tree(368, 322, 1.25, greens[0], R)}
+      <ellipse cx="200" cy="352" rx="88" ry="20" fill="#7EC8E3"/><ellipse cx="200" cy="352" rx="88" ry="20" fill="none" stroke="#fff" stroke-width="2" opacity=".5" class="a-ripple"/>
+      ${at(150, 350, an('a-pace', `<ellipse cx="0" cy="-6" rx="11" ry="7" fill="#fff"/><circle cx="9" cy="-14" r="5" fill="#fff"/><path d="M13-14l6 1-6 2z" fill="#F2A93B"/><circle cx="10" cy="-15" r="1" fill="#222"/>`))}
+      ${fly(250, '#FF8FA3', 28, 3)}${fly(210, '#FFD45A', 34, 18)}${fly(170, '#8EC5FF', 40, 30)}
+      <rect y="360" width="400" height="540" fill="#7DBB64"/>
+      ${Array.from({ length: 8 }, (_, i) => `<rect y="${380 + i * 64}" width="400" height="30" fill="#86C46C" opacity=".6"/>`).join('')}
+      ${fall(7, ['#FFC1D3', '#FFE0EA'], R, 'petal')}`;
+  };
+
+  /* 4 · Boulevard — Nachtstadt, blinkende Fenster, Neon, Autos */
+  W[4] = (u, R) => {
+    let back = '', front = '', x = -10;
+    while (x < 410) {
+      const w = 34 + R() * 32, h = 110 + R() * 120, top = G - h;
+      back += `<rect x="${f1(x)}" y="${f1(top)}" width="${f1(w)}" height="${f1(h)}" fill="#2A2352"/>`;
+      for (let yy = top + 10; yy < G - 14; yy += 16) for (let xx = x + 6; xx < x + w - 8; xx += 11)
+        if (R() < .32) back += `<rect x="${f1(xx)}" y="${f1(yy)}" width="6" height="8" fill="#FFD97A" class="a-tw" style="${tw(R, 4, 12)}"/>`;
+      x += w + 4;
+    }
+    x = -20; while (x < 420) { const w = 50 + R() * 40, h = 40 + R() * 50; front += `<rect x="${f1(x)}" y="${f1(G - h)}" width="${f1(w)}" height="${f1(h)}" fill="#1C1640"/>`; x += w + 30; }
+    return `<defs>${lg(u + 's', [[0, '#110D30'], [.2, '#2A1F5E'], [.36, '#5A3D7C']])}</defs>
+      <rect width="400" height="900" fill="url(#${u}s)"/>${stars(28, R, 190)}
+      <circle cx="318" cy="86" r="58" fill="#FFF1C1" opacity=".12"/><circle cx="318" cy="86" r="26" fill="#FFF1C1"/>
+      ${back}${front}
+      ${at(200, 252, an('a-flick', `<rect x="-54" y="-24" width="108" height="40" rx="10" fill="#FF5FA2" opacity=".14" stroke="#FF5FA2" stroke-width="3"/><text y="8" text-anchor="middle" font-size="24" font-weight="700" font-family="Fredoka,sans-serif" fill="#FFC2DE" stroke="#FF5FA2" stroke-width="1">CAFÉ ☕</text>`))}
+      <rect y="${G}" width="400" height="44" fill="#221C3A"/>
+      <g transform="translate(0,352)">${an('a-dash', `<path d="M-80 0H480" stroke="#FFE27A" stroke-width="3" stroke-dasharray="22 18" opacity=".7"/>`)}</g>
+      ${drift(345, car('#E85D75'), 8, 1)}${drift(345, car('#4FB3E8'), 11, 6)}${drift(366, car('#F2C94C', true), 9, 3, 'a-drift-r')}
+      ${lamp(56, '#FFE6A0')}${lamp(344, '#FFE6A0')}
+      <rect y="${G + 44}" width="400" height="526" fill="#2F2850"/>
+      ${Array.from({ length: 12 }, (_, i) => `<path d="M0 ${G + 70 + i * 40}H400" stroke="#3B3462" stroke-width="2"/>`).join('')}`;
+  };
+
+  /* 5 · Strand — Sonne, Palmen, Wellen, Sonnenschirm, Ball, Krabbe */
+  W[5] = (u, R) => {
+    const palm = (x, y, s, fl) => at(x, y, `<g transform="scale(${fl ? -1 : 1},1)">${an('a-sway', `<path d="M0 0Q-6-60 10-120" stroke="#8B5E3C" stroke-width="10" fill="none" stroke-linecap="round"/>${[-1, 0, 1, 2].map(k => `<path d="M${-4 + k} ${-25 - k * 25}l8-2" stroke="#6E472B" stroke-width="2"/>`).join('')}<g transform="translate(10,-120)">${[-160, -120, -70, -20, 20].map((a, i) => `<path d="M0 0Q30-14 62 6Q30-4 0 0Z" fill="${i % 2 ? '#2E8B3E' : '#3FA34D'}" transform="rotate(${a})"/>`).join('')}<circle r="5" fill="#7a4f2f"/><circle cx="6" cy="4" r="5" fill="#7a4f2f"/></g>`, '--dur:4.5s')}</g>`, s);
+    let dots = ''; for (let i = 0; i < 40; i++) dots += `<circle cx="${f1(R() * 400)}" cy="${f1(345 + R() * 500)}" r="${f1(1 + R() * 1.5)}" fill="#E5C98A"/>`;
+    return `<defs>${lg(u + 's', [[0, '#62CBE4'], [.32, '#FFF0D2']])}${lg(u + 'w', [[0, '#2AA9C4'], [1, '#71DAD9']])}</defs>
+      <rect width="400" height="900" fill="url(#${u}s)"/>
+      ${at(320, 105, `${an('a-spin', Array.from({ length: 12 }, (_, i) => `<path d="M-4-44L0-62L4-44Z" fill="#FFD45A" transform="rotate(${i * 30})"/>`).join(''))}<circle r="34" fill="#FFD24D"/>`)}
+      ${drift(70, cloud(.9), 90, 20)}${drift(150, cloud(.6, '#fff', .8), 110, 70)}
+      <rect y="268" width="400" height="72" fill="url(#${u}w)"/>
+      ${[0, 1].map(k => `<g transform="translate(0,${280 + k * 22})">${an('a-wave', wave(0, '#fff', 2, .55), `--dur:${6 + k * 2}s${k ? ';animation-direction:reverse' : ''}`)}</g>`).join('')}
+      <g transform="translate(0,334)">${an('a-wave', waveFill(0, '#ffffff', .85), '--dur:7s')}</g>
+      <rect y="340" width="400" height="560" fill="#F3DBA4"/>${dots}
+      ${drift(110, bird('#4a5560'), 36, 12)}
+      ${palm(48, 352, 1.2)}${palm(366, 346, 1.05, true)}
+      ${at(255, 345, `<rect x="-1.5" y="-70" width="3" height="70" fill="#6b4a35"/><path d="M-46-62Q0-104 46-62Z" fill="#FF6B6B"/><path d="M-23-82Q-10-92 0-96L0-62H-28Z" fill="#fff"/><path d="M23-82Q10-92 0-96V-62H28Z" fill="#fff" opacity="0"/><path d="M18-86Q30-80 46-62H24Z" fill="#fff"/>`)}
+      ${at(150, 342, an('a-bounce', `<circle cy="-12" r="12" fill="#fff"/><path d="M0-24A12 12 0 0 1 12-12H0Z" fill="#FF6B6B"/><path d="M0 0A12 12 0 0 1-12-12H0Z" fill="#4FB3E8"/><path d="M-12-12A12 12 0 0 1 0-24V-12Z" fill="#FFD45A"/>`))}
+      ${at(300, 372, an('a-pace', `<ellipse cy="-6" rx="10" ry="6" fill="#E85D4A"/><circle cx="-6" cy="-14" r="2" fill="#E85D4A"/><circle cx="6" cy="-14" r="2" fill="#E85D4A"/><path d="M-10-6l-7-6M10-6l7-6M-8-2l-6 4M8-2l6 4" stroke="#E85D4A" stroke-width="2"/>`))}`;
+  };
+
+  /* 6 · Dachterrasse — Sonnenuntergang, Skyline, Heißluftballon, Lichterketten */
+  W[6] = (u, R) => {
+    let sky = '', x = -10;
+    while (x < 410) { const w = 26 + R() * 36, h = 40 + R() * 110; sky += `<rect x="${f1(x)}" y="${f1(G - 30 - h)}" width="${f1(w)}" height="${f1(h)}" fill="#3B2448"/>`; if (R() < .5) sky += `<rect x="${f1(x + w / 2 - 3)}" y="${f1(G - 30 - h + 12)}" width="6" height="8" fill="#FFD97A" class="a-tw" style="${tw(R, 5, 10)}"/>`; x += w + 2; }
+    return `<defs>${lg(u + 's', [[0, '#2B2660'], [.13, '#7B4B8E'], [.25, '#E9806A'], [.34, '#FFC37A']])}
+      <pattern id="${u}t" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#C96B4F"/><path d="M0 0H40V40" stroke="#B05A41" stroke-width="3" fill="none"/></pattern></defs>
+      <rect width="400" height="900" fill="url(#${u}s)"/>${stars(14, R, 80)}
+      <circle cx="200" cy="300" r="120" fill="#FFD98A" opacity=".22"/><circle cx="200" cy="300" r="64" fill="#FFD98A"/>
+      ${at(86, 150, an('a-floaty', `<path d="M-26-10Q-28-48 0-50Q28-48 26-10Q18 12 6 18H-6Q-18 12-26-10Z" fill="#E85D75"/><path d="M-9-49Q-14-20-6 18H6Q14-20 9-49Z" fill="#FFD45A"/><path d="M-6 18L-6 30M6 18L6 30" stroke="#5a4636" stroke-width="1.5"/><rect x="-8" y="30" width="16" height="11" rx="2" fill="#8B5E3C"/>`))}
+      ${drift(120, bird('#3B2448'), 40, 8)}${drift(140, bird('#3B2448', .8), 48, 26)}
+      ${sky}
+      <path d="M300 300V150M300 150m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0" stroke="#3B2448" stroke-width="5" fill="#3B2448"/><circle cx="300" cy="140" r="3" fill="#FF6B6B" class="a-tw" style="--dur:1.5s"/>
+      ${lights(0, 30, 400, 30, 26, 16, ['#FFE27A', '#FFD0A1', '#FFF6C9'], R, 3.5)}
+      ${lights(0, 222, 400, 222, 24, 14, ['#FFE27A', '#FFB7A1', '#FFF6C9'], R, 4)}
+      <rect y="300" width="400" height="6" fill="#4A2E3F"/>${Array.from({ length: 17 }, (_, i) => `<rect x="${i * 25}" y="300" width="4" height="30" fill="#4A2E3F"/>`).join('')}
+      ${pot(26, 1.1, R, '#4C9A4A')}${pot(374, 1, R, '#4C9A4A')}
+      <rect y="${G}" width="400" height="570" fill="url(#${u}t)"/>`;
+  };
+
+  /* 7 · Sternecafé — Sternenhimmel, Sternschnuppen, Kronleuchter, Gold */
+  W[7] = (u, R) => {
+    let sp = ''; for (let i = 0; i < 7; i++) sp += at(R() * 400, 30 + R() * 250, an('a-tw', sparkle(.5 + R() * .7), tw(R, 2, 4)));
+    let gold = ''; for (let i = 0; i < 12; i++) gold += `<g transform="translate(${f1(R() * 400)},0)">${an('a-up', `<circle r="${f1(1.5 + R() * 2)}" fill="#FFD87A" opacity=".8"/>`, `--dur:${f1(10 + R() * 8)}s;animation-delay:-${f1(R() * 18)}s`)}</g>`;
+    const candle = x => `<rect x="${x - 3}" y="132" width="6" height="12" fill="#FFF6E0"/><ellipse cx="${x}" cy="128" rx="3.5" ry="6" fill="#FFC94D" class="a-flick"/><circle cx="${x}" cy="128" r="14" fill="#FFD87A" opacity=".2" class="a-glow"/>`;
+    return `<defs>${lg(u + 's', [[0, '#070B24'], [.22, '#18205A'], [.36, '#2A2F70']])}${lg(u + 'z', [[0, '#fff', 0], [1, '#fff', .9]], true)}${lg(u + 'g', [[0, '#FFE7A3'], [1, '#C9962E']])}
+      <pattern id="${u}m" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#151838"/><path d="M0 60L60 0" stroke="#C9962E" stroke-width="1.2" opacity=".35"/></pattern></defs>
+      <rect width="400" height="900" fill="url(#${u}s)"/>${stars(60, R, 320)}${sp}
+      <circle cx="78" cy="92" r="26" fill="#FFE9A8"/><circle cx="90" cy="84" r="24" fill="#0F1440"/>
+      ${[0, 1].map(k => `<g transform="translate(${330 - k * 140},${50 + k * 40})">${an('a-shoot', `<path d="M0 0L60-22" stroke="url(#${u}z)" stroke-width="2.5" stroke-linecap="round" transform="scale(-1,1)"/>`, `animation-delay:${k * 3.7}s`)}</g>`).join('')}
+      ${an('a-swing', `<path d="M200 0V108" stroke="#C9962E" stroke-width="2"/><ellipse cx="200" cy="118" rx="22" ry="10" fill="url(#${u}g)"/><path d="M178 118Q160 120 160 132M222 118Q240 120 240 132M190 124Q180 128 180 132M210 124Q220 128 220 132" stroke="#C9962E" stroke-width="3" fill="none"/>${candle(160)}${candle(180)}${candle(220)}${candle(240)}<path d="M186 128L200 150L214 128" fill="#FFE7A3" opacity=".8"/>`)}
+      <path d="M0 0H52Q38 120 56 260Q30 300 0 330Z" fill="#6E1530"/><path d="M400 0H348Q362 120 344 260Q370 300 400 330Z" fill="#6E1530"/>
+      <path d="M56 260q-10 8 0 16M344 260q10 8 0 16" stroke="#C9962E" stroke-width="5" fill="none"/>
+      ${gold}
+      <rect y="${G - 4}" width="400" height="5" fill="#C9962E"/><rect y="${G}" width="400" height="570" fill="url(#${u}m)"/>`;
+  };
+
+  let uid = 0;
+  const TOP = ['#A9DCF2', '#FFC99A', '#86C9EE', '#BDE5FF', '#110D30', '#62CBE4', '#2B2660', '#070B24'];
+  const BOT = ['#CFA171', '#8f7b6a', '#8C6A4F', '#7DBB64', '#2F2850', '#F3DBA4', '#C96B4F', '#151838'];
+  return { svg(i) { const u = 'w' + i + 'x' + (++uid);
+    return `<svg viewBox="0 0 400 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect y="-700" width="400" height="702" fill="${TOP[i]}"/><rect y="890" width="400" height="900" fill="${BOT[i]}"/>${W[i](u, rng(1000 + i * 77))}</svg>`; } };
+})();
 
 /* =====================================================================
    SOUND — eigene Synthese: Glöckchen, Pops, Münzen, Fanfaren + Café-Musik
@@ -495,10 +793,10 @@ const Sound = (() => {
     const f = mf(m);
     osc('sine', f, t0, dur, vol, dest); osc('sine', f * 2, t0, dur * .55, vol * .32, dest); osc('triangle', f * 3.01, t0, dur * .28, vol * .1, dest);
   }
-  function noise(t0, dur, vol, hp = 3000, dest) {
+  function noise(t0, dur, vol, hp = 3000, dest, type = 'highpass', att = .005) {
     const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-    src.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = hp;
-    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .005); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    src.buffer = noiseBuf; f.type = type; f.frequency.value = hp;
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + att); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
     src.connect(f); f.connect(g); g.connect(dest || sfxBus); src.start(t0, Math.random() * .5, dur + .05);
   }
   const fx = {
@@ -538,25 +836,45 @@ const Sound = (() => {
     giftOpen() { if (!ok()) return; const t0 = now(); noise(t0, .25, .15, 1500); [79, 84, 88, 91, 96].forEach((m, i) => bell(m, t0 + .05 + i * .06, .2, .7)); },
     intro() { if (!ok()) return; const t0 = now(); [72, 76, 79, 84].forEach((m, i) => bell(m, t0 + i * .09, .18, .6)); osc('sine', 300, t0, .12, .25, null, { glide: 900 }); }
   };
-  /* ---------- Hintergrundmusik: entspannter Café-Groove (96 BPM) ---------- */
-  const CH = [[48, 52, 55, 59], [45, 48, 52, 55], [50, 53, 57, 60], [43, 47, 50, 53]];
-  const MEL = [72, 74, 76, 79, 81, 84];
+  /* ---------- Hintergrundmusik: eigener Groove pro Café-Welt ---------- */
+  const STY = [
+    { bpm:96,  ch:[[48,52,55,59],[45,48,52,55],[50,53,57,60],[43,47,50,53]], mel:[72,74,76,79,81,84], lead:'sine', amb:null },
+    { bpm:104, ch:[[41,45,48,52],[48,52,55,59],[50,53,57,60],[46,50,53,57]], mel:[72,74,76,77,79,81], lead:'triangle', amb:'bell' },
+    { bpm:88,  ch:[[45,48,52,55],[41,45,48,52],[48,52,55,59],[43,47,50,55]], mel:[69,72,74,76,79,81], lead:'sine', amb:'sea' },
+    { bpm:100, ch:[[43,47,50,55],[50,54,57,62],[40,43,47,50],[48,52,55,59]], mel:[74,76,78,79,81,83], lead:'sine', amb:'birds' },
+    { bpm:92,  ch:[[50,53,57,60],[43,47,53,57],[48,52,55,59],[45,49,52,55]], mel:[72,74,75,77,79,82], lead:'square', amb:'city' },
+    { bpm:112, ch:[[48,52,55,60],[41,45,48,53],[43,47,50,55],[41,45,48,53]], mel:[72,74,76,79,81,84], lead:'triangle', pluck:true, amb:'sea' },
+    { bpm:84,  ch:[[51,55,58,62],[48,51,55,58],[53,56,60,63],[46,50,53,56]], mel:[75,77,79,82,84,87], lead:'sine', amb:null },
+    { bpm:76,  ch:[[48,52,55,59],[52,55,59,62],[53,57,60,64],[55,59,62,64]], mel:[76,79,81,83,84,88], lead:'sine', amb:'chimes' }
+  ];
+  let sty = STY[0];
+  function ambient(t) {
+    const a = sty.amb, r = Math.random();
+    if (a === 'sea') { if (r < .55) noise(t, 2.2, .07, 500, musBus, 'lowpass', .9); if (r < .2) { osc('sine', 1500, t + .3, .28, .05, musBus, { glide: 1000 }); osc('sine', 1450, t + .65, .3, .05, musBus, { glide: 950 }); } }
+    else if (a === 'birds') { if (r < .4) for (let k = 0; k < 3; k++) osc('sine', 2400 + Math.random() * 800, t + k * .09, .07, .04, musBus, { glide: 3400 }); }
+    else if (a === 'city') { if (r < .3) noise(t, 1.6, .05, 700, musBus, 'bandpass', .6); }
+    else if (a === 'bell') { if (r < .08) bell(60, t, .07, 3, musBus); }
+    else if (a === 'chimes') { if (r < .45) bell(pick([84, 88, 91, 96]), t, .045, 1.4, musBus); }
+  }
   function schedule() {
     if (!ctx) return;
-    const e = 60 / 96 / 2;
+    const e = 60 / sty.bpm / 2;
     if (nextT < ctx.currentTime) nextT = ctx.currentTime + .05;
     while (nextT < ctx.currentTime + .4) {
-      const bar = Math.floor(step / 8) % 4, s8 = step % 8, ch = CH[bar];
+      const bar = Math.floor(step / 8) % 4, s8 = step % 8, ch = sty.ch[bar], MEL = sty.mel;
       if (s8 === 0 || s8 === 5) osc('sine', mf(ch[0]), nextT, e * 2.2, .3, musBus, { att: .01 });
-      if (s8 === 2 || s8 === 6) ch.slice(1).forEach(m => osc('triangle', mf(m + 12), nextT, e * 1.4, .055, musBus, { att: .01 }));
+      if (s8 === 2 || s8 === 6) ch.slice(1).forEach(m => osc('triangle', mf(m + 12), nextT, e * (sty.pluck ? .7 : 1.4), .055, musBus, { att: .01 }));
       noise(nextT, .03, s8 % 2 ? .035 : .018, 7000, musBus);
+      if (s8 === 0) ambient(nextT);
       if (Math.random() < (s8 % 2 ? .25 : .45)) {
         mel = Math.max(0, Math.min(MEL.length - 1, mel + pick([-2, -1, -1, 0, 1, 1, 2])));
-        const f = mf(MEL[mel]); osc('sine', f, nextT, e * 1.8, .09, musBus); osc('sine', f * 2, nextT, e * .8, .025, musBus);
+        const f = mf(MEL[mel]), lv = sty.lead === 'square' ? .035 : .09;
+        osc(sty.lead, f, nextT, e * (sty.pluck ? .9 : 1.8), lv, musBus); osc('sine', f * 2, nextT, e * .8, .025, musBus);
       }
       nextT += e; step++;
     }
   }
+  function setWorld(i) { sty = STY[i] || STY[0]; }
   function musicOn() {
     if (!ctx || musicTimer) return;
     nextT = ctx.currentTime + .1; musBus.gain.cancelScheduledValues(ctx.currentTime);
@@ -568,7 +886,7 @@ const Sound = (() => {
   function pause() { if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {}); }
   function resume() { if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); }
   function state() { return ctx ? ctx.state : 'none'; }
-  return Object.assign(fx, { unlock, musicOn, musicOff, duck, pause, resume, state });
+  return Object.assign(fx, { unlock, musicOn, musicOff, duck, pause, resume, state, setWorld });
 })();
 function vibrate(p) { if (!S.vib) return; try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
 
@@ -726,7 +1044,7 @@ function onLevelUp(L) {
       <button class="btn g big" id="ovGo" style="margin-top:14px">${t('cont')}</button></div>`;
     ov.hidden = false; Sound.levelUp(); vibrate([20, 40, 20, 40, 60]); rain(140); shake();
     [550, 800, 1050, 1300].forEach((ms, i) => setTimeout(() => Sound.coin(i), ms));
-    $('#ovGo').onclick = () => { Sound.click(); ov.hidden = true; applyChapter(); render(); done(); };
+    $('#ovGo').onclick = () => { Sound.click(); ov.hidden = true; if (chap) S.worldPick = null; save(); applyChapter(true); render(); done(); };
   });
 }
 
@@ -853,9 +1171,44 @@ function showMergeHint() {
 const boardEl = $('#board'); const cellEls = [];
 for (let i = 0; i < N; i++) { const d = document.createElement('div'); d.className = 'cell'; d.dataset.i = i; boardEl.appendChild(d); cellEls.push(d); }
 let selected = -1, lastChapter = null;
-function applyChapter() {
-  const ch = chapterFor(S.level); if (lastChapter === ch) return; lastChapter = ch;
-  const r = document.documentElement.style; r.setProperty('--bg1', ch.bg1); r.setProperty('--bg2', ch.bg2);
+const worldIdx = () => { const cur = CHAPTERS.indexOf(chapterFor(S.level)); return S.worldPick != null && S.worldPick <= cur ? S.worldPick : cur; };
+function applyChapter(animate) {
+  const i = worldIdx(); if (lastChapter === i) return;
+  const first = lastChapter === null; lastChapter = i;
+  const ch = CHAPTERS[i], r = document.documentElement.style;
+  r.setProperty('--board', ch.ui[0]); r.setProperty('--cell', ch.ui[1]); r.setProperty('--cell2', ch.ui[2]);
+  Sound.setWorld(i);
+  const sc = $('#scene'), layer = document.createElement('div');
+  layer.className = 'sc-layer'; layer.innerHTML = Scenes.svg(i);
+  const old = [...sc.children];
+  if (animate && !first) {
+    layer.style.opacity = 0; sc.appendChild(layer);
+    requestAnimationFrame(() => requestAnimationFrame(() => { layer.style.opacity = 1; }));
+    setTimeout(() => old.forEach(o => o.remove()), 1700);
+    worldBanner(ch);
+  } else { old.forEach(o => o.remove()); sc.appendChild(layer); }
+  layoutScene();
+}
+function layoutScene() {
+  const bd = $('#board'); if (!bd) return;
+  const bt = bd.getBoundingClientRect().top, k = Math.max(innerWidth / 400, .75);
+  document.querySelectorAll('#scene .sc-layer svg').forEach(v => {
+    v.style.width = 400 * k + 'px'; v.style.height = 900 * k + 'px';
+    v.style.left = (innerWidth - 400 * k) / 2 + 'px'; v.style.top = (bt + 14 - 330 * k) + 'px';
+  });
+}
+function worldBanner(ch) {
+  const d = document.createElement('div'); d.className = 'wbanner';
+  d.innerHTML = `<b>${ch.ic}</b><span>${esc(t('welcomeW', { w: LANG === 'de' ? ch.wde : ch.en }))}</span>`;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 3300);
+  setTimeout(() => { Sound.discover(); rain(90); }, 250);
+}
+function openWorlds() {
+  const cur = CHAPTERS.indexOf(chapterFor(S.level)), sel = worldIdx();
+  openModal(`<h2>🗺️ ${t('worlds')}</h2><p style="margin:-6px 0 12px;color:var(--muted);font-size:13px">${t('pickWorld')}</p>
+    <div class="worlds">${CHAPTERS.map((c, i) => `<button class="wcard ${i > cur ? 'locked' : ''} ${i === sel ? 'on' : ''}" data-world="${i}">
+      <div class="wprev sc">${Scenes.svg(i)}</div>${i === sel ? `<span class="here">${t('here')}</span>` : ''}
+      <div class="wt">${c.ic} ${c[LANG]}<small>${t('fromLv')} ${c.lv}</small></div></button>`).join('')}</div>`);
 }
 function wantedSet() { const w = new Set(); S.orders.forEach(o => findCells(o).forEach(c => c >= 0 && w.add(c))); return w; }
 function render(popCells = []) {
@@ -879,7 +1232,7 @@ function render(popCells = []) {
   $('#xpFill').style.width = Math.min(100, 100 * S.xp / xpNeed(S.level)) + '%';
   updateCounters();
   renderTimer();
-  const pf = S.profile, ch = chapterFor(S.level);
+  const pf = S.profile, ch = CHAPTERS[worldIdx()];
   $('#bAv').textContent = pf.avatar; $('#bCafe').textContent = pf.cafe || t('defCafe');
   $('#bRank').textContent = '· ' + rankFor(S.level); $('#bChap').textContent = ch.ic + ' ' + ch[LANG];
   $('#orders').innerHTML = S.orders.map((o, k) => {
@@ -930,7 +1283,7 @@ function updateHand() {
   if (b) { const pb = center(b); h.style.setProperty('--x1', pb.x + 'px'); h.style.setProperty('--y1', pb.y + 'px'); if (h.className !== 'drag') h.className = 'drag'; }
   else if (h.className !== 'tap') h.className = 'tap';
 }
-addEventListener('resize', () => { sizeFx(); updateHand(); });
+addEventListener('resize', () => { sizeFx(); updateHand(); layoutScene(); });
 
 /* ---------------- Drag & drop ---------------- */
 const ghost = $('#ghost');
@@ -1089,6 +1442,9 @@ function openSettings() {
     <p class="center" style="color:var(--muted);font-size:12px">Merge Café v${CONFIG.version} · ${osName()}</p>`);
 }
 $('#modalBody').addEventListener('click', e => {
+  const wc = e.target.closest('[data-world]');
+  if (wc) { const i = +wc.dataset.world, cur = CHAPTERS.indexOf(chapterFor(S.level)); if (i > cur) { Sound.bonk(); return; }
+    S.worldPick = i === cur ? null : i; save(); closeModal(); applyChapter(true); return; }
   const a = e.target.closest('[data-act],[data-buy],[data-up]'); if (!a) return;
   if (a.dataset.buy) return buy(a.dataset.buy);
   if (a.dataset.up) return buyUp(a.dataset.up);
@@ -1109,7 +1465,7 @@ document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click'
   ({ shop: openShop, upgrades: openUpgrades, daily: openDaily, settings: openSettings })[b.dataset.open]();
 }));
 $('#resEnergy').onclick = openShop; $('#resGems').onclick = openShop;
-$('#brand').onclick = () => showOnboarding();
+$('#brand').onclick = e => { if (e.target.closest('#bChap')) openWorlds(); else showOnboarding(); };
 document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
 
 /* ---------------- Onboarding / Personalisierung ---------------- */
@@ -1150,7 +1506,8 @@ function showOnboarding() {
 /* ---------------- Splash / Start ---------------- */
 function setupSplash() {
   $('#spTitle').innerHTML = 'Merge Café'.split('').map((c, i) => `<span style="animation-delay:${.3 + i * .06}s,${1.5 + i * .08}s">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
-  const pf = S.profile, ch = chapterFor(S.level);
+  const pf = S.profile, ch = CHAPTERS[worldIdx()];
+  $('#spScene').innerHTML = Scenes.svg(worldIdx());
   $('#spWelcome').innerHTML = pf.done
     ? `${pf.avatar} ${esc(t('welcomeBack', { n: pname() }))}<br><small style="opacity:.85">${esc(pf.cafe || t('defCafe'))} · ${t('level')} ${S.level} · ${ch.ic} ${ch[LANG]}</small>${S.energy >= maxEnergy() && S.stats.sessions > 1 ? `<br><small>${t('energyReady')}</small>` : ''}`
     : t('welcomeNew');
@@ -1174,7 +1531,7 @@ setInterval(() => {
   if (Date.now() - lastAct > 7000) { lastAct = Date.now(); showMergeHint(); }
 }, 1000);
 
-window.MC = { close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state() };
+window.MC = { close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state(), world: L => { S.level = L; S.worldPick = null; applyChapter(true); render(); } };
 
 /* ---------------- Boot ---------------- */
 S = load();
@@ -1186,7 +1543,7 @@ if (daysSince >= 1) once('retained_d1'); if (daysSince >= 7) once('retained_d7')
 tickEnergy();
 Object.assign(shown, { coins: S.coins, gems: S.gems, energy: S.energy });
 $('#coins').textContent = fmt(S.coins); $('#gems').textContent = fmt(S.gems); $('#energy').textContent = S.energy;
-applyChapter(); fillOrders(); render(); save(); setupSplash();
+applyChapter(); fillOrders(); render(); save(); setupSplash(); requestAnimationFrame(layoutScene); setTimeout(layoutScene, 400);
 Platform.init();
 setInterval(() => { const e = S.energy; tickEnergy(); if (S.energy !== e) render(); else renderTimer(); }, 1000);
 try { if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.endsWith('claude.ai') && !location.hostname.includes('claudeusercontent')) navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
