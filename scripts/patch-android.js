@@ -33,8 +33,22 @@ if (!/android:screenOrientation=/.test(m)) {
 // weil inject-config.js dort die Test-Kennung durch die echte ersetzt.
 const dbgDir = 'android/app/src/debug/assets/public';
 fs.mkdirSync(dbgDir, { recursive: true });
-fs.writeFileSync(dbgDir + '/build.json', JSON.stringify({ kind: 'debug', admobRewarded: 'ca-app-pub-3940256099942544/5224354917' }) + '\n');
-console.log('Debug-Paket: Test-Anzeigenblock markiert');
+const dbgInfo = { kind: 'debug', admobRewarded: 'ca-app-pub-3940256099942544/5224354917' };
+// RevenueCat Test Store: Der test_-Schluessel stuerzt in jedem Release-Paket absichtlich ab (Schutz von RevenueCat). Er darf deshalb nur hier,
+// im Debug-Paket, landen – nie in www/index.html und nie in den Store-Paketen. Es werden ausschliesslich test_-Schluessel uebernommen.
+const rcTest = (process.env.REVENUECAT_TEST_KEY || '').trim();
+if (/^test_[A-Za-z0-9]{8,}$/.test(rcTest)) dbgInfo.rcTest = rcTest;
+else if (rcTest) console.warn('WARNUNG: REVENUECAT_TEST_KEY beginnt nicht mit test_ und wird ignoriert');
+fs.writeFileSync(dbgDir + '/build.json', JSON.stringify(dbgInfo) + '\n');
+console.log('Debug-Paket: Test-Anzeigenblock markiert' + (dbgInfo.rcTest ? ', RevenueCat-Test-Store-Schluessel hinterlegt' : ', ohne RevenueCat-Test-Store-Schluessel'));
+// RevenueCat-Oberflaeche (Paywall, Customer Center) braucht mindestens Android 7.0 (API 24). Liegt die Vorgabe des Capacitor-Projekts darunter,
+// bricht der Build mit einem Manifest-Konflikt ab; deshalb hier auf 24 anheben (betrifft weniger als 1 % der Geraete).
+const vars = 'android/variables.gradle';
+if (fs.existsSync(vars)) {
+  const v = fs.readFileSync(vars, 'utf8');
+  const w = v.replace(/(minSdkVersion\s*=\s*)(\d+)/, (a, p, n) => (Number(n) < 24 ? p + '24' : a));
+  if (w !== v) { fs.writeFileSync(vars, w); console.log('minSdkVersion auf 24 angehoben (RevenueCat-Oberflaeche)'); }
+}
 let g = fs.readFileSync(gradle, 'utf8');
 g = g.replace(/versionCode\s+\d+/, `versionCode ${build}`).replace(/versionName\s+"[^"]*"/, `versionName "1.0.${build}"`);
 fs.writeFileSync(gradle, g);
