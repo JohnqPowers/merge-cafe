@@ -125,20 +125,11 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .catc .ch2{left:14px;top:6px;font-size:16px}
 .catc.happy .ch2{animation:ch2 1.2s ease-out}
 @keyframes ch2{0%{opacity:0;transform:translateY(8px) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translateY(-16px) scale(1.2)}}
-/* Mocha mit Bildern (art/cat, Import: scripts/cat_import.py): kleines Bild im Bestellbereich, Sprung/Streicheln in #catFly.
-   Ohne Bilder bleibt die gezeichnete Katze oben. Bewegt wird nur per transform; Treffer nur in der sichtbaren Katze (.cf-hit). */
+/* Mocha mit Bild (art/cat, nur Ruhebilder, Import: scripts/cat_import.py): kleines Bild im Bestellbereich. Ohne Bilder bleibt die gezeichnete Katze oben. */
 .catc .cat-sp{display:none;position:absolute;right:-3px;bottom:22px;width:50px;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .catc.sprite .cat-svg,.catc.sprite .zz{display:none}
 .catc.sprite .cat-sp{display:block}
-.catc.sprite.away .cat-sp{visibility:hidden}
 .catc.sprite.hop .cat-sp{animation:catHop .85s}
-#catFly{position:fixed;inset:0;z-index:42;pointer-events:none;contain:layout paint}
-.cf-box{position:absolute;left:0;top:0;transform-origin:50% 50%;will-change:transform;visibility:hidden}
-.cf-box.on{visibility:visible}
-.cf-img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.cf-hit{position:absolute;border-radius:44%;pointer-events:none;touch-action:none;-webkit-tap-highlight-color:transparent}
-.cf-box.hit .cf-hit{pointer-events:auto}
-.cf-heart{position:absolute;width:30px;height:auto;pointer-events:none;user-select:none;will-change:transform,opacity}
 @media (prefers-reduced-motion:reduce){.cus svg,.cus img,.ey,.cat-svg *,.order.ready .plate button{animation:none!important}}
 #hint{min-height:0;font-size:13px;text-align:center;color:var(--accent);font-weight:500;margin-bottom:4px}
 #boardWrap{flex:1;display:flex;align-items:flex-end;justify-content:center;min-height:0;position:relative}
@@ -482,6 +473,7 @@ svg.ic.l{width:26px;height:26px}
   box-shadow:inset 0 4px 9px rgba(0,0,0,.45),inset 0 -2px 0 rgba(255,255,255,.14)}
 #board::after{content:"";position:absolute;inset:-1.425% -3% -4.63% -3%;z-index:6;pointer-events:none;background:var(--frimg,url(art/frame.webp)) 0 0/100% 100% no-repeat}
 .sc-floor{position:absolute;display:block;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.sc-bg{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0;pointer-events:none;-webkit-user-drag:none;user-select:none}
 .cell,.cell:nth-child(odd){background:var(--hole);border-radius:12px;box-shadow:var(--holesh)}
 .cell:nth-child(even){background:var(--hole2)}
 .cell .it{font-size:min(60cqw,38px);text-shadow:0 2px 2px rgba(60,25,5,.35)}
@@ -838,6 +830,7 @@ img.fx{object-fit:contain}
 <linearGradient id="gdGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9BF08A"/><stop offset="1" stop-color="#34B24C"/></linearGradient>
 <linearGradient id="gdBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DDCFF"/><stop offset="1" stop-color="#3F8DEA"/></linearGradient>
 <linearGradient id="gdPurple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D2B0FF"/><stop offset="1" stop-color="#8657E6"/></linearGradient>
+<linearGradient id="gdKraft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE7BF"/><stop offset="1" stop-color="#E0A862"/></linearGradient>
 <linearGradient id="gdGrey" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F1EE"/><stop offset="1" stop-color="#B9B0A8"/></linearGradient>
 <linearGradient id="gdOrange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD98A"/><stop offset="1" stop-color="#FF9220"/></linearGradient>
 <path id="spk4" d="M0-12Q2-2 12 0Q2 2 0 12Q-2 2-12 0Q-2-2 0-12Z"/>
@@ -849,7 +842,7 @@ img.fx{object-fit:contain}
 <symbol id="i-gift" viewBox="0 0 64 64"><rect x="9" y="28" width="46" height="30" rx="5" fill="url(#gdRed)" stroke="#9E1F3A" stroke-width="3"/><rect x="5" y="20" width="54" height="13" rx="4.5" fill="url(#gdRed)" stroke="#9E1F3A" stroke-width="3"/><rect x="27" y="20" width="10" height="38" fill="#FFD84A" stroke="#C98A00" stroke-width="2.4"/><path d="M32 20C23 5 9 9 15 17C19 22 27 20 32 20Z" fill="#FFD84A" stroke="#C98A00" stroke-width="3" stroke-linejoin="round"/><path d="M32 20C41 5 55 9 49 17C45 22 37 20 32 20Z" fill="#FFD84A" stroke="#C98A00" stroke-width="3" stroke-linejoin="round"/><path d="M13 36V52" stroke="#fff" stroke-width="3" opacity=".5" stroke-linecap="round"/></symbol>
 <symbol id="i-bag" viewBox="0 0 64 64"><path d="M20 26V18A12 12 0 0 1 44 18V26" fill="none" stroke="#1C7A3A" stroke-width="7" stroke-linecap="round"/><path d="M20 26V18A12 12 0 0 1 44 18V26" fill="none" stroke="#C9FFC4" stroke-width="2.6" stroke-linecap="round"/><path d="M11 22H53L57 54Q57.5 60 51 60H13Q6.5 60 7 54Z" fill="url(#gdGreen)" stroke="#1C7A3A" stroke-width="3.4" stroke-linejoin="round"/><path d="M32.0 30.5L34.6 37.4L42.0 37.8L36.2 42.4L38.2 49.5L32.0 45.4L25.8 49.5L27.8 42.4L22.0 37.8L29.4 37.4Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round" opacity=".95"/><path d="M14 30L12.5 50" stroke="#fff" stroke-width="3" opacity=".5" stroke-linecap="round"/></symbol>
 <symbol id="i-tool" viewBox="0 0 64 64"><g transform="translate(4 4) scale(2.2)"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="url(#gdBlue)" stroke="#1F5BB8" stroke-width="1.5" stroke-linejoin="round"/></g><path d="M18 40L9 49" stroke="#fff" stroke-width="3" opacity=".55" stroke-linecap="round"/></symbol>
-<symbol id="i-bin" viewBox="0 0 64 64"><rect x="24" y="5" width="16" height="9" rx="3.5" fill="#B9B0A8" stroke="#5B5149" stroke-width="3"/><path d="M8 17Q8 13 12 13H52Q56 13 56 17V20H8Z" fill="url(#gdGrey)" stroke="#5B5149" stroke-width="3.2" stroke-linejoin="round"/><path d="M13 22H51L48 55Q47.6 60 43 60H21Q16.4 60 16 55Z" fill="url(#gdGrey)" stroke="#5B5149" stroke-width="3.2" stroke-linejoin="round"/><path d="M25 29V51M32 29V51M39 29V51" stroke="#8E847B" stroke-width="3.4" stroke-linecap="round"/><path d="M17 26L19 47" stroke="#fff" stroke-width="3" opacity=".7" stroke-linecap="round"/></symbol>
+<symbol id="i-togo" viewBox="0 0 64 64"><path d="M21 24V15A11 11 0 0 1 43 15V24" fill="none" stroke="#7A4A22" stroke-width="7" stroke-linecap="round"/><path d="M21 24V15A11 11 0 0 1 43 15V24" fill="none" stroke="#FFE7BF" stroke-width="2.6" stroke-linecap="round"/><path d="M11 22H53L57 54Q57.5 60 51 60H13Q6.5 60 7 54Z" fill="url(#gdKraft)" stroke="#7A4A22" stroke-width="3.4" stroke-linejoin="round"/><path d="M21.5 35H42.5L40.4 52Q40 55 37 55H27Q24 55 23.6 52Z" fill="#fff" stroke="#7A4A22" stroke-width="2.6" stroke-linejoin="round"/><path d="M19.5 34H44.5" stroke="#7A4A22" stroke-width="4.2" stroke-linecap="round"/><path d="M22.6 43.5H41.4" stroke="#E5365E" stroke-width="4"/><path d="M14 30L12.5 50" stroke="#fff" stroke-width="3" opacity=".55" stroke-linecap="round"/></symbol>
 <symbol id="i-gear" viewBox="0 0 64 64"><path d="M27.9 10.4L29.1 3.1L34.9 3.1L36.1 10.4L44.4 13.8L50.3 9.5L54.5 13.7L50.2 19.6L53.6 27.9L60.9 29.1L60.9 34.9L53.6 36.1L50.2 44.4L54.5 50.3L50.3 54.5L44.4 50.2L36.1 53.6L34.9 60.9L29.1 60.9L27.9 53.6L19.6 50.2L13.7 54.5L9.5 50.3L13.8 44.4L10.4 36.1L3.1 34.9L3.1 29.1L10.4 27.9L13.8 19.6L9.5 13.7L13.7 9.5L19.6 13.8ZM41 32A9 9 0 1 0 23 32A9 9 0 1 0 41 32Z" fill="url(#gdPurple)" stroke="#4F2A9E" stroke-width="3.2" stroke-linejoin="round" fill-rule="evenodd"/><path d="M17 20A19 19 0 0 1 28 12" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none" opacity=".6"/></symbol>
 <symbol id="i-tv" viewBox="0 0 64 64"><rect x="5" y="10" width="54" height="40" rx="10" fill="url(#gdPurple)" stroke="#4F2A9E" stroke-width="3.4"/><path d="M26 21L44 30L26 39Z" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><path d="M20 57H44" stroke="#4F2A9E" stroke-width="5" stroke-linecap="round"/><path d="M11 18Q13 14 18 14" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity=".6"/></symbol>
 <symbol id="i-heart" viewBox="0 0 64 64"><path d="M32 57C10 41 6 28 6 20C6 12 12 7 19 7C25 7 29 10 32 15C35 10 39 7 45 7C52 7 58 12 58 20C58 28 54 41 32 57Z" fill="url(#gdRed)" stroke="#A81F44" stroke-width="3.4" stroke-linejoin="round"/><path d="M15 18Q17 13 23 13" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none" opacity=".7"/></symbol>
@@ -887,7 +880,7 @@ img.fx{object-fit:contain}
   <nav id="bottom">
     <button data-open="shop" class="shop"><svg><use href="#i-bag"/></svg><span data-t="shop"></span></button>
     <button data-open="upgrades" class="up"><svg><use href="#i-tool"/></svg><span data-t="upgrades"></span></button>
-    <div id="trash"><svg><use href="#i-bin"/></svg><span data-t="sell"></span></div>
+    <div id="trash"><svg><use href="#i-togo"/></svg><span data-t="sell"></span></div>
     <button data-open="daily" id="dailyBtn" class="day"><svg><use href="#i-gift"/></svg><span data-t="daily"></span></button>
     <button data-open="settings" class="set"><svg><use href="#i-gear"/></svg><span data-t="settings"></span></button>
   </nav>
@@ -994,7 +987,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.16',
+  version: '1.5.17',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
@@ -1013,8 +1006,8 @@ const LANG = (navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' 
 
 const STR = {
   de: {
-    shop:'Shop', upgrades:'Ausbau', sell:'Verkaufen', daily:'Bonus', settings:'Optionen',
-    deliver:'Liefern', boardFull:'Brett voll! Verschmelze etwas oder zieh es in den Mülleimer.',
+    shop:'Shop', upgrades:'Ausbau', sell:'Take-away', daily:'Bonus', settings:'Optionen',
+    deliver:'Liefern', boardFull:'Brett voll! Verschmelze etwas oder zieh einen Artikel auf „Take-away“.',
     noEnergy:'Keine Energie! Warte kurz, schau Werbung oder nutze Diamanten.',
     tut0:'Tippe auf die Teekanne 🫖, um Kaffeebohnen zu erzeugen.',
     tut1:'Zieh eine Bohne auf eine gleiche Bohne – zack, Espresso!',
@@ -1025,7 +1018,7 @@ const STR = {
     refill:'Energie auffüllen', watchAd:'Werbung ansehen', adsLeft:'heute noch',
     free:'Gratis', onlyApp:'Käufe sind in der App-Version verfügbar.',
     starter:'Starterpaket', gemsS:'Handvoll Diamanten', gemsM:'Truhe Diamanten', oneTime:'einmalig',
-    notEnough:'Nicht genug', upGen:'Bessere Zutaten', upGenD:'Mehr Chance auf Stufe 2 beim Erzeugen',
+    notEnough:'Nicht genug', upGen:'Bessere Artikel', upGenD:'Chance auf Stufe 2 beim Erzeugen',
     upBat:'Großer Akku', upBatD:'+20 maximale Energie', upSlots:'Mehr Kundschaft', upSlotsD:'+1 Auftragsplatz',
     max:'MAX', dailyT:'Täglicher Bonus', claim:'Abholen', claimed:'Morgen wieder!', day:'Tag',
     sfx:'Soundeffekte', music:'Musik', vib:'Vibration', on:'An', off:'Aus',
@@ -1043,11 +1036,11 @@ const STR = {
     cafeName:'Wie soll dein Café heißen?', cafePh:'Name deines Cafés', pickAv:'Wähle deine Figur', letsGo:'Los geht’s!', entHi:'Willkommen,', entSkip:'Tippen zum Überspringen', entWatch:'Einzug ansehen',
     profile:'Profil & Café', edit:'Ändern', defName:'Chef', defCafe:'Mein Café',
     newFound:'Neu entdeckt!', great:'Super!', gift:'Überraschung!', tapOpen:'Tippe auf das Geschenk!',
-    giftGot:'Du bekommst', catTap:'Mocha schnurrt 💕', catPet:'Streichle Mocha: wisch über sie 💕', nextCity1:'Nur noch 1 Level bis {c}!', nextCityN:'Noch {n} Level bis {c}!', chapterNew:'Dein Café zieht um', worlds:'Deine Weltreise', passport:'Reisepass', pcNew:'Neue Postkarte!', pcTrip:'Station', pcBonus:'Reisebonus', here:'Du bist hier', fromLv:'ab Level', welcomeW:'Willkommen {w}!', pickWorld:'Tippe auf eine bereiste Stadt, um dorthin zurückzukehren.', thanksName:'Danke, {n}!', level:'LEVEL'
+    giftGot:'Du bekommst', catTap:'Mocha schnurrt 💕', nextCity1:'Nur noch 1 Level bis {c}!', nextCityN:'Noch {n} Level bis {c}!', chapterNew:'Dein Café zieht um', worlds:'Deine Weltreise', passport:'Reisepass', pcNew:'Neue Postkarte!', pcTrip:'Station', pcBonus:'Reisebonus', here:'Du bist hier', fromLv:'ab Level', welcomeW:'Willkommen {w}!', pickWorld:'Tippe auf eine bereiste Stadt, um dorthin zurückzukehren.', thanksName:'Danke, {n}!', level:'LEVEL'
   },
   en: {
-    shop:'Shop', upgrades:'Upgrades', sell:'Sell', daily:'Bonus', settings:'Options',
-    deliver:'Serve', boardFull:'Board full! Merge something or drag it to the bin.',
+    shop:'Shop', upgrades:'Upgrades', sell:'Take-away', daily:'Bonus', settings:'Options',
+    deliver:'Serve', boardFull:'Board full! Merge something or drag an item onto “Take-away”.',
     noEnergy:'Out of energy! Wait a bit, watch an ad or use gems.',
     tut0:'Tap the teapot 🫖 to make coffee beans.',
     tut1:'Drag a bean onto a matching bean – boom, espresso!',
@@ -1058,7 +1051,7 @@ const STR = {
     refill:'Refill energy', watchAd:'Watch an ad', adsLeft:'left today',
     free:'Free', onlyApp:'Purchases are available in the app version.',
     starter:'Starter Pack', gemsS:'Handful of Gems', gemsM:'Chest of Gems', oneTime:'one-time',
-    notEnough:'Not enough', upGen:'Better Ingredients', upGenD:'Higher chance of tier 2 when producing',
+    notEnough:'Not enough', upGen:'Better Items', upGenD:'Chance of tier 2 when producing',
     upBat:'Big Battery', upBatD:'+20 max energy', upSlots:'More Customers', upSlotsD:'+1 order slot',
     max:'MAX', dailyT:'Daily Bonus', claim:'Claim', claimed:'Come back tomorrow!', day:'Day',
     sfx:'Sound effects', music:'Music', vib:'Vibration', on:'On', off:'Off',
@@ -1076,7 +1069,7 @@ const STR = {
     cafeName:'What should your café be called?', cafePh:'Your café’s name', pickAv:'Pick your character', letsGo:'Let’s go!', entHi:'Welcome,', entSkip:'Tap to skip', entWatch:'Watch entrance',
     profile:'Profile & Café', edit:'Edit', defName:'Chef', defCafe:'My Café',
     newFound:'New discovery!', great:'Great!', gift:'Surprise!', tapOpen:'Tap the gift!',
-    giftGot:'You get', catTap:'Mocha purrs 💕', catPet:'Pet Mocha: swipe over her 💕', nextCity1:'Just 1 level to {c}!', nextCityN:'Just {n} levels to {c}!', chapterNew:'Your café is moving', worlds:'Your world trip', passport:'Passport', pcNew:'New postcard!', pcTrip:'Stop', pcBonus:'Travel bonus', here:'You are here', fromLv:'from level', welcomeW:'Welcome to {w}!', pickWorld:'Tap a city you have visited to go back there.', thanksName:'Thanks, {n}!', level:'LEVEL'
+    giftGot:'You get', catTap:'Mocha purrs 💕', nextCity1:'Just 1 level to {c}!', nextCityN:'Just {n} levels to {c}!', chapterNew:'Your café is moving', worlds:'Your world trip', passport:'Passport', pcNew:'New postcard!', pcTrip:'Stop', pcBonus:'Travel bonus', here:'You are here', fromLv:'from level', welcomeW:'Welcome to {w}!', pickWorld:'Tap a city you have visited to go back there.', thanksName:'Thanks, {n}!', level:'LEVEL'
   }
 };
 Object.assign(STR.de, {
@@ -1084,12 +1077,12 @@ Object.assign(STR.de, {
   gemsHave:'Du hast', gemsUse:'Dafür sind sie da', gemsEarn:'So bekommst du welche – gratis', gemsBuy:'Diamanten kaufen',
   useRefill:'Energie sofort voll', useRefillD:'Ohne Wartezeit weiterspielen',
   chancesT:'Chancen im Spiel', chGift:'Geschenk (gratis)', chGiftD:'{c} % Münzen · {e} % Energie · {g} % Diamanten',
-  chSpawn:'Zutat erzeugen', chSpawnD:'Stufe 2 mit {p} % Chance, sonst Stufe 1. Mehr mit „Bessere Zutaten“.',
-  useIng:'Fehlende Zutaten kaufen', useIngD:'Tippe auf einen Auftrag, der noch nicht fertig ist',
+  chSpawn:'Artikel erzeugen', chSpawnD:'Stufe 2 mit {p} % Chance, sonst Stufe 1. Mehr mit „Bessere Artikel“.',
+  useIng:'Fehlende Artikel kaufen', useIngD:'Tippe auf einen Auftrag, der noch nicht fertig ist',
   earnLevel:'Level aufsteigen', earnLevelD:'+3, mit höherem Level mehr', earnCity:'Neue Stadt erreichen', earnCityD:'bis zu +15',
   earnDaily:'Täglicher Bonus', earnDailyD:'bis zu +25 am 7. Tag', earnGift:'Geschenke & Entdeckungen', earnGiftD:'immer wieder +1 bis +5',
   gemTip:'Tipp: Tippe oben auf den Diamanten – dort steht, wofür er gut ist.',
-  orderT:'Auftrag', orderP:'Das braucht dein Gast. Was fehlt, kannst du sofort kaufen.', orderOk:'Alles da – tippe auf „Liefern“!', buyIng:'Zutaten kaufen',
+  orderT:'Auftrag', orderP:'Das braucht dein Gast. Was fehlt, kannst du sofort kaufen.', orderOk:'Alles da – tippe auf „Liefern“!', buyIng:'Artikel kaufen',
   onBoard:'liegt bereit', missing:'fehlt', gemsShort:'Zu wenig Diamanten', gemsHint:'Was sind Diamanten?',
   noEnergyT:'Keine Energie', noEnergyP:'Die nächste Energie kommt in {t}.', waitFree:'Warten kostet nichts: alle {m} Min. gibt es 1 Energie.',
   shopFree:'Gratis', shopEnergy:'Energie', adLoading:'Video wird geladen …', adGot:'+25 Energie!',
@@ -1102,12 +1095,12 @@ Object.assign(STR.en, {
   gemsHave:'You have', gemsUse:'What they are for', gemsEarn:'How to get them – for free', gemsBuy:'Buy gems',
   useRefill:'Refill energy instantly', useRefillD:'Keep playing without waiting',
   chancesT:'Odds in the game', chGift:'Gift (free)', chGiftD:'{c}% coins · {e}% energy · {g}% gems',
-  chSpawn:'Producing an ingredient', chSpawnD:'Tier 2 with a {p}% chance, otherwise tier 1. Higher with "Better Ingredients".',
-  useIng:'Buy missing ingredients', useIngD:'Tap an order that is not ready yet',
+  chSpawn:'Producing an item', chSpawnD:'Tier 2 with a {p}% chance, otherwise tier 1. Higher with "Better Items".',
+  useIng:'Buy missing items', useIngD:'Tap an order that is not ready yet',
   earnLevel:'Level up', earnLevelD:'+3, more at higher levels', earnCity:'Reach a new city', earnCityD:'up to +15',
   earnDaily:'Daily bonus', earnDailyD:'up to +25 on day 7', earnGift:'Gifts & discoveries', earnGiftD:'now and then +1 to +5',
   gemTip:'Tip: tap the gem at the top – it shows what gems are for.',
-  orderT:'Order', orderP:'This is what your guest wants. You can buy what is missing right away.', orderOk:'All set – tap “Serve”!', buyIng:'Buy ingredients',
+  orderT:'Order', orderP:'This is what your guest wants. You can buy what is missing right away.', orderOk:'All set – tap “Serve”!', buyIng:'Buy items',
   onBoard:'ready on board', missing:'missing', gemsShort:'Not enough gems', gemsHint:'What are gems?',
   noEnergyT:'Out of energy', noEnergyP:'Next energy in {t}.', waitFree:'Waiting is free: 1 energy every {m} min.',
   shopFree:'Free', shopEnergy:'Energy', adLoading:'Loading video …', adGot:'+25 energy!',
@@ -2014,33 +2007,6 @@ const Sound = (() => {
       nextT += e; step++;
     }
   }
-  /* Schnurren (Katze Mocha): Schleife aus art/cat/purr.wav; lädt das Spiel sie nicht (z. B. file://), schnurrt ein leises Ersatzrauschen.
-     Respektiert die Stummschaltung (ok() = Ton an), weicher Ein- und Ausblender. */
-  let purrBuf = null, purrTried = false, purrN = null;
-  function purrLoad() {
-    if (purrTried || !ctx) return; purrTried = true;
-    try { fetch('art/cat/purr.wav').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => new Promise((res, rej) => ctx.decodeAudioData(b, res, rej))).then(b => { purrBuf = b; }).catch(() => {}); } catch (e) {}
-  }
-  function purr(on, fadeMs = 180) {
-    if (!ctx) return;
-    if (!on) {
-      if (!purrN) return;
-      const n = purrN, t = ctx.currentTime; purrN = null;
-      try { n.g.gain.cancelScheduledValues(t); n.g.gain.setValueAtTime(n.g.gain.value, t); n.g.gain.linearRampToValueAtTime(0, t + fadeMs / 1000); n.stop(t + fadeMs / 1000 + .05); } catch (e) {}
-      return;
-    }
-    if (!ok() || purrN) return;
-    purrLoad();
-    const t = ctx.currentTime, g = ctx.createGain(), src = [];
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.4, t + .12); g.connect(sfxBus);
-    if (purrBuf) { const s = ctx.createBufferSource(); s.buffer = purrBuf; s.loop = true; s.connect(g); s.start(t); src.push(s); }
-    else {   // Ersatz: tiefes Rauschen, mit 24 Hz im Takt gepulst
-      const s = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), am = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-      s.buffer = noiseBuf; s.loop = true; lp.type = 'lowpass'; lp.frequency.value = 240; am.gain.value = .5; lfo.frequency.value = 24; lg.gain.value = .5;
-      lfo.connect(lg); lg.connect(am.gain); s.connect(lp); lp.connect(am); am.connect(g); s.start(t); lfo.start(t); src.push(s, lfo);
-    }
-    purrN = { g, stop: when => src.forEach(s => { try { s.stop(when); } catch (e) {} }) };
-  }
   function setWorld(i) { sty = STY[i] || STY[0]; }
   function musicOn() {
     if (!ctx || musicTimer) return;
@@ -2053,7 +2019,7 @@ const Sound = (() => {
   function pause() { if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {}); }
   function resume() { if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); }
   function state() { return ctx ? ctx.state : 'none'; }
-  return Object.assign(fx, { unlock, init, musicOn, musicOff, duck, pause, resume, state, setWorld, purr });
+  return Object.assign(fx, { unlock, init, musicOn, musicOff, duck, pause, resume, state, setWorld });
 })();
 function vibrate(p) { if (!S.vib) return; try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
 
@@ -2742,6 +2708,7 @@ function spawn(gi) {
   flyItem(itemEmoji(it), fromP, toP, () => {
     incoming.delete(p); const el = cellEls[p]; el.classList.remove('incoming'); el.classList.add('pop'); setTimeout(() => el.classList.remove('pop'), 420);
     Sound.plop(); updateHand();
+    if (it.t > 0 && S.tut >= 3) { burst(toP.x, toP.y, 10, GOLD, 3); floatText(toP.x, toP.y - 24, `${t('tier')} ${it.t + 1}!`); }   // Glückstreffer (Ausbau „Bessere Artikel“): sichtbar machen
   });
   save();
 }
@@ -2811,7 +2778,11 @@ function setFrameArt(i, now) {
   im.src = 'art/' + k + '.webp';
 }
 function buildLayer(i) {
-  const l = document.createElement('div'); l.className = 'sc-layer'; l.innerHTML = Scenes.svg(i);
+  const l = document.createElement('div'); l.className = 'sc-layer';
+  if (ART.has('b' + i)) {            // fertiges Vollbild der Welt (docs/ART_BRIEF.md, Datei b<N>): ersetzt gezeichnete Szene und Boden, eine Quelle für den ganzen Hintergrund
+    const bg = new Image(); bg.className = 'sc-bg'; bg.alt = ''; bg.decoding = 'async'; bg.draggable = false; bg.src = 'art/b' + i + '.webp'; l.appendChild(bg); return l;
+  }
+  l.innerHTML = Scenes.svg(i);
   if (ART.has('f' + i)) { const im = new Image(); im.className = 'sc-floor'; im.alt = ''; im.decoding = 'async'; im.draggable = false; im.src = 'art/f' + i + '.webp'; l.appendChild(im); }   // fertiger Boden (docs/ART_BRIEF.md)
   return l;
 }
@@ -2893,7 +2864,7 @@ function render(popCells = []) {
     if (incoming.has(i)) cls += ' incoming';
     if (S.tut === 0 && it && it.g === 0) cls += ' pulse';
     el.className = cls + (keep.length ? ' ' + keep.join(' ') : '');
-    const html = it ? `<span class="it">${itemEmoji(it)}</span>${it.g === undefined ? `<span class="tier">${it.t + 1}</span>` : ''}` : '';
+    const html = it ? `<span class="it">${itemEmoji(it)}</span>${it.g === undefined && it.t > 0 ? `<span class="tier">${it.t + 1}</span>` : ''}` : '';
     if (el._h !== html) { el._h = html; el.innerHTML = html; }
     if (it && it.g === undefined) { if (el.dataset.t !== String(Math.min(7, it.t))) el.dataset.t = Math.min(7, it.t); } else if (el.dataset.t !== undefined) delete el.dataset.t;
   }
@@ -3037,31 +3008,20 @@ $('#orders').addEventListener('click', e => {
   else if (S.tut >= 3) { Sound.click(); openOrder(idx); }
   else { Sound.bonk(); card.classList.remove('nope'); void card.offsetWidth; card.classList.add('nope'); setTimeout(() => card.classList.remove('nope'), 380); }
 });
-/* ---------------- Katze Mocha: Sprung aufs Brett, Streicheln, Rückkehr ----------------
-   Bilder, Frames und Zeiten: www/art/cat (Import: scripts/cat_import.py schreibt die Tabelle CAT). Das Brett wird nie angefasst:
-   Mocha liegt als eigene Ebene (#catFly) darüber und fängt Berührungen nur in ihrer sichtbaren Trefferfläche ab (.cf-hit).
-   Ablauf: Tippen auf die Katze oben rechts → Sprung per Bézier-Kurve übers Brett (wird dabei größer) → Landung → Streichen mit dem
-   Finger = Schnurren + Herzen → 8 s ohne Streicheln: Rückkehr zum frisch gemessenen Platz oben rechts. Fenster/Werbung/Tab-Wechsel
-   holen sie sofort zurück. Ton nur bei eingeschaltetem Ton (Sound.purr). Ohne Bilder bleibt die gezeichnete Katze mit altem Verhalten. */
-const CAT = /*CAT_DATA*/{"v":1,"w":320,"h":430,"files":["c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13","c14","c15","c16","c17","c18","c19","c20","c21","c22"],"map":[0,1,2,1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,10,19,20,21],"hit":[0.113,0.179,0.919,0.949],"hearts":["h1","h2","h3"],"purr":true,"states":{"IDLE":{"f":[1,2,3,4],"ms":220,"loop":1},"JUMPING":{"f":[5,6,7,8],"ms":110,"loop":0},"LANDING":{"f":[9,10,11,12],"ms":135,"loop":0},"PETTING":{"f":[13,14,15,16,17,18,19,20],"ms":180,"loop":1},"RETURNING":{"f":[21,22,23,24],"ms":120,"loop":0}},"idleReturnMs":8000,"fadeOutMs":180}/*END_CAT_DATA*/;
+/* ---------------- Katze Mocha: kleines Ruhebild im Bestellbereich ----------------
+   Seit 1.5.17 ohne Sprung aufs Brett und ohne Streicheln (Rückmeldung des Eigentümers: Mocha blieb nach dem Streicheln auf dem Brett
+   stehen; die 22 Bilder samt Schnurr-Ton kosteten Arbeitsspeicher). Geladen werden nur die Ruhebilder aus www/art/cat (Tabelle CAT,
+   geschrieben von scripts/cat_import.py). Ohne Bilder bleibt die gezeichnete Katze (SVG). Antippen: Miau, Freude, kurzer Hinweis. */
+const CAT = /*CAT_DATA*/{"v":2,"w":320,"h":430,"files":["c01","c02","c03"],"map":[0,1,2,1],"states":{"IDLE":{"f":[1,2,3,4],"ms":220,"loop":1}}}/*END_CAT_DATA*/;
 const CatFx = (() => {
-  const OFF = { get on() { return false; }, get away() { return false; }, init() {}, launch: () => false, abort() {}, mode: () => 'off' };
+  const OFF = { get on() { return false; }, init() {}, abort() {}, mode: () => 'off' };
   const C = CAT; if (!C || !C.files || !C.states) return OFF;
-  const IDLE = C.states.IDLE, JUMP = C.states.JUMPING, LAND = C.states.LANDING, PET = C.states.PETTING, BACK = C.states.RETURNING;
-  const FLY = 720, FLYBACK = 680, imgs = [];
-  let mode = 'off', layer, box, big, hitEl, homeEl, bw = 0, bh = 0, cx = 0, cy = 0;
-  let vw0 = 0, vh0 = 0, idleT = 0, idleI = 0, stepT = 0, retT = 0, raf = 0, petDown = false, petLast = 0, petDist = 0, petI = 0, px = 0, py = 0, heartT = 0, heartN = 0;
+  const IDLE = C.states.IDLE, imgs = [];
+  let mode = 'off', homeEl, idleT = 0, idleI = 0;
   const pre = k => { const f = C.map[k - 1]; if (f === undefined) return null; if (!imgs[f]) { const i = new Image(); i.src = 'art/cat/' + C.files[f] + '.webp'; imgs[f] = i; } return imgs[f]; };
   const loaded = k => { const i = pre(k); return !!i && i.complete && i.naturalWidth > 0; };
   const show = (el, k) => { if (!el || el._k === k || !loaded(k)) return; el._k = k; el.src = pre(k).src; };
-  const easeIO = p => p < .5 ? 2 * p * p : 1 - Math.pow(2 - 2 * p, 2) / 2, easeOut = p => 1 - (1 - p) * (1 - p);
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const bez = (a, c, b, t) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * c + t * t * b;
-  const place = (x, y, s) => { cx = x; cy = y; box.style.transform = `translate3d(${(x - bw / 2).toFixed(1)}px,${(y - bh / 2).toFixed(1)}px,0) scale(${s.toFixed(4)})`; };
-  const lastLand = () => LAND.f[LAND.f.length - 1];
-  const canGo = () => started && S.tut >= 3 && !drag && $('#modal').hidden && $('#ov').hidden && $('#adOverlay').hidden && !oBusy && !document.hidden;
-
-  /* Daheim: kleines Bild im Bestellbereich, vier Frames im Kreis (ruht per Calm.quiet wie alle Endlos-Animationen) */
+  /* Ruhebild: vier Frames im Kreis (ruht per Calm.quiet wie alle Endlos-Animationen) */
   function idleLoop() {
     clearTimeout(idleT); idleT = setTimeout(idleLoop, IDLE.ms);
     if (mode !== 'home' || document.hidden || Calm.quiet()) return;
@@ -3075,126 +3035,13 @@ const CatFx = (() => {
       homeEl = document.createElement('img'); homeEl.className = 'cat-sp'; homeEl.alt = ''; homeEl.draggable = false;
       c.appendChild(homeEl); show(homeEl, IDLE.f[0]); c.classList.add('sprite'); mode = 'home';
       IDLE.f.forEach(pre); idleLoop();
-      setTimeout(() => { for (let k = 1; k <= C.map.length; k++) pre(k); }, 1500);          // den Rest laden, wenn das Spiel läuft
     };
     if (first.decode) first.decode().then(go, () => {}); else first.onload = go;
   }
-  function build() {
-    if (layer) return;
-    layer = document.createElement('div'); layer.id = 'catFly'; layer.setAttribute('aria-hidden', 'true');
-    box = document.createElement('div'); box.className = 'cf-box';
-    big = document.createElement('img'); big.className = 'cf-img'; big.alt = ''; big.draggable = false;
-    hitEl = document.createElement('div'); hitEl.className = 'cf-hit';
-    box.append(big, hitEl); layer.appendChild(box); document.body.appendChild(layer);
-    hitEl.addEventListener('pointerdown', onDown); hitEl.addEventListener('pointermove', onMove);
-    hitEl.addEventListener('pointerup', onUp); hitEl.addEventListener('pointercancel', onUp);
-  }
-  /* Flug auf einer Bézier-Kurve (Start, Ziel, Bogen nach oben); Größe und Frames laufen mit. Nur transform, kein left/top. */
-  function flight(a, b, ms, st, ease, then) {
-    const t0 = performance.now(), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - 110;
-    cancelAnimationFrame(raf);
-    const step = now => {
-      const p = clamp((now - t0) / ms, 0, 1), e = ease(p);
-      place(bez(a.x, mx, b.x, e), bez(a.y, my, b.y, e), a.s + (b.s - a.s) * e);
-      show(big, st.f[Math.min(st.f.length - 1, Math.floor((now - t0) / st.ms))]);
-      if (p < 1) raf = requestAnimationFrame(step); else then();
-    };
-    raf = requestAnimationFrame(step);
-  }
-  function launch() {
-    if (mode !== 'home' || !canGo()) return false;
-    build();
-    const hc = homeEl.getBoundingClientRect(), bd = $('#board').getBoundingClientRect();
-    if (!hc.width || !bd.width) return false;
-    bw = Math.round(clamp(bd.width * .45, 110, 176)); bh = Math.round(bw * C.h / C.w);
-    box.style.width = bw + 'px'; box.style.height = bh + 'px';
-    const h = C.hit; hitEl.style.cssText = `left:${h[0] * 100}%;top:${h[1] * 100}%;width:${(h[2] - h[0]) * 100}%;height:${(h[3] - h[1]) * 100}%`;
-    const a = { x: hc.left + hc.width / 2, y: hc.top + hc.height / 2, s: hc.width / bw };
-    const b = { x: clamp(bd.left + bd.width / 2, bw / 2 + 6, innerWidth - bw / 2 - 6), y: clamp(bd.top + bd.height * .36, bh / 2 + 70, innerHeight - bh / 2 - 90), s: 1 };
-    mode = 'jump'; lastAct = Date.now(); petDown = false; idleI = 0; vw0 = innerWidth; vh0 = innerHeight;
-    $('#cat').classList.add('away'); box.classList.remove('hit'); box.classList.add('on'); big._k = 0;
-    show(big, JUMP.f[0]); place(a.x, a.y, a.s);
-    Sound.unlock(); Sound.meow(); vibrate(10);
-    flight(a, b, FLY, JUMP, easeOut, land);
-    return true;
-  }
-  function land() {
-    mode = 'land'; Sound.plop(); vibrate(14);
-    burst(cx, cy + bh * .4, 12, GOLD, 4);
-    let i = 0; clearTimeout(stepT);
-    const next = () => { show(big, LAND.f[i]); if (++i < LAND.f.length) stepT = setTimeout(next, LAND.ms); else stepT = setTimeout(sit, LAND.ms); };
-    next();
-  }
-  function sit() {
-    mode = 'sit'; show(big, lastLand()); box.classList.add('hit'); arm();
-    if ((S.stats.catHint | 0) < 2) { S.stats.catHint = (S.stats.catHint | 0) + 1; toast(t('catPet')); save(); }
-  }
-  const arm = () => { clearTimeout(retT); retT = setTimeout(back, C.idleReturnMs || 8000); };
-  /* Streicheln: Wischen über die sichtbare Katze (Zeiger gefangen, gezählt wird nur Bewegung innerhalb der Trefferfläche) */
-  const inside = (x, y) => { const r = hitEl.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
-  function onDown(e) {
-    if (mode !== 'sit' && mode !== 'pet') return;
-    petDown = true; px = e.clientX; py = e.clientY; petDist = 0; clearTimeout(retT); lastAct = Date.now();
-    try { hitEl.setPointerCapture(e.pointerId); } catch (_) {}
-    e.preventDefault();
-  }
-  function onMove(e) {
-    if (!petDown || (mode !== 'sit' && mode !== 'pet')) return;
-    const d = Math.hypot(e.clientX - px, e.clientY - py); px = e.clientX; py = e.clientY;
-    if (d < .5) return;
-    petDist += d; lastAct = Date.now();
-    if (inside(e.clientX, e.clientY)) { petLast = performance.now(); if (petDist > 10 && mode === 'sit') startPet(); }
-  }
-  function onUp(e) {
-    if (!petDown) return; petDown = false;
-    try { hitEl.releasePointerCapture(e.pointerId); } catch (_) {}
-    if (petDist <= 10 && mode === 'sit') { petLast = performance.now(); startPet(); }          // einfaches Tippen = kurzes Streicheln
-    if (mode === 'sit') arm();
-  }
-  function startPet() {
-    mode = 'pet'; petI = 0; clearTimeout(retT); Sound.purr(true, C.fadeOutMs); heart(); heartT = performance.now(); petStep();
-  }
-  function petStep() {
-    clearTimeout(stepT); if (mode !== 'pet') return;
-    const now = performance.now();
-    if (now - petLast > (petDown ? 600 : 380)) { endPet(); return; }                           // nur solange wirklich gestreichelt wird
-    show(big, PET.f[petI++ % PET.f.length]);
-    if (now - heartT > 650) { heart(); heartT = now; }
-    stepT = setTimeout(petStep, PET.ms);
-  }
-  function endPet() { if (mode !== 'pet') return; Sound.purr(false, C.fadeOutMs); mode = 'sit'; show(big, lastLand()); arm(); }
-  function heart() {
-    if (!C.hearts || !C.hearts.length || !layer) return;
-    const el = document.createElement('img'); el.className = 'cf-heart'; el.alt = ''; el.draggable = false;
-    el.src = 'art/cat/' + C.hearts[heartN++ % C.hearts.length] + '.webp';
-    el.style.left = (cx + (Math.random() - .5) * bw * .55).toFixed(0) + 'px'; el.style.top = (cy - bh * .34 + Math.random() * 16).toFixed(0) + 'px';
-    layer.appendChild(el);
-    const dy = 56 + Math.random() * 26, an = el.animate([{ transform: 'translate(-50%,-50%) scale(.5)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .22 }, { transform: `translate(-50%,calc(-50% - ${dy.toFixed(0)}px)) scale(1.12)`, opacity: 0 }], { duration: 1150, easing: 'ease-out' });
-    an.onfinish = an.oncancel = () => el.remove();
-  }
-  function back() {
-    if (mode !== 'sit' && mode !== 'pet') return;
-    if (mode === 'pet') Sound.purr(false, C.fadeOutMs);
-    clearTimeout(stepT); clearTimeout(retT); petDown = false; mode = 'back'; box.classList.remove('hit');
-    const hc = homeEl.getBoundingClientRect();                                                    // Ursprung frisch messen: das Layout kann sich verschoben haben
-    if (!hc.width) { finish(); return; }
-    flight({ x: cx, y: cy, s: 1 }, { x: hc.left + hc.width / 2, y: hc.top + hc.height / 2, s: hc.width / bw }, FLYBACK, BACK, easeIO, finish);
-  }
-  function finish() {
-    cancelAnimationFrame(raf); clearTimeout(stepT); clearTimeout(retT); petDown = false; Sound.purr(false, 120);
-    if (box) { box.classList.remove('on', 'hit'); box.style.transform = ''; }
-    const c = $('#cat'); if (c) c.classList.remove('away');
-    if (homeEl) { show(homeEl, IDLE.f[0]); idleI = 0; }
-    if (mode !== 'off') mode = 'home';
-  }
-  const abort = () => { if (mode !== 'off' && mode !== 'home') finish(); };
-  document.addEventListener('visibilitychange', () => { if (document.hidden) abort(); });
-  addEventListener('resize', () => { if (Math.abs(innerWidth - vw0) > 40 || Math.abs(innerHeight - vh0) > 160) abort(); }); addEventListener('orientationchange', abort);
-  return { get on() { return mode !== 'off'; }, get away() { return mode !== 'off' && mode !== 'home'; }, init, launch, abort, mode: () => mode };
+  return { get on() { return mode !== 'off'; }, init, abort() {}, mode: () => mode };
 })();
 $('#cat').addEventListener('click', () => {
   lastAct = Date.now();
-  if (CatFx.launch() || CatFx.away) return;                                                       // Mocha ist unterwegs: Tipp auf den leeren Platz bleibt still
   Sound.meow(); catReact('happy', 1600); toast(t('catTap')); vibrate(12);
 });
 setInterval(() => { const c = $('#cat'); if (c) c.classList.toggle('sleep', started && Date.now() - lastAct > 25000); }, 2000);
@@ -3211,7 +3058,8 @@ const PRO_GEMS = 5;                                            // Pro: Diamanten
 function adState() { if (S.ads.day !== today()) S.ads = { day: today(), n: 0, d: 0 }; S.ads.d = S.ads.d | 0; return S.ads; }
 const wishCost = tr => Math.max(2, Math.ceil(Math.pow(2, tr) * .35));
 const GIFT_P = { coins: .40, energy: .35 };                    // Geschenk-Inhalt: Rest (25 %) sind Diamanten; die Chancen-Anzeige in „Was sind Diamanten?“ liest dieselben Werte
-const spawnChance = () => .1 + .05 * S.up.gen;                 // Chance auf Stufe 2 beim Erzeugen (Ausbau „Bessere Zutaten“ +5 % je Stufe)
+const chanceAt = l => .1 + .05 * l;                            // Chance auf Stufe 2 beim Erzeugen (Ausbau „Bessere Artikel“ +5 % je Stufe)
+const spawnChance = () => chanceAt(S.up.gen);
 const pct = x => Math.round(x * 100);
 const regenTxt = () => { const s = String(Math.round(CONFIG.energyRegenMs / 6000) / 10); return LANG === 'de' ? s.replace('.', ',') : s; };
 const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -3428,7 +3276,8 @@ const UPS = [
 function openUpgrades() {
   openModal(`<h2>${ic('tool')}${t('upgrades')}</h2>` + UPS.map(u => {
     const l = S.up[u.k], maxed = l >= u.max, c = maxed ? 0 : u.cost(l);
-    return `<div class="row"><div class="mi">${ic(u.ic)}</div><div class="tx">${t(u.n)}<span class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span><small>${t(u.d)}</small></div>
+    const pc = LANG === 'de' ? ' %' : '%', desc = u.k === 'gen' ? `${t(u.d)}: ${pct(chanceAt(l))}${pc}` + (maxed ? '' : ` → ${pct(chanceAt(l + 1))}${pc}`) : t(u.d);   // Ausbau Artikel: aktuelle und nächste Chance direkt sichtbar
+    return `<div class="row"><div class="mi">${ic(u.ic)}</div><div class="tx">${t(u.n)}<span class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span><small>${desc}</small></div>
       <button class="btn" data-up="${u.k}" ${maxed || S.coins < c ? 'disabled' : ''}>${maxed ? t('max') : ic('coin') + ' ' + fmt(c)}</button></div>`;
   }).join(''), 'upgrades');
 }

@@ -8,7 +8,7 @@ Am 24.11.2026 wurden Name und Spielprinzip auf Klon- und Kollisionsrisiko geprü
 
 ## 2. Was an diesem Spiel eigen ist
 
-- **Prinzip:** Generatoren (Teekanne, Brotkorb, Hühnerstall) erzeugen Zutaten gegen Energie, gleiche Teile werden zusammengezogen, Gäste werden aktiv beliefert, kein Zeitlimit, Brett 7×8.
+- **Prinzip:** Generatoren (Teekanne, Brotkorb, Hühnerstall) erzeugen Artikel (Zutaten, Gebäck) gegen Energie, gleiche Teile werden zusammengezogen, Gäste werden aktiv beliefert, kein Zeitlimit, Brett 7×8.
 - **Fortschritt:** Level, XP, Weltreise (9 Städte), Upgrades, Tagesbonus.
 - **Ketten:** 22 Stufen in 3 Ketten.
 - **Grafik, Oberfläche, Texte:** eigene (Bilder vom Eigentümer, eigene Oberfläche, eigene Texte).

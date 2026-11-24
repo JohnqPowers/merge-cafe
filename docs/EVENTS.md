@@ -31,6 +31,8 @@ Alle Events werden über `Platform.track()` an AppsFlyer gesendet, und zwar **nu
 | `pro_start` (param `sku`) | ja | Pro erstmals aktiv (Kauf oder Wiederherstellung; nach Neuinstallation erneut) | Analyse |
 | `pro_restore` (param `sku`) | nein | Pro über „Käufe wiederherstellen“ oder die Paywall zurückgeholt (kein Umsatz) | Analyse |
 
+Hinweis 25.11.2026: Die drei Pro-Ereignisse (`paywall_open`, `pro_start`, `pro_restore`) sind **inaktiv**, solange Noa's Pro ausgeschaltet ist (`CONFIG.revenuecat.proEnabled: false`, seit v1.5.16); die Namen bleiben reserviert und werden nicht umbenannt. `purchase` und `first_purchase` laufen weiter für Diamanten-Pakete und Startpaket.
+
 Hinweis Umsatz: Das Spiel sendet `purchase` selbst, mit `af_revenue` (Preis aus dem Store) und `af_currency`. **Die serverseitige Weitergabe von RevenueCat an AppsFlyer nicht zusätzlich einschalten**, sonst wird derselbe Umsatz doppelt gezählt (`docs/MONETARISIERUNG.md`, Punkt M4).
 
 Hinweis Namen: Bestehende Event-Namen niemals umbenennen, Almedia rechnet darüber ab. Neue Events nur hinzufügen und hier eintragen.

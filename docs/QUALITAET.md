@@ -1,13 +1,13 @@
 # Test- und Qualitätsbericht – Noa's Bean Trail
 
-Stand: 24.11.2026. Spielversion 1.5.15 (Push auf `main` am 24.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
+Stand: 25.11.2026. Spielversion 1.5.17 (Push auf `main` am 25.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
 
 ## 1. Kurzfazit
 
 | Bereich | Stand |
 |---|---|
-| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24 (beide Fenstergrößen), 106/106, 11/11, 20/20, 91/91, 16/16 und ein Ablaufprotokoll ohne Fehler (Abschnitt 3) |
-| Echter Android-Build ab Version 1.5.8 | **durchgelaufen** am 24.11.2026 (CI, Build 13 bis 17; zuletzt Build 17, Commit b89a630, Spielversion 1.5.15 mit Pro und Paywall-Plugin; Build 14 scheiterte an einem Netzwerkfehler von Maven Central, nicht am Code); Paket geprüft, aber **auf keinem Gerät gelaufen** (Abschnitt 6, Punkt Q1) |
+| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24 (beide Fenstergrößen), 115/115, 11/11, 20/20, 91/91, 16/16, dazu Katze 11/11, Hintergründe 7/7 und Wortwahl 12/12 (Abschnitt 3) |
+| Echter Android-Build ab Version 1.5.8 | **durchgelaufen** am 24.11.2026 (CI, Build 13 bis 18; Build 17 enthielt Pro und Paywall-Plugin (Spielversion 1.5.15), Build 18 (Commit 2855e02, Spielversion 1.5.16) ist ohne Plugin gebaut und kleiner: 34,1 MB statt 47 MB; Build 14 scheiterte an einem Netzwerkfehler von Maven Central, nicht am Code); Paket geprüft, aber **auf keinem Gerät gelaufen** (Abschnitt 6, Punkt Q1) |
 | Echte Geräte | Der Eigentümer hat Test-APKs bis Build 12 selbst gespielt (Rückmeldungen stehen in `reports/weekly/`). **Gerätemodell, Android-Version und Build sind nicht dokumentiert**, es gibt kein Gerätetest-Protokoll. Die Lücke ist offen. Build 13 (neue Paket-ID) liegt dem Eigentümer seit dem 24.11.2026 vor, die Rückmeldung steht aus. |
 | Abstürze | **Keine Daten.** Im Spiel ist keine Absturzmeldung eingebaut, und die App war nie im Store. Bekannte Fehler stammen aus Tests und Rückmeldungen. |
 | Werbung, Käufe, Messung, Einwilligung | nur mit **nachgebauten Plugins** geprüft, nie mit echten Konten (Abschnitt 6, Q3) |
@@ -23,17 +23,19 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 - Der Spielstand `tests/state.json` (Level 12, Paris) wird für Tests ab Level 12 eingespielt.
 - Konsolenfehler und fehlende Bilder zählen als Testfehler.
 
-## 3. Automatische Tests (Lauf vom 24.11.2026, Version 1.5.15)
+## 3. Automatische Tests (Lauf vom 25.11.2026, Version 1.5.17)
 
 | Datei | Ergebnis | Inhalt |
 |---|---|---|
-| `tests/test_gesamt.py` | **24/24** bei 390×844 und bei 360×640 | Start, Profil, Tutorial bis zur ersten Lieferung (inkl. Merge), Spiel bis Level 6 (dabei Stadtwechsel Hamburg → Wien bei Level 5), Geschenk-Fach, Verdoppeln per Demo-Werbung, „Keine Energie“-Fenster, Energie-Werbung (Zähler), Auffüllen mit Diamanten, Zutaten kaufen, Tagesbonus, Münzen-Verdoppeln-Chip, Erklär-Fenster „Diamanten“, Ausbau kaufen, Neustart mit erhaltenem Spielstand, Chancen-Anzeige im Diamanten-Fenster, keine Konsolenfehler |
-| `tests/test_plattform.py` | **106/106** | Einwilligung vor Werbung und Messung, Ablehnen/Zustimmen/Widerruf, Werbe-Einstellungen, Ereignis-Warteschlange (verwerfen oder senden), Store-Preise statt Platzhalter, Kauf und Gutschrift, Kauf abgebrochen, Browser-Variante ohne Plugins, **Sperre bei unvollständigen Rechtstexten** (S9), **Debug-Paket mit Test-Anzeigenblock** (S10), **Store-Paket ohne Testmarkierung** (S11), **Noa's Pro** (S12 bis S18: Paywall und Kauf, Pro schon beim Start, Kundeninfo-Meldung in beiden Formen, Tagesgeschenk einmal je Tag, eigene Paketliste, Abbruch auch als Fehlercode, Wiederherstellen, Customer Center und Ausweich-Hinweis, Schlüsselregeln für `test_`-Schlüssel, Fehlerfälle) |
+| `tests/test_gesamt.py` | **24/24** bei 390×844 und bei 360×640 | Start, Profil, Tutorial bis zur ersten Lieferung (inkl. Merge), Spiel bis Level 6 (dabei Stadtwechsel Hamburg → Wien bei Level 5), Geschenk-Fach, Verdoppeln per Demo-Werbung, „Keine Energie“-Fenster, Energie-Werbung (Zähler), Auffüllen mit Diamanten, fehlende Artikel kaufen, Tagesbonus, Münzen-Verdoppeln-Chip, Erklär-Fenster „Diamanten“, Ausbau kaufen, Neustart mit erhaltenem Spielstand, Chancen-Anzeige im Diamanten-Fenster, keine Konsolenfehler |
+| `tests/test_plattform.py` | **115/115** | Einwilligung vor Werbung und Messung, Ablehnen/Zustimmen/Widerruf, Werbe-Einstellungen, Ereignis-Warteschlange (verwerfen oder senden), Store-Preise statt Platzhalter, Kauf und Gutschrift, Kauf abgebrochen, Browser-Variante ohne Plugins, **Sperre bei unvollständigen Rechtstexten** (S9), **Debug-Paket mit Test-Anzeigenblock** (S10), **Store-Paket ohne Testmarkierung** (S11), **Noa's Pro** (S12 bis S18: Paywall und Kauf, Pro schon beim Start, Kundeninfo-Meldung in beiden Formen, Tagesgeschenk einmal je Tag, eigene Paketliste, Abbruch auch als Fehlercode, Wiederherstellen, Customer Center und Ausweich-Hinweis, Schlüsselregeln für `test_`-Schlüssel, Fehlerfälle; die Pro-Tests laufen mit eingeschaltetem Schalter), **Auslieferungszustand** (S19: Pro ausgeschaltet, im Shop und in den Optionen ist nichts davon sichtbar, Käufe laufen weiter) |
 | `tests/test_ausrichtung.py` | **11/11** | Dreh-Hinweis nur bei Querformat und sehr niedrigen Fenstern (844×390, 700×520), nicht bei Handy hochkant und nicht bei Tablets (1024×600, 1280×800, 810×1080); Deutsch und Englisch; Hinweis deckt alles ab und liegt oben |
 | `tests/test_spielstand.py` | **20/20** | Update-Sicherheit des Spielstands: alter, unvollständiger Spielstand lädt (neue Felder bekommen Standardwerte, alte Emoji-Figur wird auf die neue Kennung umgestellt), Zusatzfelder bleiben, kaputter Text, fremde Version, falsche Brettgröße, leeres Profil und unbekannte Figur starten ein neues Spiel bzw. Ersatzwerte ohne Absturz, Level-12-Stand lädt bei 360×640 |
 | `tests/test_store.py` | **91/91** | Store-Unterlagen ohne Browser: Titel höchstens 30, Kurzbeschreibung 80, Beschreibung 4000 Zeichen, Alt-Texte höchstens 140; keine Werbewörter, Emojis oder Fremdnamen im Titel; Zahlen im Text (22 Leckereien, 3 Ketten, 9 Welten, 12 Figuren, 7 Bonus-Tage, Automaten, Städte) stimmen mit `www/index.html`; Icon 512×512 mit Alpha, Feature-Grafiken 1024×500 ohne Alpha, 6 Screenshots je Sprache 1080×1920 ohne Alpha, deutsche und englische Fassung verschieden, keine Reste mit altem Namen in `store/`. Mit absichtlich falschem Text geprüft: schlägt dann fehl. |
 | `tests/test_herkunft.py` | **16/16** | Herkunftsnachweise ohne Browser: Manifest der ausgelieferten Dateien (`docs/herkunft/ausgelieferte_dateien.csv`) ist aktuell und stimmt mit den Dateien überein (Pfad, Größe, SHA-256), jedes Spielbild hat eine Quelle, Verzeichnis des Eigentümers und Paketlisten sind stimmig, keine Namen anderer Spiele in den Herkunftsdateien |
-| `tests/test_katze.py` | Ablaufprotokoll A–H, **kein Fehler** | Katze Mocha: Tutorial (Katze aus), fehlende Bilder (gezeichnete Katze bleibt), Sprung und Landung bei 360×640, 5 Gästeplätze (Katze ausgeblendet), Streicheln mit Ton, Tippen, Tab-Wechsel, Adressleiste, Querformat, Ton aus. Dieser Test druckt Messwerte; er hat keine feste Bestanden/Durchgefallen-Zählung, ich lese die Ausgabe. |
+| `tests/test_katze.py` | **11/11** | Katze Mocha (ab 1.5.17 nur Ruhebild): Bild geladen, nur `c01` bis `c03` im Netz, keine Flug-Ebene, Antippen, fehlende Bilder (gezeichnete Katze bleibt), 360×640, 5 Gästeplätze (Katze ausgeblendet), Dateien in `www/art/cat`. |
+| `tests/test_hintergrund.py` | **7/7** | Vollbild-Hintergrund je Welt (`art/b<N>.webp`): mit Bild ersetzt er Szene und Boden, ohne Bild bleibt alles wie zuvor, andere Welten unberührt. |
+| `tests/test_wortwahl.py` | **12/12** | Wortwahl und Anzeige ab 1.5.17: „Take-away“ mit Take-away-Symbol statt „Verkaufen“ und Mülltonne, „Bessere Artikel“ mit Chance in Prozent (10 % → 15 % bis 35 %), Hinweis „Stufe 2!“ beim Glückstreffer und keiner ohne, Stufe 1 ohne Zahl auf dem Teil; Deutsch und Englisch, keine Konsolenfehler. |
 
 **Zusatzprüfung zu 1.5.13:** `scripts/inject-config.js` wurde auf einer Kopie von `www/` ausgeführt (Rechtstexte ohne Platzhalter, deshalb `legalReady: true`). Die Seite lädt in Chrome (390×844) ohne Konsolen- oder Seitenfehler, Impressum und Datenschutz zeigen die Anbieterangaben ohne Platzhalter. Das ist die Browser-Schicht des CI-Builds.
 
@@ -51,7 +53,7 @@ Aufruf: siehe `tests/README.md`.
 | Spielfluss (Ziehen, Mergen, Automat, Lieferung), CPU 8× | Frames über 33 ms: 64–71 → 19–23; mittlere Frame-Zeit 25–27 ms → 19–20 ms | v1.5.1 (Endlos-Animationen ruhen beim Spielen, Zieh-Schatten per `transform`) |
 | 16 Übergänge × 3 Läufe, CPU 6× | Frames über 33 ms: 185 → 154; mittlerer Spitzen-Frame 86 → 69 ms; Merge und Automat tippen weiter bei 80–120 ms (Rauschen ±30 %) | v1.5.2 |
 | Ziehen, CPU 4× | Mittel 16,9 ms, 95 % der Frames bei 16,8 ms | v1.5.3 |
-| Katze, CPU 4× | keine Ausreißer über 50 ms | v1.5.7 |
+| Katze, CPU 4× | keine Ausreißer über 50 ms (Messung der damaligen Fassung mit Sprung und Streicheln; beides gibt es seit 1.5.17 nicht mehr) | v1.5.7 |
 
 Größe: `www/` hat 3,7 MB (davon `index.html` 437 KB mit eingebetteten Schriften, der Rest Bilder und Ton). Die Größe der APK und der `.aab` ist erst nach dem ersten Build bekannt.
 
@@ -74,13 +76,13 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 | Q4 | Tablets und Faltgeräte: Android 16 ignoriert die Hochformat-Sperre ab 600 dp. Im Querformat bei 1024×600 ist das Brett klein (Felder 26–32 px), das Spiel bleibt bedienbar. | mittel | akzeptiert, bei Bedarf Seitenlayout für Querformat |
 | Q5 | Handy im Querformat: Start-Knopf und Brett wären nicht erreichbar. Behoben: Sperre im Manifest plus Dreh-Hinweis. | – | behoben in v1.5.10, im echten Build ungeprüft |
 | Q6 | Bilder: Böden für Wien, Paris und Rom sind Platzhalter (Wien ist der Berlin-Entwurf), Böden 4 bis 8 fehlen (gebauter Ersatz im Spiel), die zwölf Einzugs-Posen fehlen (Kachel statt Pose). Fünf Teile-Bilder sind am Rand leicht angeschnitten (Donut, Brot, Croissant, Salat, Weizen). | niedrig | offen, braucht neue Bilder des Eigentümers |
-| Q7 | Katze Mocha: Frames teils abgewandelte Kopien, `purr.wav` ist ein Platzhalter. Herkunft der Bilder vom Eigentümer erklärt (24.11.2026), aber nicht lückenlos belegt: Prompt, Modellversion und Tarif je Bild fehlen, Rechte am Referenzmaterial sind nicht geprüft (`docs/HERKUNFT_BILDER.md`, `docs/ASSETS_LIZENZEN.md`). | niedrig | offen |
+| Q7 | Katze Mocha: drei Ruhebilder, teils abgewandelte Kopien (Schnurr-Ton seit 1.5.17 entfernt). Herkunft der Bilder vom Eigentümer erklärt (24.11.2026), aber nicht lückenlos belegt: Prompt, Modellversion und Tarif je Bild fehlen, Rechte am Referenzmaterial sind nicht geprüft (`docs/HERKUNFT_BILDER.md`, `docs/ASSETS_LIZENZEN.md`). | niedrig | offen |
 | Q8 | Bedienungshilfen (TalkBack, große Schrift, Farbenblindheit) nicht geprüft. Das Spiel nutzt kaum beschriftete Elemente (7 Stellen mit `aria-label` oder `role`). | mittel | offen, in den Gerätetest aufnehmen |
 | Q9 | Sprachen: Deutsch und Englisch. Bei anderen Gerätesprachen zeigt das Spiel Englisch (so festgelegt, nicht in jeder Sprache geprüft). | niedrig | akzeptiert |
 | Q10 | Belohnungen werden auf dem Gerät gutgeschrieben, ohne Server (siehe `docs/TECHNIK.md`, R5). | niedrig | akzeptiert |
 | Q11 | Ohne vollständige Rechtstexte bleiben Werbung, Käufe und Messung in der App gesperrt (`legalReady`). Seit dem 24.11.2026 sind Impressum und Datenschutz ausgefüllt, und der Android-Build 13 setzt `legalReady` auf true (in der Test-APK nachgewiesen). Ohne Konten und Schlüssel zeigt das Debug-Paket nur Googles Test-Anzeigen, es gibt keine Käufe und keine Messung. | – | erledigt; offen sind Konten und Schlüssel (Q3) |
 | Q12 | Ein unlesbarer oder fremder Spielstand (kaputter Text, andere Versionsnummer, falsche Brettgröße) wird nicht repariert, das Spiel startet neu und überschreibt ihn beim nächsten Speichern. Es gibt keine Sicherungskopie. Relevant erst, wenn eine spätere Version das Format ändert (`v` erhöhen) und jemand zur alten Version zurückkehrt. | niedrig | akzeptiert; bei einer Formatänderung vorher eine Sicherungskopie des alten Textes anlegen |
-| Q13 | **Noa's Pro (Paywall, Kauf, Wiederherstellen, Abo-Verwaltung) ist nur mit nachgebauten Plugins getestet.** Die echte Paywall-Oberfläche, die Form der Plugin-Antworten (Kundeninfo-Meldung, Paywall-Ergebnis) und der Ablauf mit dem Test Store sind nicht auf einem Gerät gelaufen; im Paket (Build 17) sind nur die Aufrufnamen und die neuen Activities nachgewiesen. Das Spiel liest den Pro-Zustand aus dem Entitlement, nicht aus Ergebnistexten. Dazu: Das RevenueCat-Dashboard (Angebot, Entitlement, Paywall) ist nicht eingerichtet bzw. nicht prüfbar. | hoch | Gerätetest (Abschnitt 8, Punkt 6) mit Test-APK und gesetztem Secret `REVENUECAT_TEST_KEY`; Dashboard einrichten (`docs/TECHNIK.md`, R9 und R10) |
+| Q13 | *(ruht: Pro ist seit 1.5.16 ausgeschaltet, gilt beim Wiedereinschalten)* **Noa's Pro (Paywall, Kauf, Wiederherstellen, Abo-Verwaltung) ist nur mit nachgebauten Plugins getestet.** Die echte Paywall-Oberfläche, die Form der Plugin-Antworten (Kundeninfo-Meldung, Paywall-Ergebnis) und der Ablauf mit dem Test Store sind nicht auf einem Gerät gelaufen; im Paket (Build 17) sind nur die Aufrufnamen und die neuen Activities nachgewiesen. Das Spiel liest den Pro-Zustand aus dem Entitlement, nicht aus Ergebnistexten. Dazu: Das RevenueCat-Dashboard (Angebot, Entitlement, Paywall) ist nicht eingerichtet bzw. nicht prüfbar. | – (ruht) | vor dem Wiedereinschalten: Gerätetest (Abschnitt 8, Punkt 6) mit Test-APK und gesetztem Secret `REVENUECAT_TEST_KEY`; Dashboard einrichten (`docs/TECHNIK.md`, R9 und R10) |
 
 ### Behobene Fehler (Auswahl, mit Version)
 
@@ -92,6 +94,7 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 - v1.5.10: Querformat auf dem Handy (Hochformat-Sperre, Dreh-Hinweis); Schrift „Lilita One“ lag verändert unter dem Originalnamen vor (jetzt unverändert, siehe Lizenzverzeichnis).
 - v1.5.12: Das Diamanten-Fenster nannte „+3 bis +7 pro Level“; ab Level 15 gibt es mehr (Formel 3 + 2 je 5 Level). Der Text ist korrigiert, die Chancen (Geschenk, Stufe 2 beim Erzeugen) stehen jetzt im Spiel.
 - v1.5.11: Die öffentliche Test-APK hätte mit echter AdMob-Kennung echte Anzeigen gezeigt (Kontosperre bei eigenen Klicks möglich); sie nutzt jetzt Googles Test-Anzeigenblock.
+- v1.5.17 (Rückmeldung des Eigentümers vom Handy, 24.11.2026): Die Katze blieb nach dem Streicheln auf dem Brett stehen und verdeckte es; Sprung und Streicheln entfernt (außerdem 22 statt 3 Bilder im Arbeitsspeicher). „Verkaufen“ mit Mülltonne war irreführend, jetzt „Take-away“ mit Take-away-Symbol. „Bessere Zutaten“ war nicht spürbar: Jetzt heißt es „Bessere Artikel“, zeigt die Chance in Prozent und meldet einen Glückstreffer („Stufe 2!“); die Chancen selbst sind unverändert. Das App-Icon wirkte auf dem Handy zu klein: Motiv in der Android-Vordergrundebene von 690 auf 810 px vergrößert, Rand bis an die Ecken gefüllt. Auf jedem Teil stand eine Zahl, auch bei Stufe 1; jetzt erst ab Stufe 2. Die gezeichnete Szene oben passt in Paris nicht zu den gemalten Bildern: Platz für ein Vollbild-Hintergrundbild je Welt eingebaut (`b<N>`), Bilder fehlen noch (`docs/ART_BRIEF.md`, Etappe 3).
 
 ## 7. Freigabekriterien
 
@@ -117,10 +120,10 @@ Mindestens drei Geräte, möglichst: ein Einsteiger-Handy (2 bis 3 GB RAM, Andro
 Ablauf je Gerät (jeweils Test-APK ohne und mit Rechtstexten):
 1. Neu installieren, starten (Zeit bis zum ersten Bild schätzen), Figur wählen, Einzug, Tutorial bis zur ersten Lieferung.
 2. 10 Minuten durchgehend spielen: Merge-Gefühl, Automaten tippen, Lieferungen, Geschenk-Fach, Tagesbonus; Wärme und Akkuverbrauch notieren.
-3. Ton und Musik aus und an, Vibration, Katze streicheln.
+3. Ton und Musik aus und an, Vibration, Katze antippen (Miau, bleibt oben im Bestellbereich), Icon auf dem Startbildschirm (Größe, Rand).
 4. Werbung: Test-Anzeige bis zum Ende (Belohnung kommt), Anzeige vorzeitig schließen (keine Belohnung), ohne Netz (keine Anzeige, kein Absturz).
 5. Einwilligung (Gerät im EWR): Fenster erscheint, Ablehnen sperrt Werbung und Messung, „Werbe-Einstellungen“ in den Optionen ändern.
-6. Shop: Preis kommt aus dem Store, Kauf mit Lizenztester, Gutschrift, Kauf abbrechen. Noa's Pro: Pro-Karte im Shop und Zeile in den Optionen, Paywall öffnet, Kauf im Test Store, Pro aktiv (Belohnung ohne Video, +5 Diamanten einmal je Tag), „Käufe wiederherstellen“, „Abo verwalten“.
+6. Shop: Preis kommt aus dem Store, Kauf mit Lizenztester, Gutschrift, Kauf abbrechen. Im Auslieferungszustand ist von Noa's Pro nichts zu sehen (keine Karte im Shop, keine Zeilen in den Optionen). Nur wenn Pro eingeschaltet ist: Pro-Karte im Shop und Zeile in den Optionen, Paywall öffnet, Kauf im Test Store, Pro aktiv (Belohnung ohne Video, +5 Diamanten einmal je Tag), „Käufe wiederherstellen“, „Abo verwalten“.
 7. App in den Hintergrund, Anruf, Bildschirm aus und an; Neustart; Spielstand erhalten; Flugmodus-Start.
 8. Systemschrift und Anzeigegröße auf „groß“; Sprache Englisch; Drehen (Handy bleibt hochkant); TalkBack kurz anschalten.
 
@@ -130,6 +133,6 @@ Ablauf je Gerät (jeweils Test-APK ohne und mit Rechtstexten):
 
 Gefundene Fehler kommen mit Nummer in Abschnitt 6; jeder Fehler bekommt, wenn möglich, einen Test in `tests/`.
 
-## Quellen (Stand 24.11.2026)
+## Quellen (Stand 25.11.2026)
 - Google, Android vitals und Schwellen für schlechtes Verhalten: https://developer.android.com/google/play/vitals
 - Google, Hintergrund zu den Kennzahlen (2022): https://android-developers.googleblog.com/2022/10/raising-bar-on-technical-quality-on-google-play.html

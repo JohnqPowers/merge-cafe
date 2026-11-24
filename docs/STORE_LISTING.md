@@ -36,7 +36,7 @@ Prüfung per Skript: `python3 -I tests/test_store.py` (Zeichenlängen, Bildforma
 ```text
 Willkommen im gemütlichsten Café der Welt! ☕🥐
 
-Tippe auf Teekanne, Brotkorb und Hühnerstall, um Zutaten zu erzeugen. Ziehe zwei gleiche Teile zusammen: Aus der Kaffeebohne wird Espresso, daraus Matcha und Bubble Tea – und aus Weizen am Ende eine Festtorte.
+Tippe auf Teekanne, Brotkorb und Hühnerstall, um Artikel zu erzeugen. Ziehe zwei gleiche Teile zusammen: Aus der Kaffeebohne wird Espresso, daraus Matcha und Bubble Tea – und aus Weizen am Ende eine Festtorte.
 
 Deine Gäste warten schon mit ihren Bestellungen. Liefere sie aus, verdiene Münzen und steige Level für Level auf. Mit jedem Kapitel zieht dein Café in eine neue Stadt: von Hamburg über Paris und Kyoto bis ins Sternecafé über den Wolken.
 
@@ -44,7 +44,7 @@ Deine Gäste warten schon mit ihren Bestellungen. Liefere sie aus, verdiene Mün
 ★ 22 Leckereien in 3 Ketten: Kaffee, Backwaren und Frühstück
 ★ 9 Welten von Hamburg bis ins Sternecafé
 ★ Dein Café, deine Figur: 12 Figuren zur Auswahl und ein eigener Café-Name
-★ Café-Katze Mocha: antippen und streicheln, dann schnurrt sie
+★ Café-Katze Mocha schaut zu, wenn du bedienst – antippen lohnt sich
 ★ Täglicher Bonus mit 7-Tage-Serie und kostenlose Geschenke
 ★ Bestellungen laufen nie ab
 ★ Kein Konto nötig, dein Spielstand bleibt auf deinem Gerät
@@ -52,7 +52,7 @@ Deine Gäste warten schon mit ihren Bestellungen. Liefere sie aus, verdiene Mün
 
 Gut zu wissen
 • Kostenlos spielbar. Optional gibt es In-App-Käufe (Diamanten) und freiwillige Werbevideos, für die du eine Belohnung bekommst. Keine Banner, keine Pflicht-Werbung.
-• Zutaten erzeugen kostet Energie. Sie füllt sich mit der Zeit von selbst auf; du kannst sie auch mit Diamanten oder einem Werbevideo auffüllen.
+• Artikel erzeugen kostet Energie. Sie füllt sich mit der Zeit von selbst auf; du kannst sie auch mit Diamanten oder einem Werbevideo auffüllen.
 • Geschenke enthalten zufällige Belohnungen (Münzen, Energie oder Diamanten). Sie sind gratis; die Chancen siehst du im Spiel im Diamanten-Fenster.
 • Wo es vorgeschrieben ist, fragt das Spiel vor Werbung und Messung nach deiner Einwilligung. Du kannst sie jederzeit in den Optionen ändern.
 • Für Spieler ab 16 Jahren.
@@ -71,7 +71,7 @@ Lade Noa's Bean Trail herunter und mach dein Café zur Legende!
 ```text
 Welcome to the coziest café in the world! ☕🥐
 
-Tap the teapot, the bread basket and the hen house to make ingredients. Drag two matching items together: a coffee bean becomes espresso, then matcha and bubble tea – and wheat ends up as a party cake.
+Tap the teapot, the bread basket and the hen house to make items. Drag two matching items together: a coffee bean becomes espresso, then matcha and bubble tea – and wheat ends up as a party cake.
 
 Your guests are already waiting with their orders. Serve them, earn coins and level up. With every chapter your café moves to a new city: from Hamburg through Paris and Kyoto all the way to the Star Café above the clouds.
 
@@ -79,7 +79,7 @@ Your guests are already waiting with their orders. Serve them, earn coins and le
 ★ 22 treats in 3 merge chains: coffee, bakery and breakfast
 ★ 9 worlds from Hamburg to the Star Café
 ★ Your café, your character: 12 characters to choose from and a café name of your own
-★ Café cat Mocha: tap her and pet her, and she purrs
+★ Café cat Mocha watches while you serve – give her a tap
 ★ Daily bonus with a 7-day streak and free gifts
 ★ Orders never expire
 ★ No account needed, your progress stays on your device
@@ -87,7 +87,7 @@ Your guests are already waiting with their orders. Serve them, earn coins and le
 
 Good to know
 • Free to play. Optional in-app purchases (gems) and voluntary reward videos are available. No banners, no forced ads.
-• Making ingredients costs energy. It refills over time on its own; you can also refill it with gems or by watching a reward video.
+• Making items costs energy. It refills over time on its own; you can also refill it with gems or by watching a reward video.
 • Gifts contain random rewards (coins, energy or gems). They are free; you can see the odds in the game, in the gems window.
 • Where required, the game asks for your consent before ads and measurement. You can change it any time in the options.
 • For players aged 16 and over.
@@ -144,11 +144,11 @@ Jede Zahl und jede Funktion im Text muss im Spiel stimmen. Die Zahlen prüft `te
 | Teekanne, Brotkorb, Hühnerstall | `CHAINS.genName` |
 | 9 Welten von Hamburg bis Sternecafé | `CHAPTERS`: Hamburg, Wien, Paris, Rom, Istanbul, Kyoto, New York, Rio de Janeiro, Sternecafé |
 | 12 Figuren, eigener Café-Name | `www/art/a1…a12`; Begrüßung in `showOnboarding` |
-| Café-Katze Mocha: antippen, streicheln, schnurrt | `CatFx` (Sprung, Streichen, Herzen; Ton nur bei eingeschaltetem Ton), `tests/test_katze.py` |
+| Café-Katze Mocha schaut zu, Antippen: Miau und kurzer Hinweis | `CatFx` (Ruhebild im Bestellbereich, seit 1.5.17 ohne Sprung und Streicheln), `tests/test_katze.py` |
 | Täglicher Bonus, 7-Tage-Serie | `DAILY` mit 7 Einträgen |
 | Geschenke gratis, Zufall, Chancen im Diamanten-Fenster | `GIFT_P`, Fenster „Chancen im Spiel“, `tests/test_gesamt.py` |
 | Bestellungen laufen nie ab | Aufträge haben keinen Zeitstempel; neue entstehen nur, wenn ein Platz frei ist (`fillOrders`) |
-| Zutaten kosten Energie, füllt sich von selbst auf, mit Diamanten oder Video auffüllbar | `CONFIG.energyRegenMs` (90 s je Punkt), Auffüllen für 15 Diamanten, Video „+25 Energie“ |
+| Artikel erzeugen kostet Energie, füllt sich von selbst auf, mit Diamanten oder Video auffüllbar | `CONFIG.energyRegenMs` (90 s je Punkt), Auffüllen für 15 Diamanten, Video „+25 Energie“ |
 | Keine Banner, keine Pflicht-Werbung | nur belohnte Videos auf Tipp (`docs/MONETARISIERUNG.md`) |
 | Kein Konto, Spielstand auf dem Gerät | kein Login im Code; Speicherung lokal (`mergecafe_v1`), `docs/PRIVACY.md` |
 | Deutsch und Englisch | `STR.de`, `STR.en` |

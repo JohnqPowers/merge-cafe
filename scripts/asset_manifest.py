@@ -38,6 +38,7 @@ GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile
     (r'^www/art/a\d+\.webp$', 'Spielerfigur', KI),
     (r'^www/art/c\d+\.webp$', 'Gast', KI),
     (r'^www/art/f\d+\.webp$', 'Boden', KI),
+    (r'^www/art/b\d+\.webp$', 'Hintergrund (Vollbild)', KI),
     (r'^www/art/frame\d*\.webp$', 'Brett-Rahmen', KI),
     (r'^www/art/e\d+\.webp$', 'Einzugs-Pose', KI),
     (r'^www/art/fx_[a-z0-9]+\.webp$', 'Effekt', KI),

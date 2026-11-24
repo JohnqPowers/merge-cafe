@@ -1,6 +1,6 @@
 # Datenschutz – Datenflüsse und Entwurf für „Datensicherheit“ (Play Console)
 
-Stand: 24.11.2026, Spielversion 1.5.15. **Verbindlich für Nutzer ist `www/privacy.html`** (Deutsch und Englisch, in der App unter Optionen verlinkt). Diese Datei ist die interne Übersicht dazu und der Entwurf für das Formular „Datensicherheit“ in der Play Console. Keine Rechtsberatung. Die Angaben des Verantwortlichen (Name, ladungsfähige Anschrift, E-Mail) hat der Eigentümer am 24.11.2026 geliefert; sie stehen in `privacy.html` und `impressum.html`. Taucht dort wieder ein Platzhalter `[[…]]` auf, bleiben Werbung, Käufe und Messung in der App gesperrt (`CONFIG.legalReady`).
+Stand: 25.11.2026, Spielversion 1.5.17. **Verbindlich für Nutzer ist `www/privacy.html`** (Deutsch und Englisch, in der App unter Optionen verlinkt). Diese Datei ist die interne Übersicht dazu und der Entwurf für das Formular „Datensicherheit“ in der Play Console. Keine Rechtsberatung. Die Angaben des Verantwortlichen (Name, ladungsfähige Anschrift, E-Mail) hat der Eigentümer am 24.11.2026 geliefert; sie stehen in `privacy.html` und `impressum.html`. Taucht dort wieder ein Platzhalter `[[…]]` auf, bleiben Werbung, Käufe und Messung in der App gesperrt (`CONFIG.legalReady`).
 
 ## 1. Grundsatz
 
@@ -14,7 +14,7 @@ Kein Konto, kein eigener Server, keine Freitexte an Dritte. Spielstand, Spielern
 | Google UMP (Einwilligung) | Einwilligungsfenster, „Werbe-Einstellungen“ | Einwilligungsstatus | Art. 6 Abs. 1 lit. a; § 25 Abs. 1 TDDDG | beim Start, vor Werbung und Messung |
 | Google AdMob | belohnte Videos | IP-Adresse (grobe Region), Interaktionen (Start, Tippen, Videoansicht), Diagnose (Startzeit, Hänger, Energie), Werbe-ID, App-Set-ID | Art. 6 Abs. 1 lit. a | nur nach Einwilligung (`initAds`) |
 | AppsFlyer | Herkunfts- und Ereignismessung; Weitergabe an Vermittler (z. B. Almedia) zur Abrechnung | IP (grober Ort), Werbe-ID, App-Starts, Ereignisse mit Zahlen (`docs/EVENTS.md`), Geräte- und Leistungsangaben (Betrugserkennung), Kauf mit Umsatz | Art. 6 Abs. 1 lit. a; § 25 Abs. 1 TDDDG | nur nach Einwilligung; stoppt beim Widerruf |
-| RevenueCat | Käufe prüfen, Store-Preise, Pro (Abo, Lifetime) freischalten | anonyme Kennung, Kaufbeleg, Produkt, Land, Währung, IP, Pro-Status | Art. 6 Abs. 1 lit. b, f, c | in der App, unabhängig von der Werbe-Einwilligung, aber nur wenn `legalReady` |
+| RevenueCat | Käufe prüfen, Store-Preise (Pro, Abo und Lifetime, ist seit 1.5.16 ausgeschaltet; wird es eingeschaltet, kommen Pro-Status und Abo-Hinweis in die Datenschutzseite zurück) | anonyme Kennung, Kaufbeleg, Produkt, Land, Währung, IP | Art. 6 Abs. 1 lit. b, f, c | in der App, unabhängig von der Werbe-Einwilligung, aber nur wenn `legalReady` |
 | Google Play | Zahlung | nur Google (wir und RevenueCat bekommen keine Zahlungsdaten) | – | beim Kauf |
 | GitHub Pages | Web-Version | IP und Zugriffsdaten in Server-Protokollen des Hosters; keine Cookies, keine Analyse, Schriften eingebettet | Art. 6 Abs. 1 lit. f | nur Web-Version |
 

@@ -15,7 +15,7 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
 
 - **Bilder:** Die Motive und Anforderungen stammen aus Briefings des Eigentümers (u. a. `docs/ART_BRIEF.md`), aus den darauf aufbauenden Gesprächen und teilweise aus hochgeladenen Referenzbildern. PNG-Dateien, Vorschauen, Zuschnitte, Hintergrundausschnitte, Transparenzvarianten und Animationen entstanden aus generierten Bildern durch technische Nachbearbeitung. Die 25 Spielgegenstände mit Automaten stammen aus einem KI-gestützten Original-Set, teils aus Sammelillustrationen aufbereitet.
 - **Grenze der Dokumentation:** Das Verzeichnis nennt die unmittelbare Quelldatei oder das Paket, nicht zwingend die einzelne Generierung oder den wörtlichen Prompt. Eine lückenlose, promptgenaue Kette je Datei gibt es nicht. Die Prüfsummen (SHA-256) dienen der technischen Identifizierung.
-- **Katze Mocha:** Der Eigentümer zeigte einen Screenshot des eigenen Spiels mit Katze als Referenz (Nutzereingabe, kein generiertes Original). Daraufhin entstanden mehrere Katzenbilder; für eine Prototyp-Animation wurden daraus Frames durch Skalierung, Drehung, Verschiebung und Compositing abgeleitet. Das Paket enthält 24 Frames, ein Spritesheet, eine GIF-Vorschau, Konfigurationsdaten und einen synthetisch erzeugten Schnurrton. Nicht jeder Frame ist eine neu gezeichnete Körperpose. Im Paket sind zwei Paare byte-identisch (Frame 2 und 4, Frame 12 und 21); `scripts/cat_import.py` speichert sie nur einmal (22 Bilder).
+- **Katze Mocha:** Der Eigentümer zeigte einen Screenshot des eigenen Spiels mit Katze als Referenz (Nutzereingabe, kein generiertes Original). Daraufhin entstanden mehrere Katzenbilder; für eine Prototyp-Animation wurden daraus Frames durch Skalierung, Drehung, Verschiebung und Compositing abgeleitet. Das Paket enthält 24 Frames, ein Spritesheet, eine GIF-Vorschau, Konfigurationsdaten und einen synthetisch erzeugten Schnurrton. Nicht jeder Frame ist eine neu gezeichnete Körperpose. Im Paket sind zwei Paare byte-identisch (Frame 2 und 4, Frame 12 und 21); `scripts/cat_import.py` speichert sie nur einmal (22 Bilder). **Seit 1.5.17** bleiben im Spiel nur die drei Ruhebilder (`c01` bis `c03`); die übrigen Frames, die Herzen und der Schnurrton sind aus dem Spiel entfernt, `cat_import.py` schreibt nur noch den Zustand IDLE.
 - **Referenzmaterial:** Hochgeladene Screenshots sind Referenz und werden nicht als generierte Spielgrafik ausgegeben.
 
 ## 3. Rechtlicher Rahmen und Grenzen
@@ -41,7 +41,7 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
 2. **Nachstellung:** In einer Kopie des Repos wurden die Pakete mit den Skripten neu eingelesen und die Ergebnisse Byte für Byte mit den ausgelieferten Dateien verglichen:
    - 49 Dateien aus den Paketen für Teile, Automaten, Figuren und Gäste: gleich (`scripts/art_import.py`),
    - Boden Hamburg und Rahmen aus den Einzeldateien: gleich; Böden Paris und Rom: gleich (`scripts/floor_prep.py` mit den dokumentierten Maßen, dann `art_import.py`),
-   - Katze, 22 Frames, 3 Herzen und Schnurr-Datei: gleich (`scripts/cat_import.py`),
+   - Katze, drei Ruhebilder (bis 1.5.16: 22 Frames, 3 Herzen und Schnurr-Datei): gleich (`scripts/cat_import.py`),
    - Web- und Android-Icons: gleich aus dem Icon-Original (`assets/src/build-icon.py`); das Original im Repo hat dieselbe Prüfsumme wie der Verzeichnis-Eintrag `noas_bean_trail_icon_original_1254.png`,
    - **nicht nachstellbar:** `f1` (vorläufiger Boden, Platzhalter für Wien). Die Quelle `f1_berlin.png` steht im Entwurfspaket und im Verzeichnis, die ausgelieferte Datei entstand aber anders oder aus einer anderen Fassung.
 3. **Grenze dieser Prüfung:** Sie belegt „Paket → Skript → Spieldatei“. Sie belegt nicht, wie die Pakete selbst entstanden sind. Bitgleichheit gilt für die Bibliotheksversionen vom 24.11.2026 (Pillow, OpenCV, NumPy); andere Versionen können abweichende Bytes liefern, ohne dass die Quelle falsch wäre. Nachstellen immer in einer Kopie des Repos: Die Skripte überschreiben `www/art` und das Bildmanifest in `www/index.html`.
@@ -66,6 +66,6 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
 | Entwürfe ersetzen: Böden `f1` bis `f3` (Verzeichnis: für die finale App einzeln neu erzeugen), Böden 4 bis 8, zwei Stadtrahmen | Eigentümer |
 | Einzugs-Posen und Stadtrahmen liegen im Verzeichnis, aber nicht im Projekt: als ZIP liefern, dann importiert und nachgestellt der Agent | Eigentümer, dann Agent |
 | Startbild (`assets/splash*.png`): Herkunft nicht protokolliert und nicht im Verzeichnis; bestätigen oder ersetzen | Eigentümer |
-| Schnurr-Datei: synthetischer Platzhalter, durch eine eigene oder lizenzierte Aufnahme ersetzen | Eigentümer |
+| ~~Schnurr-Datei ersetzen~~ erledigt: Datei seit 1.5.17 entfernt, kein Ton mehr | – |
 | Transparenzkanten und Darstellung kleiner Spielfiguren auf dem Gerät prüfen | Eigentümer, beim Gerätetest |
 | Ob die Stores eine Kennzeichnung KI-erzeugter Bilder verlangen, vor dem Upload in den dann gültigen Richtlinien nachlesen | Eigentümer |

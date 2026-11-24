@@ -16,9 +16,11 @@ damit Android, Apple und Google Play die Form selbst zuschneiden können. Daraus
   www/icons/icon-192.png / -512.png         vollflächig (Favicon, Apple-Touch-Icon, Web-Manifest)
   www/icons/icon-maskable-512.png     512  Kunst 84 %, Rand weich fortgesetzt (Sicherheitszone für Masken)
 
-Maße für das adaptive Icon: Ebene 108 dp = 1024 px, sichtbares Fenster 72 dp = 683 px.
-690 px Kunst füllen das Fenster bei Quadrat- und Squircle-Masken ganz aus; bei der Kreismaske
-bleibt der Schriftzug sichtbar, nur die äußersten Ecken fallen weg.
+Maße für das adaptive Icon: Ebene 108 dp = 1024 px. Android (AOSP, Pixel, Samsung) zeigt ein Fenster von 72 dp = 683 px; manche
+Oberflächen (Xiaomi HyperOS) zeigen die ganze Ebene, dort wirkte die Kunst mit 690 px zu klein und der Rand war verwaschen (Rückmeldung
+des Eigentümers 24.11.2026). Seit 1.5.17: Kunst 810 px (79 % der Ebene), der Rest der Ebene ein Goldverlauf in den Farben des Rahmens.
+Im 683-px-Fenster werden dafür rund 8 % der Kunst am Rand abgeschnitten (goldener Rahmen und Randdetails), Figuren, Katze, Tasse und
+Schriftzug bleiben ganz; bei der Kreismaske fallen die äußersten Ecken weg.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -29,7 +31,7 @@ from scipy import ndimage as ndi
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'assets' / 'src' / 'app-icon-original.png'
-ADAPTIVE_ART = 690      # px der Kunst auf der 1024-px-Ebene
+ADAPTIVE_ART = 810      # px der Kunst auf der 1024-px-Ebene
 MASKABLE_ART = 0.84     # Anteil der Kunst auf der maskierbaren Leinwand
 
 
@@ -77,19 +79,28 @@ def fill_corners(im):
     return res
 
 
+def frame_corners(F):
+    """Mittlere Farbe des Rahmens nahe den vier Ecken der Kunst (oben links, oben rechts, unten links, unten rechts)."""
+    h, k, o = F.shape[0], 18, 28
+    med = lambda y, x: np.median(F[y:y + k, x:x + k].reshape(-1, 3), axis=0)
+    return med(o, o), med(o, h - o - k), med(h - o - k, o), med(h - o - k, h - o - k)
+
+
 def extended(F, canvas, art_px):
-    """Kunst mittig auf der Leinwand, der Rand wird gespiegelt, weichgezeichnet und überblendet."""
-    sigma, feather = canvas * 0.028, max(4, canvas // 90)
+    """Kunst mittig auf der Leinwand, außen ein weicher Goldverlauf in den Farben des Rahmens (kein verwaschenes Spiegelbild der Szene)."""
+    tl, tr, bl, br = frame_corners(F)
+    u = np.linspace(0, 1, canvas)[None, :, None]
+    v = np.linspace(0, 1, canvas)[:, None, None]
+    grad = tl * (1 - u) * (1 - v) + tr * u * (1 - v) + bl * (1 - u) * v + br * u * v
+    feather = max(4, canvas // 90)
     art = resize(F, art_px)
     pad = (canvas - art_px) // 2
-    pad2 = canvas - art_px - pad
-    ext = cv2.GaussianBlur(cv2.copyMakeBorder(art, pad, pad2, pad, pad2, cv2.BORDER_REFLECT), (0, 0), sigma)
     m = np.zeros((canvas, canvas), np.float32)
     m[pad:pad + art_px, pad:pad + art_px] = 1
     m = cv2.GaussianBlur(cv2.erode(m, np.ones((feather, feather), np.uint8)), (0, 0), feather / 2)[..., None]
-    full = np.zeros((canvas, canvas, 3), np.uint8)
+    full = np.zeros((canvas, canvas, 3), np.float32)
     full[pad:pad + art_px, pad:pad + art_px] = art
-    return (full * m + ext * (1 - m)).round().astype(np.uint8)
+    return (full * m + grad * (1 - m)).round().astype(np.uint8)
 
 
 def foreground(F, canvas, art_px):

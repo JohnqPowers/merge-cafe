@@ -96,7 +96,7 @@ All in `www/index.html` → `CONFIG` and in `capacitor.config.json`:
 | AppsFlyer Dev Key, iOS App ID | `CONFIG.appsflyer` | AppsFlyer dashboard |
 | AdMob app IDs + rewarded unit IDs | `capacitor.config.json`, `CONFIG.admob` | AdMob (currently Google **test IDs**) |
 | RevenueCat API keys | `CONFIG.revenuecat` | RevenueCat dashboard |
-| RevenueCat Pro | entitlement `noa_s_bean_trail_pro` (`CONFIG.revenuecat.entitlement`), current offering with packages monthly / annual / lifetime, paywall designed in the dashboard | RevenueCat dashboard, see `docs/MONETARISIERUNG.md` |
+| RevenueCat Pro (**switched off since 1.5.16**, `CONFIG.revenuecat.proEnabled: false`; nothing to do for launch) | entitlement `noa_s_bean_trail_pro` (`CONFIG.revenuecat.entitlement`), current offering with packages monthly / annual / lifetime, paywall designed in the dashboard; only needed if Pro is switched on later | RevenueCat dashboard, see `docs/MONETARISIERUNG.md`, section 11 |
 | In-app products | `starter_pack`, `gems_small`, `gems_large` | create identically in Play Console / App Store Connect + RevenueCat |
 | Privacy policy and Impressum | `www/privacy.html`, `www/impressum.html`: replace every `[[…]]`. While any remains, ads, purchases and measurement stay off in the app (`CONFIG.legalReady`). | owner's real details; see `docs/PRIVACY.md` |
 | App ID `io.github.johnqpowers.beantrail` | `capacitor.config.json` | your own reverse domain |

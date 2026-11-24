@@ -8,7 +8,7 @@ Stand: 24.11.2026, Spielversion 1.5.13. Nachweis darüber, woher jedes Bild, jed
 |---|---|
 | Schriften | **belegt.** Zwei Schriften unter SIL OFL 1.1, Originaltexte und Originaldateien im Repo, Lizenzseite im Spiel (Optionen → Lizenzen). |
 | Software | **bekannt.** Lizenzen siehe Abschnitt 5; genaue Versionen hält jeder Build im Artefakt `versionen-<Nr>` fest (`docs/TECHNIK.md`). Eine vollständige Liste aller Unterbibliotheken fehlt noch (Abschnitt 5). |
-| Töne, Musik | **eigen.** Alles wird im Spiel erzeugt (WebAudio). Einzige Audiodatei: das Katzen-Schnurren, ein synthetischer Platzhalter aus dem Katzenpaket des Eigentümers. |
+| Töne, Musik | **eigen.** Alles wird im Spiel erzeugt (WebAudio). Seit 1.5.17 gibt es keine Audiodatei mehr (das Katzen-Schnurren, ein synthetischer Platzhalter, ist entfernt). |
 | Symbole | **eigen.** 27 SVG-Symbole im Code, im Projekt gezeichnet, keine Fremd-Symbolsätze. |
 | Emojis | Systemschrift des Geräts, nicht eingebettet. |
 | **Bilder** | **erklärt, nicht lückenlos belegt.** Laut Eigentümer (24.11.2026) überwiegend mit der Bildgenerierung von OpenAI (ChatGPT) nach seinen Briefings erstellt; Verzeichnis mit Prüfsummen und Manifest der ausgelieferten Dateien liegen im Repo (`docs/herkunft/`), 82 von 83 Bild- und Tondateien lassen sich aus den Paketen bitgleich nachstellen. Es fehlen Prompt, Modellversion und Tarif je Bild, und die Rechte am Referenzmaterial sind nicht geprüft (Abschnitt 3, `docs/HERKUNFT_BILDER.md`). Das bleibt der wichtigste offene Punkt dieses Verzeichnisses. |
@@ -25,8 +25,8 @@ Stand: 24.11.2026, Spielversion 1.5.13. Nachweis darüber, woher jedes Bild, jed
 | Gäste | `www/art/c1` bis `c12` | 12 | wie Teile | `art_import.py` (240 × 270) | gezeichnete Typen |
 | Böden | `www/art/f0` bis `f3` | 4 von 9 | wie Teile | `art_import.py`, `floor_prep.py` | gebauter Boden |
 | Brett-Rahmen | `www/art/frame.webp` | 1 | wie Teile | `art_import.py` (auf 7:8 umgebaut) | CSS-Rahmen |
-| Katze Mocha | `www/art/cat/c01` bis `c22`, `h1` bis `h3` | 22 Frames + 3 Herzen | Eigentümer, Katzen-Paket 24.11.2026; Frames teils abgewandelte Kopien | `scripts/cat_import.py` | gezeichnete SVG-Katze |
-| Schnurren | `www/art/cat/purr.wav` | 1 | Katzen-Paket, laut Paket **Platzhalter** (`audio/purr_*.wav`); Schleife nahtlos geschnitten | `cat_import.py` | synthetischer Ersatzton im Code |
+| Katze Mocha | `www/art/cat/c01` bis `c03` | 3 Ruhebilder (seit 1.5.17; vorher 22 Frames + 3 Herzen) | Eigentümer, Katzen-Paket 24.11.2026; Frames teils abgewandelte Kopien | `scripts/cat_import.py` | gezeichnete SVG-Katze |
+| Schnurren | entfernt in 1.5.17 (`www/art/cat/purr.wav` und der Ersatzton im Code) | 0 | war laut Katzen-Paket ein **Platzhalter** (`audio/purr_*.wav`) | – | – |
 | Einzugs-Posen, Effekte, Böden 4 bis 8, Rahmen je Welt | `e1` bis `e12`, `fx_*`, `f4` bis `f8`, `frame0` bis `frame8` | nicht im Spiel: Posen und Stadtrahmen stehen im Verzeichnis des Eigentümers, sind dem Projekt aber nicht geliefert; `f4` bis `f8` sind Entwürfe im Paket `merge_cafe_8_stadtboeden_entwurf.zip`, nicht eingebaut; `fx_*` nicht geliefert | – | – | Fallbacks im Spiel |
 
 Die Dateinamen sind der Vertrag zwischen Brief, Import-Skript und Spiel (`docs/ART_BRIEF.md`). Das Manifest `const ART` in `www/index.html` führt das Skript selbst nach. Nachweis je ausgelieferte Datei (Pfad, Version, SHA-256, Quelle): `docs/herkunft/ausgelieferte_dateien.csv`.
@@ -52,7 +52,7 @@ Hinweise:
 - **Nutzungsbedingungen:** Vom Eigentümer am 24.11.2026 geprüft, vom Agenten nicht selbst abgerufen. Den Stand des Abrufs mit Datum aufheben und vor dem Start fachkundig einordnen lassen. Das klärt keine Rechte Dritter.
 - **Referenzmaterial:** Hochgeladene Screenshots und Referenzbilder sind Referenz, keine generierten Originale; ihre Nutzungsrechte sind nicht geprüft.
 - **Zufällige Ähnlichkeit:** Figuren, Gäste und Teile einmal gegen bekannte Figuren und Logos ansehen (Brief: keine Texte, keine Marken). Die Prüfung gegen das früher untersuchte Referenzspiel ist erledigt (Bericht an den Eigentümer, 24.11.2026); eine Sichtprüfung gegen weitere bekannte Figuren steht aus.
-- **Katze:** Frames teils abgeleitet, zwei Paare im Paket sind Kopien (Frame 2 und 4, 12 und 21), Schnurren ist ein synthetischer Platzhalter. Eine eigene, lizenzierte Aufnahme ersetzt `purr.wav` ohne Codeänderung (gleicher Dateiname); danach Herkunft hier eintragen.
+- **Katze:** Frames teils abgeleitet, ein Paar im Paket ist eine Kopie (Frame 2 und 4). Seit 1.5.17 bleiben nur die drei Ruhebilder; Schnurr-Ton, Herzen und die übrigen Frames sind entfernt (Speicher, kein Streicheln mehr). Herkunft der drei Bilder: wie zuvor, siehe `docs/HERKUNFT_BILDER.md`.
 - **Startbild:** `assets/splash.png` und `assets/splash-dark.png` stehen nicht im Verzeichnis des Eigentümers, ihre Erzeugung ist nicht protokolliert; bestätigen oder ersetzen.
 - **Nicht behaupten:** dass jedes Bild exklusiv urheberrechtlich geschützt, markenrechtlich freigegeben, einzeln extern lizenzgeprüft oder die Herkunft aller Referenzen abschließend geklärt sei.
 - **Store-Angaben:** Die Lizenzseite im Spiel nennt die KI-Unterstützung offen. Ob ein Store eine Kennzeichnung von KI-Bildern verlangt, vor dem Upload in den dann gültigen Richtlinien nachlesen.
@@ -85,14 +85,13 @@ Prüfung im Vergleich zu vorher: das Startbild unterscheidet sich nach dem Tausc
 | `@appsflyer-sdk/js-core-plugin` | `7.1.0` | JS-Schnittstelle, per esbuild nach `www/af.js` gebündelt | Lizenzfeld im Paket beim Build prüfen |
 | AppsFlyer Android SDK | über das Plugin | Messung | Bedingungen von AppsFlyer |
 | `@revenuecat/purchases-capacitor` | `latest` (**nicht festgelegt**) | Käufe | MIT |
-| `@revenuecat/purchases-capacitor-ui` | `latest` (**nicht festgelegt**; muss zur Version des Kern-Plugins passen) | RevenueCat-Paywall und Customer Center (Android, nicht Web); zieht Jetpack Compose in die App (APK +13 MB) | MIT laut Angabe des Anbieters; in `node_modules/.../package.json` beim nächsten lokalen `npm install` gegenprüfen |
 | RevenueCat Android SDK, Google Play Billing Library | Billing 9.1.0 im Build 13 | Käufe | MIT (RevenueCat); Billing nach Google-Bedingungen |
 | AndroidX, Kotlin-Bibliotheken | von Gradle aufgelöst | Android-Grundlagen | Apache License 2.0 |
 | `esbuild` | `^0.25.0` | nur Build-Werkzeug (nicht in der App) | MIT |
 | Playwright, Python-Bibliotheken (Pillow, OpenCV, NumPy) | lokal | nur Tests und Bild-Skripte (nicht in der App) | verschiedene freie Lizenzen |
 
 **Offen:**
-- `latest` bei Capacitor und den beiden RevenueCat-Plugins (Kern und Paywall, gemeinsam festschreiben) bedeutet: jeder Build zieht die aktuelle Version. Nach dem ersten erfolgreichen Build die aufgelöste `package-lock.json` (liegt im Artefakt `versionen-<Nr>` als `npm-tree.txt`, bzw. lokal per `npm install`) festschreiben und `latest` durch feste Versionen ersetzen (`docs/TECHNIK.md`, Abschnitt Updates).
+- `latest` bei Capacitor und dem RevenueCat-Kern-Plugin bedeutet: jeder Build zieht die aktuelle Version. Nach dem ersten erfolgreichen Build die aufgelöste `package-lock.json` (liegt im Artefakt `versionen-<Nr>` als `npm-tree.txt`, bzw. lokal per `npm install`) festschreiben und `latest` durch feste Versionen ersetzen (`docs/TECHNIK.md`, Abschnitt Updates).
 - Eine vollständige Lizenzliste inklusive aller Unterbibliotheken (npm und Gradle) erzeugen und auf der Lizenzseite verlinken (z. B. mit `license-checker` für npm und dem Google-OSS-Licenses-Plugin für Gradle). Das ist ohne Netz nicht prüfbar und wird beim ersten CI-Lauf nachgeholt.
 
 ## 6. Pflege
@@ -106,3 +105,5 @@ Prüfung im Vergleich zu vorher: das Startbild unterscheidet sich nach dem Tausc
 - US Copyright Office, Copyright and Artificial Intelligence, Part 2: Copyrightability (29.01.2025): https://copyright.gov/newsnet/2025/1060.html
 - SIL Open Font License 1.1: https://openfontlicense.org (Texte der beiden Schriften: `www/ofl/`)
 - Schriftquellen: https://github.com/google/fonts (`ofl/fredoka`, `ofl/lilitaone`)
+
+Hinweis 25.11.2026: Das RevenueCat-Paywall-Plugin (`@revenuecat/purchases-capacitor-ui`, MIT laut Anbieter) war nur in v1.5.15 (Build 17) eingebaut und ist seit v1.5.16 nicht mehr im Paket (Pro ausgeschaltet, `docs/MONETARISIERUNG.md`, Abschnitt 11). Wird es wieder eingebaut, kommen die Zeile in diese Tabelle und der Eintrag in `www/licenses.html` zurück.

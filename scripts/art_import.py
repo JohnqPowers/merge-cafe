@@ -9,6 +9,7 @@ einheitliche Sprites in www/art/<key>.webp. Drei Arten, erkannt am Dateinamen:
   - Gaeste           c1_kapitaen_hein.png                  -> 240x270, Halbfigur steht unten buendig (Bildausschnitt bleibt wie gezeichnet)
   - Einzugs-Posen    e1_baristina.png                      -> 576x864, Ganzkoerper-Pose fuer den Einzug (ersetzt dort die Kachel)
   - Boden            f0_hamburg.png                        -> 1024x1024, deckend (Boden unter dem Brett, Stadt 0 = Hamburg ... f8)
+  - Hintergrund      b2_paris.png                          -> Vollbild im Hochformat, deckend, Breite 720 (ersetzt gezeichnete Szene und Boden der Welt N = 0 ... 8)
   - Rahmen           frame.png                             -> Magenta (#FF00FF) aussen und im Fenster wird transparent; der Rahmen wird auf
                                                                das Brett-Verhaeltnis umgebaut (Ecken bleiben, Mittelstuecke werden gedehnt) und
                                                                bekommt einen weichen Schatten -> frame.webp. Masse stehen in FR_* und im CSS (#board).
@@ -27,13 +28,14 @@ import cv2
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
-KEY = re.compile(r'^(g\d|k\d_s\d|[ace]\d{1,2}|f\d|frame\d?|fx_[a-z0-9]+)(?:[_.]|$)')
+KEY = re.compile(r'^(g\d|k\d_s\d|[ace]\d{1,2}|[bf]\d|frame\d?|fx_[a-z0-9]+)(?:[_.]|$)')
 AV_W = AV_H = 208                                                       # Figuren: Leinwand (Platz fuer Huete ueber der Kachel)
 AV_TILE = 176                                                           # Kantenlaenge der Kachel auf der Leinwand
 GU_W, GU_H = 240, 270                                                    # Gaeste: Seitenverhaeltnis wie die Vorlage (512x576)
 PO_W, PO_H = 576, 864                                                    # Einzugs-Posen (Ganzkoerper, 2:3)
 FX_S = 160                                                               # Effekt-Sprites
 FLOOR_W = 1024                                                           # Boeden: Breite (quadratisch)
+BG_W, BG_H_MAX = 720, 1600                                               # Hintergruende: Breite und hoechste Hoehe (Hochformat, 9:19,5 ergibt 720x1560)
 FR_W, FR_T = 1000, 0.068                                                 # Rahmen: Aussenbreite (Referenz) und Dicke als Anteil der Breite
 FR_H = round(FR_W * (1 - 2 * FR_T) * 8 / 7 + 2 * FR_W * FR_T)            # Fenster 7:8 -> Aussenhoehe (1123); CSS: aspect-ratio 1000/1123
 FR_PAD = (30, 16, 30, 52)                                                # Schattenrand links, oben, rechts, unten (CSS: inset -3% -1.425% -4.63% -3%)
@@ -49,7 +51,7 @@ def kind_of(key):
         return 'frame'
     if key.startswith('fx_'):
         return 'fx'
-    return {'a': 'avatar', 'c': 'guest', 'e': 'pose', 'f': 'floor'}.get(key[0], 'item')
+    return {'a': 'avatar', 'b': 'bg', 'c': 'guest', 'e': 'pose', 'f': 'floor'}.get(key[0], 'item')
 
 
 def cutout(im):
@@ -264,6 +266,17 @@ def floor_asset(im):
     return im.resize((FLOOR_W, round(im.size[1] * k)), Image.LANCZOS) if k < 1 else im
 
 
+def bg_asset(im):
+    """Vollbild-Hintergrund einer Welt: Hochformat, deckend (kein Alpha), auf BG_W Breite und hoechstens BG_H_MAX Hoehe verkleinert (nie vergroessert).
+    Das Spiel legt das Bild mit object-fit: cover und Ausrichtung oben auf den ganzen Schirm."""
+    im = im.convert('RGB')
+    w, h = im.size
+    if h < w * 1.4:
+        raise ValueError('Hintergrund muss ein Hochformat sein (mindestens 1:1,4), z. B. 1080x2340')
+    k = min(1.0, BG_W / w, BG_H_MAX / h)
+    return im.resize((round(w * k), round(h * k)), Image.LANCZOS) if k < 1 else im
+
+
 def sources(path):
     p = Path(path)
     if p.is_dir():
@@ -325,6 +338,8 @@ def main():
                 sp = portrait(cutout(im), FX_S, FX_S, 0.96, False)
             elif kd == 'floor':
                 sp = floor_asset(im)
+            elif kd == 'bg':
+                sp = bg_asset(im)
             elif kd == 'frame':
                 sp = frame_asset(im)
             else:
@@ -333,7 +348,7 @@ def main():
             print('FEHLER', name, '->', e)
             continue
         f = out / (key + '.webp')
-        sp.save(f, 'WEBP', quality=86 if kd in ('floor', 'frame') else 85, alpha_quality=95 if kd == 'frame' else 92, method=6)
+        sp.save(f, 'WEBP', quality=84 if kd == 'bg' else 86 if kd in ('floor', 'frame') else 85, alpha_quality=95 if kd == 'frame' else 92, method=6)
         total += f.stat().st_size
         done.append(key)
         print('ok  %-26s -> art/%s.webp (%d KB)' % (name, key, f.stat().st_size // 1024))
