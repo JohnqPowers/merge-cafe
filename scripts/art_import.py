@@ -27,7 +27,7 @@ import cv2
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
-KEY = re.compile(r'^(g\d|k\d_s\d|[ace]\d{1,2}|f\d|frame|fx_[a-z0-9]+)(?:[_.]|$)')
+KEY = re.compile(r'^(g\d|k\d_s\d|[ace]\d{1,2}|f\d|frame\d?|fx_[a-z0-9]+)(?:[_.]|$)')
 AV_W = AV_H = 208                                                       # Figuren: Leinwand (Platz fuer Huete ueber der Kachel)
 AV_TILE = 176                                                           # Kantenlaenge der Kachel auf der Leinwand
 GU_W, GU_H = 240, 270                                                    # Gaeste: Seitenverhaeltnis wie die Vorlage (512x576)
@@ -45,7 +45,7 @@ def key_of(name):
 
 
 def kind_of(key):
-    if key == 'frame':
+    if re.fullmatch(r'frame\d?', key):                                     # frame = Standard, frame<N> = eigener Rahmen der Welt N
         return 'frame'
     if key.startswith('fx_'):
         return 'fx'

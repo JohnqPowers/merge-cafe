@@ -466,7 +466,7 @@ svg.ic.l{width:26px;height:26px}
 #board::before{content:"";position:absolute;inset:calc(var(--ft) - 3px);height:auto;border-radius:calc(var(--bw) * .065);z-index:-1;pointer-events:none;
   background:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,0) 16%),radial-gradient(circle at 7px 7px,rgba(255,255,255,.14) 1.4px,rgba(255,255,255,0) 2px) 0 0/16px 16px,linear-gradient(170deg,var(--fr1),var(--fr2));
   box-shadow:inset 0 4px 9px rgba(0,0,0,.45),inset 0 -2px 0 rgba(255,255,255,.14)}
-#board::after{content:"";position:absolute;inset:-1.425% -3% -4.63% -3%;z-index:6;pointer-events:none;background:url(art/frame.webp) 0 0/100% 100% no-repeat}
+#board::after{content:"";position:absolute;inset:-1.425% -3% -4.63% -3%;z-index:6;pointer-events:none;background:var(--frimg,url(art/frame.webp)) 0 0/100% 100% no-repeat}
 .sc-floor{position:absolute;display:block;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none}
 .cell,.cell:nth-child(odd){background:var(--hole);border-radius:12px;box-shadow:var(--holesh)}
 .cell:nth-child(even){background:var(--hole2)}
@@ -1226,7 +1226,7 @@ const avArt = v => ART.has(avId(v)) ? ' art' : '';
 const avatarHTML = v => { const id = avId(v); return ART.has(id) ? `<img class="avi" src="art/${id}.webp" alt="" draggable="false" decoding="async">` : AV_BY[id].em; };
 const avStyle = v => { const c = AV_COL[(+avId(v).slice(1) - 1) % AV_COL.length]; return `--ah:${c};--ah2:${shade(c, -.3)}`; };
 const preArt = k => { if (ART.has(k)) { const im = new Image(); im.decoding = 'async'; im.src = 'art/' + k + '.webp'; } };
-(window.requestIdleCallback || setTimeout)(() => ART.forEach(k => { if (!/^e\d+$/.test(k)) preArt(k); }));      // Einzugs-Posen (e<N>) lädt erst die Wahl der Figur
+(window.requestIdleCallback || setTimeout)(() => ART.forEach(k => { if (!/^(e|frame)\d+$/.test(k)) preArt(k); }));      // Einzugs-Posen (e<N>) lädt erst die Wahl der Figur, Rahmen (frame<N>) erst die Welt
 const maxTier = c => CHAINS[c].items.length - 1;
 const center = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
 const pname = () => (S.profile.name || t('defName'));
@@ -2509,8 +2509,18 @@ for (let i = 0; i < N; i++) { const d = document.createElement('div'); d.classNa
 let selected = -1, lastChapter = null, bootDefer = true;
 const worldIdx = () => { const cur = CHAPTERS.indexOf(chapterFor(S.level)); return S.worldPick != null && S.worldPick <= cur ? S.worldPick : cur; };
 const PRE = {}, PCART = {};
+let frameWant = -1;
 const idle = fn => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 5000 }) : setTimeout(fn, 1500));
 const afterPaint = fn => requestAnimationFrame(() => setTimeout(fn, 16));
+/* Rahmen je Welt: art/frame<N>.webp (eigener oder umgefärbter Rahmen); ohne Bild bleibt der Standard-Rahmen (CSS-Variable --frimg) */
+function setFrameArt(i, now) {
+  const k = 'frame' + i, r = document.documentElement.style; frameWant = i;
+  if (!ART.has(k)) { r.removeProperty('--frimg'); return; }
+  const u = 'url(art/' + k + '.webp)';
+  if (now) { r.setProperty('--frimg', u); return; }                       // erster Aufbau: direkt setzen (kein Standard-Rahmen dazwischen)
+  const im = new Image(); im.decoding = 'async'; im.onload = () => { if (frameWant === i) r.setProperty('--frimg', u); };   // sonst erst wenn geladen, ohne Flackern
+  im.src = 'art/' + k + '.webp';
+}
 function buildLayer(i) {
   const l = document.createElement('div'); l.className = 'sc-layer'; l.innerHTML = Scenes.svg(i);
   if (ART.has('f' + i)) { const im = new Image(); im.className = 'sc-floor'; im.alt = ''; im.decoding = 'async'; im.draggable = false; im.src = 'art/f' + i + '.webp'; l.appendChild(im); }   // fertiger Boden (docs/ART_BRIEF.md)
@@ -2523,14 +2533,14 @@ function cardArt(i, still) { // <svg> fuer Postkarte/Weltkarte; vorgebaute Versi
 /* Naechste Stadt im Leerlauf vorbauen, damit der Wechsel beim Level-Up ohne Hänger klappt */
 function prewarm() {
   const nxt = CHAPTERS.indexOf(chapterFor(S.level)) + 1; if (nxt >= CHAPTERS.length) return;
-  setTimeout(() => idle(() => { if (!PRE[nxt]) PRE[nxt] = buildLayer(nxt); idle(() => { if (!PCART[nxt]) PCART[nxt] = cardArt(nxt, false); }); }), 2500);
+  setTimeout(() => idle(() => { if (!PRE[nxt]) PRE[nxt] = buildLayer(nxt); preArt('frame' + nxt); idle(() => { if (!PCART[nxt]) PCART[nxt] = cardArt(nxt, false); }); }), 2500);
 }
 function applyChapter(animate, banner) {
   const i = worldIdx(); if (lastChapter === i) return;
   const first = lastChapter === null; lastChapter = i;
   const ch = CHAPTERS[i], r = document.documentElement.style;
   r.setProperty('--board', ch.ui[0]); r.setProperty('--cell', ch.ui[1]); r.setProperty('--cell2', ch.ui[2]);
-  r.setProperty('--awn1', AWN[i][0]); r.setProperty('--awn2', AWN[i][1]); r.setProperty('--fr1', FRAME[i][0]); r.setProperty('--fr2', FRAME[i][1]);
+  r.setProperty('--awn1', AWN[i][0]); r.setProperty('--awn2', AWN[i][1]); r.setProperty('--fr1', FRAME[i][0]); r.setProperty('--fr2', FRAME[i][1]); setFrameArt(i, first);
   Sound.setWorld(i);
   if (first && bootDefer) { bootDefer = false; return; } // Szene folgt nach dem ersten Bild
   const sc = $('#scene'), layer = PRE[i] || buildLayer(i); delete PRE[i];
