@@ -30,7 +30,7 @@ window.Capacitor={isNativePlatform:()=>true,getPlatform:()=>'android',Plugins:{
   showConsentForm:async()=>{L('AdMob.showConsentForm');await wait(250);window.__cfg.info=window.__cfg.afterForm;return window.__cfg.afterForm},
   showPrivacyOptionsForm:async()=>{L('AdMob.showPrivacyOptionsForm');if(window.__cfg.afterPrivacy)window.__cfg.info=window.__cfg.afterPrivacy},
   initialize:async o=>{L('AdMob.initialize '+JSON.stringify(o))},
-  prepareRewardVideoAd:async()=>{L('AdMob.prepareRewardVideoAd')},
+  prepareRewardVideoAd:async o=>{L('AdMob.prepareRewardVideoAd '+JSON.stringify(o||{}))},
   showRewardVideoAd:async()=>{L('AdMob.showRewardVideoAd');return {type:'coin',amount:1}}
  },
  Purchases:{
@@ -42,7 +42,7 @@ window.Capacitor={isNativePlatform:()=>true,getPlatform:()=>'android',Plugins:{
   purchaseStoreProduct:async o=>{L('RC.purchaseStoreProduct '+o.product.identifier);return {}}
  }}};
 """ % json.dumps(cfg)
-async def mk(b, cfg=None, native=True, af=True, legal=True):
+async def mk(b, cfg=None, native=True, af=True, legal=True, build=None):
     pg = await b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=1, locale='de-DE')
     pg.errs = []
     pg.on('pageerror', lambda e: pg.errs.append('PAGEERR ' + str(e)))
@@ -52,6 +52,7 @@ async def mk(b, cfg=None, native=True, af=True, legal=True):
             r = await route.fetch(); body = (await r.text()).replace('legalReady: false', 'legalReady: true', 1)
             await route.fulfill(response=r, body=body)
         await pg.route('**/index.html', fix)
+    if build is not None: await pg.route('**/build.json', lambda r: r.fulfill(status=200, content_type='application/json', body=json.dumps(build)))
     if native:
         await pg.add_init_script(native_mock(cfg))
         if af: await pg.route('**/af.js', lambda r: r.fulfill(status=200, content_type='application/javascript', body=AF_MOCK))
@@ -180,6 +181,22 @@ async def main():
         ok('S9 gesperrt: Hinweis „Testversion“ in den Optionen, keine Werbe-Einstellungen', 'Testversion' in txt and not await pg.evaluate("!!document.querySelector('[data-act=privopt]')"), txt[-160:].replace('\n', ' | '))
         await pg.evaluate("MC.close()"); await pg.evaluate("MC.levelUp(13)"); await pg.wait_for_timeout(300)
         ok('S9 gesperrt: keine Messereignisse, keine Fehler', await log(pg) == [] and not pg.errs, pg.errs); await pg.close()
+        # S10: Debug-Paket (build.json vorhanden) -> Testanzeigen; S11: Store-Paket (keine Datei) -> Kennung aus CONFIG
+        cfg = {'info': {'status': 'NOT_REQUIRED', 'isConsentFormAvailable': False, 'canRequestAds': True, 'privacyOptionsRequirementStatus': 'NOT_REQUIRED'}}
+        dbg = {'kind': 'debug', 'admobRewarded': 'ca-app-pub-3940256099942544/5224354917'}
+        pg = await mk(b, cfg, build=dbg); lg = await log(pg); print('S10 Log:', [l for l in lg if l.startswith('AdMob')])
+        ok('S10 Debug: AdMob.initialize mit Testmodus', any(l.startswith('AdMob.initialize') and '"initializeForTesting":true' in l for l in lg), lg)
+        ok('S10 Debug: Video mit Test-Anzeigenblock und isTesting', any(l.startswith('AdMob.prepareRewardVideoAd') and '5224354917' in l and '"isTesting":true' in l for l in lg), lg)
+        await pg.evaluate("MC.close()"); await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
+        txt = await pg.evaluate("document.getElementById('modalBody').innerText")
+        ok('S10 Debug: Hinweis „Test-Paket“ in den Optionen', 'Test-Paket' in txt, txt[-120:].replace('\n', ' | '))
+        ok('S10 keine Fehler', not pg.errs, pg.errs); await pg.close()
+        pg = await mk(b, cfg); lg = await log(pg); print('S11 Log:', [l for l in lg if l.startswith('AdMob')])
+        ok('S11 Store-Paket: kein Testmodus', any(l.startswith('AdMob.initialize') and '"initializeForTesting":false' in l for l in lg), lg)
+        ok('S11 Store-Paket: Video mit Kennung aus CONFIG, isTesting aus', any(l.startswith('AdMob.prepareRewardVideoAd') and '"isTesting":false' in l and '5224354917' in l for l in lg), lg)
+        await pg.evaluate("MC.close()"); await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
+        ok('S11 Store-Paket: kein Test-Hinweis', 'Test-Paket' not in await pg.evaluate("document.getElementById('modalBody').innerText"))
+        ok('S11 keine Fehler', not pg.errs, pg.errs); await pg.close()
         await b.close()
     print(f'\nERGEBNIS: {sum(res)}/{len(res)} bestanden')
 asyncio.run(main())

@@ -992,7 +992,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.10',
+  version: '1.5.11',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
@@ -1031,6 +1031,7 @@ const STR = {
     privacy:'Datenschutz', legal:'Impressum', licenses:'Lizenzen', adPriv:'Werbe-Einstellungen', adPrivD:'Einwilligung ansehen oder ändern', open:'Öffnen',
     testBuild:'Testversion: Werbung, Käufe und Messung sind aus, bis Impressum und Datenschutz vollständig sind.',
     rotate:'Bitte ins Hochformat drehen – das Spiel braucht mehr Höhe.',
+    dbgBuild:'Test-Paket: Werbung zeigt nur Testanzeigen.',
     adOff:'Werbung ist aus. Du kannst das unter Optionen ändern.', storeOff:'Käufe sind gerade nicht verfügbar.', collection:'Sammlung', adPlaying:'Werbung läuft …', adDemo:'(Demo-Werbung im Browser)',
     energyFull:'Energie voll', thanks:'Danke für deinen Kauf!',
     purchaseFail:'Kauf abgebrochen.', adFail:'Gerade keine Werbung verfügbar.', limitAds:'Tageslimit erreicht',
@@ -1063,6 +1064,7 @@ const STR = {
     privacy:'Privacy', legal:'Legal notice', licenses:'Licenses', adPriv:'Ad choices', adPrivD:'Review or change your consent', open:'Open',
     testBuild:'Test build: ads, purchases and measurement are off until the legal notice and privacy policy are complete.',
     rotate:'Please rotate to portrait – the game needs more height.',
+    dbgBuild:'Test package: ads show test ads only.',
     adOff:'Ads are off. You can change this under Settings.', storeOff:'Purchases are not available right now.', collection:'Collection', adPlaying:'Ad playing …', adDemo:'(demo ad in browser)',
     energyFull:'Energy full', thanks:'Thanks for your purchase!',
     purchaseFail:'Purchase cancelled.', adFail:'No ad available right now.', limitAds:'Daily limit reached',
@@ -1179,13 +1181,14 @@ const FALLBACK_PRICE = { starter_pack: '1,99 €', gems_small: '0,99 €', gems_
    Ereignisse, die vor dem Start anfallen (z. B. session_start), warten in einer Warteschlange und gehen erst nach start() raus;
    wird keine Messung erlaubt, werden sie verworfen. */
 const Platform = {
-  consentOk: false, privacyForm: false, decided: false, locked: false,
+  consentOk: false, privacyForm: false, decided: false, locked: false, build: {},
   adsInit: false, adReady: false, adBusy: false,
   afReady: false, afOn: false, afInit: false, afPending: true, evq: [],
   rcOk: false, products: {},
   async init() {
     if (!isNative()) { this.consentOk = true; this.decided = true; this.dropQueue(); return; }
     if (!CONFIG.legalReady) { this.locked = true; this.decided = true; this.dropQueue(); return; }       // Rechtstexte unvollständig: weder Werbung noch Käufe noch Messung
+    await this.buildInfo();                                                                          // Debug-Paket? (Test-Anzeigenblock)
     const rc = this.initRC();                                                                        // Käufe unabhängig von der Werbe-Einwilligung
     try { if (await loadScript('af.js')) await Promise.race([this.afPrepare(), new Promise(r => setTimeout(r, 8000))]); } catch (e) { console.warn('AppsFlyer', e); }   // hängt die Vorbereitung, blockiert sie die Einwilligung nicht
     await this.consent();                                                                            // fragt bei Bedarf (EU/UK) den Nutzer
@@ -1241,16 +1244,26 @@ const Platform = {
     try { await A.showPrivacyOptionsForm(); this.setConsent(await A.requestConsentInfo()); } catch (e) { console.warn('Privacy options', e); }
     if (!this.consentOk) { this.adReady = false; this.stopMeasurement(); } else { this.initAds(); this.afMaybeStart(); }
   },
+  /* Nur das Debug-Paket (Test-APK) enthält die Datei build.json (scripts/patch-android.js). Dort laufen Anzeigen mit Googles Test-Anzeigenblock,
+     damit eigene Klicks beim Testen nie echte Anzeigen treffen (sonst droht AdMob-Sperre). Das Store-Paket hat die Datei nicht. */
+  async buildInfo() {
+    try {
+      const r = await Promise.race([fetch('build.json', { cache: 'no-store' }), new Promise((_, no) => setTimeout(no, 1500))]);
+      if (r && r.ok) { const j = await r.json(); if (j && j.kind === 'debug') this.build = j; }
+    } catch (e) {}
+    return this.build;
+  },
   async initAds() {
     const A = Plug().AdMob; if (!A || this.adsInit || !this.consentOk) return; this.adsInit = true;
-    try { await A.initialize({ maxAdContentRating: 'ParentalGuidance' }); } catch (e) { console.warn('AdMob init', e); this.adsInit = false; return; }
+    try { await A.initialize({ maxAdContentRating: 'ParentalGuidance', initializeForTesting: this.build.kind === 'debug' }); } catch (e) { console.warn('AdMob init', e); this.adsInit = false; return; }
     this.preloadAd();
   },
   /* Nächstes Video schon im Hintergrund laden, damit der Tipp sofort wirkt */
   async preloadAd() {
     const P = Plug(); if (!P.AdMob || !this.adsInit || !this.consentOk || this.adReady || this.adBusy) return this.adReady;
     this.adBusy = true;
-    try { await P.AdMob.prepareRewardVideoAd({ adId: osName() === 'ios' ? CONFIG.admob.rewardedIOS : CONFIG.admob.rewardedAndroid }); this.adReady = true; }
+    const dbg = this.build.kind === 'debug';
+    try { await P.AdMob.prepareRewardVideoAd({ adId: dbg && this.build.admobRewarded ? this.build.admobRewarded : (osName() === 'ios' ? CONFIG.admob.rewardedIOS : CONFIG.admob.rewardedAndroid), isTesting: dbg }); this.adReady = true; }
     catch (e) { this.adReady = false; }
     this.adBusy = false; return this.adReady;
   },
@@ -3237,7 +3250,8 @@ function openSettings() {
     <div class="row"><div class="mi">${ic('note')}</div><div class="tx">${t('licenses')}</div><a class="btn b" style="text-decoration:none" href="licenses.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
     <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
-    ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}`, 'settings');
+    ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}
+    ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}</p>` : ''}`, 'settings');
 }
 $('#modalBody').addEventListener('click', e => {
   const wc = e.target.closest('[data-world]');

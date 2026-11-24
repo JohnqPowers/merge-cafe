@@ -28,6 +28,13 @@ if (!/android:screenOrientation=/.test(m)) {
   if (y !== m) { m = y; fs.writeFileSync(manifest, m); console.log('Hochformat gesperrt'); }
   else console.warn('WARNUNG: MainActivity im Manifest nicht gefunden, Ausrichtung nicht gesperrt');
 }
+// Debug-Paket (öffentliche Test-APK): Markierung für Googles Test-Anzeigenblock. Liegt nur in src/debug, also nicht im Store-Paket.
+// Das Spiel liest die Datei beim Start (Platform.buildInfo in www/index.html). Der Testblock steht hier, nicht in www/index.html,
+// weil inject-config.js dort die Test-Kennung durch die echte ersetzt.
+const dbgDir = 'android/app/src/debug/assets/public';
+fs.mkdirSync(dbgDir, { recursive: true });
+fs.writeFileSync(dbgDir + '/build.json', JSON.stringify({ kind: 'debug', admobRewarded: 'ca-app-pub-3940256099942544/5224354917' }) + '\n');
+console.log('Debug-Paket: Test-Anzeigenblock markiert');
 let g = fs.readFileSync(gradle, 'utf8');
 g = g.replace(/versionCode\s+\d+/, `versionCode ${build}`).replace(/versionName\s+"[^"]*"/, `versionName "1.0.${build}"`);
 fs.writeFileSync(gradle, g);
