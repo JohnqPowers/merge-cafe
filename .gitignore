@@ -4,3 +4,5 @@ ios/
 *.jks
 *.keystore
 .env
+www/af.js
+npm-tree.txt

@@ -1,5 +1,6 @@
 // Ergänzt das generierte Android-Projekt um Pflichteinträge:
 // - AdMob APPLICATION_ID (ohne diesen Eintrag stürzt die App beim Start ab)
+// - VIBRATE-Berechtigung (Vibration im Spiel)
 // - versionCode / versionName aus der Build-Nummer
 const fs = require('node:fs');
 const manifest = 'android/app/src/main/AndroidManifest.xml';
@@ -12,6 +13,12 @@ if (!m.includes('com.google.android.gms.ads.APPLICATION_ID')) {
   m = m.replace(/<application([^>]*)>/, `<application$1>\n        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="${admobAppId}"/>`);
   fs.writeFileSync(manifest, m);
   console.log('AdMob APPLICATION_ID eingetragen');
+}
+// Vibration (Einstellung „Vibration“ im Spiel): ohne diese Berechtigung ignoriert Android navigator.vibrate() in der App still.
+if (!m.includes('android.permission.VIBRATE')) {
+  m = m.replace('</manifest>', '    <uses-permission android:name="android.permission.VIBRATE" />\n</manifest>');
+  fs.writeFileSync(manifest, m);
+  console.log('VIBRATE-Berechtigung eingetragen');
 }
 let g = fs.readFileSync(gradle, 'utf8');
 g = g.replace(/versionCode\s+\d+/, `versionCode ${build}`).replace(/versionName\s+"[^"]*"/, `versionName "1.0.${build}"`);

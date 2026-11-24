@@ -8,18 +8,21 @@
     "sync": "npx cap sync",
     "android": "npx cap open android",
     "ios": "npx cap open ios",
-    "web-zip": "node -e \"require('child_process').execSync('cd www && tar -a -c -f ../merge-cafe-web.zip *',{stdio:'inherit',shell:true})\""
+    "web-zip": "node -e \"require('child_process').execSync('cd www && tar -a -c -f ../merge-cafe-web.zip *',{stdio:'inherit',shell:true})\"",
+    "bundle": "node scripts/bundle-af.js"
   },
   "dependencies": {
-    "@capacitor/core": "latest",
+    "appsflyer-capacitor-plugin": "7.0.4",
+    "@appsflyer-sdk/js-core-plugin": "7.1.0",
+    "@capacitor-community/admob": "^8.0.0",
     "@capacitor/android": "latest",
+    "@capacitor/core": "latest",
     "@capacitor/ios": "latest",
-    "@capacitor-community/admob": "latest",
-    "appsflyer-capacitor-plugin": "latest",
     "@revenuecat/purchases-capacitor": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
-    "@capacitor/assets": "latest"
+    "@capacitor/assets": "latest",
+    "esbuild": "^0.25.0"
   }
 }

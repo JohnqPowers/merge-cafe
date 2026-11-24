@@ -37,6 +37,16 @@ jobs:
         run: npm install
       - name: Schlüssel einsetzen
         run: node scripts/inject-config.js
+      - name: AppsFlyer-Schnittstelle bündeln (www/af.js)
+        run: node scripts/bundle-af.js
+      - name: Eingesetzte Versionen festhalten
+        run: |
+          npm ls --all --omit=dev > npm-tree.txt || true
+          { echo '### Eingesetzte Versionen (npm ls)'; echo '```'; npm ls --depth=0 || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: versionen-${{ github.run_number }}
+          path: npm-tree.txt
       - name: Android-Projekt erzeugen
         run: |
           npx cap add android

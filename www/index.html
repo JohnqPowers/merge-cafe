@@ -986,7 +986,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.7',
+  version: '1.5.8',
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -1021,7 +1021,8 @@ const STR = {
     max:'MAX', dailyT:'Täglicher Bonus', claim:'Abholen', claimed:'Morgen wieder!', day:'Tag',
     sfx:'Soundeffekte', music:'Musik', vib:'Vibration', on:'An', off:'Aus',
     reset:'Fortschritt löschen', resetSure:'Wirklich? Nochmal tippen.',
-    privacy:'Datenschutz', collection:'Sammlung', adPlaying:'Werbung läuft …', adDemo:'(Demo-Werbung im Browser)',
+    privacy:'Datenschutz', legal:'Impressum', licenses:'Lizenzen', adPriv:'Werbe-Einstellungen', adPrivD:'Einwilligung ansehen oder ändern', open:'Öffnen',
+    adOff:'Werbung ist aus. Du kannst das unter Optionen ändern.', storeOff:'Käufe sind gerade nicht verfügbar.', collection:'Sammlung', adPlaying:'Werbung läuft …', adDemo:'(Demo-Werbung im Browser)',
     energyFull:'Energie voll', thanks:'Danke für deinen Kauf!',
     purchaseFail:'Kauf abgebrochen.', adFail:'Gerade keine Werbung verfügbar.', limitAds:'Tageslimit erreicht',
     play:'Spielen', welcomeNew:'Dein eigenes Café wartet auf dich!', welcomeBack:'Willkommen zurück, {n}!',
@@ -1050,7 +1051,8 @@ const STR = {
     max:'MAX', dailyT:'Daily Bonus', claim:'Claim', claimed:'Come back tomorrow!', day:'Day',
     sfx:'Sound effects', music:'Music', vib:'Vibration', on:'On', off:'Off',
     reset:'Reset progress', resetSure:'Sure? Tap again.',
-    privacy:'Privacy', collection:'Collection', adPlaying:'Ad playing …', adDemo:'(demo ad in browser)',
+    privacy:'Privacy', legal:'Legal notice', licenses:'Licenses', adPriv:'Ad choices', adPrivD:'Review or change your consent', open:'Open',
+    adOff:'Ads are off. You can change this under Settings.', storeOff:'Purchases are not available right now.', collection:'Collection', adPlaying:'Ad playing …', adDemo:'(demo ad in browser)',
     energyFull:'Energy full', thanks:'Thanks for your purchase!',
     purchaseFail:'Purchase cancelled.', adFail:'No ad available right now.', limitAds:'Daily limit reached',
     play:'Play', welcomeNew:'Your very own café is waiting!', welcomeBack:'Welcome back, {n}!',
@@ -1153,46 +1155,100 @@ const APP_NAME = "Noa's Bean Trail"; // Spielname: hier, in <title>, manifest, c
 const Cap = () => window.Capacitor;
 const Plug = () => (window.Capacitor && window.Capacitor.Plugins) || {};
 const osName = () => (Cap() && Cap().getPlatform && Cap().getPlatform()) || 'web';
+const isNative = () => !!(Cap() && Cap().isNativePlatform && Cap().isNativePlatform());
+const loadScript = src => new Promise(res => { const el = document.createElement('script'); el.src = src; el.onload = () => res(true); el.onerror = () => res(false); document.head.appendChild(el); });
+const FALLBACK_PRICE = { starter_pack: '1,99 €', gems_small: '0,99 €', gems_large: '4,99 €' };   // nur Anzeige im Browser; in der App zeigt der Store den echten Preis
 
+/* Ablauf beim Start der App (Browser: nichts davon):
+   1. Einwilligung (Google UMP, DSGVO) – ohne sie werden weder Werbung angefordert noch Messdaten gesendet.
+   2. Nur wenn erlaubt (canRequestAds): AdMob starten, erstes Belohnungs-Video vorladen, AppsFlyer starten.
+   3. RevenueCat (Käufe) ist unabhängig davon, braucht nur die anonyme App-Kennung.
+   AppsFlyer 7: Schnittstelle liegt in www/af.js (vom Build gebündelt, scripts/bundle-af.js) als window.AFPlugin.
+   Reihenfolge laut Hersteller: TCF-Daten aktivieren → init → Session-bereit-Listener → dort start(), nachdem die Einwilligung geklärt ist.
+   Ereignisse, die vor dem Start anfallen (z. B. session_start), warten in einer Warteschlange und gehen erst nach start() raus;
+   wird keine Messung erlaubt, werden sie verworfen. */
 const Platform = {
+  consentOk: false, privacyForm: false, decided: false,
+  adsInit: false, adReady: false, adBusy: false,
+  afReady: false, afOn: false, afInit: false, afPending: true, evq: [],
+  rcOk: false, products: {},
   async init() {
-    const P = Plug();
-    try { if (P.AppsFlyer) await P.AppsFlyer.initSDK({ devKey: CONFIG.appsflyer.devKey, appID: CONFIG.appsflyer.iosAppId, isDebug: false, registerConversionListener: true, waitForATTUserAuthorization: 10 }); } catch (e) { console.warn('AppsFlyer init', e); }
-    try { if (P.AdMob) await P.AdMob.initialize({}); } catch (e) { console.warn('AdMob init', e); }
-    try { await this.consent(); } catch (e) {}
-    this.preloadAd();
-    try { if (P.Purchases) await P.Purchases.configure({ apiKey: osName() === 'ios' ? CONFIG.revenuecat.ios : CONFIG.revenuecat.android }); } catch (e) { console.warn('RevenueCat init', e); }
+    if (!isNative()) { this.consentOk = true; this.decided = true; this.dropQueue(); return; }
+    const rc = this.initRC();                                                                        // Käufe unabhängig von der Werbe-Einwilligung
+    try { if (await loadScript('af.js')) await Promise.race([this.afPrepare(), new Promise(r => setTimeout(r, 8000))]); } catch (e) { console.warn('AppsFlyer', e); }   // hängt die Vorbereitung, blockiert sie die Einwilligung nicht
+    await this.consent();                                                                            // fragt bei Bedarf (EU/UK) den Nutzer
+    this.decided = true;
+    if (this.consentOk) { this.initAds(); this.afMaybeStart(); } else this.dropQueue();
+    if (!window.AFPlugin || !this.afInit) this.dropQueue();                                          // ohne Messung nichts aufheben
+    await rc;
   },
+  /* AppsFlyer vorbereiten: TCF-Daten aktivieren, init (sendet noch nichts), Session-bereit-Listener */
+  async afPrepare() {
+    const AF = window.AFPlugin; if (!AF || this.afInit) return; this.afInit = true;
+    try {
+      try { await AF.enableTCFDataCollection({ shouldCollect: true }); } catch (e) { console.warn('AppsFlyer TCF', e); }
+      await AF.init({ devKey: CONFIG.appsflyer.devKey, appId: CONFIG.appsflyer.iosAppId });
+      await AF.registerSessionReadyListener(() => { this.afReady = true; this.afMaybeStart(); });
+    } catch (e) { console.warn('AppsFlyer init', e); this.afInit = false; this.dropQueue(); }
+  },
+  afMaybeStart() {
+    const AF = window.AFPlugin;
+    if (!AF || !this.afInit || !this.afReady || !this.decided || !this.consentOk || this.afOn || this.afStopped) return;
+    this.afOn = true;
+    AF.start().then(() => this.flushQueue()).catch(e => { console.warn('AppsFlyer start', e); this.afOn = false; });
+  },
+  afSend(name, params) { try { window.AFPlugin.logEvent({ eventName: name, eventValues: params }).catch(() => {}); } catch (e) {} },
+  flushQueue() { const q = this.evq; this.evq = []; this.afPending = false; q.forEach(([n, p]) => this.afSend(n, p)); },
+  dropQueue() { this.evq = []; this.afPending = false; },
+  stopMeasurement() { const AF = window.AFPlugin; this.afStopped = true; this.dropQueue(); if (AF && this.afOn) { this.afOn = false; try { AF.stop({ shouldStop: true }).catch(() => {}); } catch (e) {} } },
   track(name, params = {}) {
     try {
       (window.__events = window.__events || []).push({ name, params, ts: Date.now() });
-      const P = Plug();
-      if (P.AppsFlyer) P.AppsFlyer.logEvent({ eventName: name, eventValue: params }).catch(()=>{});
-      if (P.FirebaseAnalytics) P.FirebaseAnalytics.logEvent({ name, params }).catch(()=>{});
-      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+      if (this.afOn) this.afSend(name, params);
+      else if (this.afPending && this.evq.length < 60) this.evq.push([name, params]);
     } catch (e) {}
   },
-  adReady: false, adBusy: false,
-  /* Einwilligung (Google UMP / DSGVO): ohne sie liefert AdMob in der EU kaum Werbung aus */
+  /* Einwilligung (Google UMP / DSGVO). Läuft bei jedem Start; zeigt das Fenster nur, wenn es nötig ist. */
   async consent() {
-    const P = Plug(); if (!P.AdMob || !P.AdMob.requestConsentInfo) return;
+    const A = Plug().AdMob; if (!A || !A.requestConsentInfo) { this.consentOk = true; return; }
+    let info = null;
     try {
-      const info = await P.AdMob.requestConsentInfo();
-      if (info && info.isConsentFormAvailable && info.status === 'REQUIRED') await P.AdMob.showConsentForm();
+      info = await A.requestConsentInfo();
+      if (info && info.isConsentFormAvailable && info.status === 'REQUIRED') info = (await A.showConsentForm()) || info;
     } catch (e) { console.warn('Consent', e); }
+    this.setConsent(info);
+  },
+  setConsent(info) {
+    const st = info && info.status;
+    this.consentOk = !!info && (info.canRequestAds === true || (info.canRequestAds === undefined && (st === 'OBTAINED' || st === 'NOT_REQUIRED')));
+    this.privacyForm = !!info && info.privacyOptionsRequirementStatus === 'REQUIRED';
+  },
+  /* Einstellungen → „Werbe-Einstellungen“: Einwilligung ansehen oder widerrufen (Pflicht, wenn Google das Fenster verlangt) */
+  async privacyOptions() {
+    const A = Plug().AdMob; if (!A || !A.showPrivacyOptionsForm) return;
+    try { await A.showPrivacyOptionsForm(); this.setConsent(await A.requestConsentInfo()); } catch (e) { console.warn('Privacy options', e); }
+    if (!this.consentOk) { this.adReady = false; this.stopMeasurement(); } else { this.initAds(); this.afMaybeStart(); }
+  },
+  async initAds() {
+    const A = Plug().AdMob; if (!A || this.adsInit || !this.consentOk) return; this.adsInit = true;
+    try { await A.initialize({ maxAdContentRating: 'ParentalGuidance' }); } catch (e) { console.warn('AdMob init', e); this.adsInit = false; return; }
+    this.preloadAd();
   },
   /* Nächstes Video schon im Hintergrund laden, damit der Tipp sofort wirkt */
   async preloadAd() {
-    const P = Plug(); if (!P.AdMob || this.adReady || this.adBusy) return this.adReady;
+    const P = Plug(); if (!P.AdMob || !this.adsInit || !this.consentOk || this.adReady || this.adBusy) return this.adReady;
     this.adBusy = true;
     try { await P.AdMob.prepareRewardVideoAd({ adId: osName() === 'ios' ? CONFIG.admob.rewardedIOS : CONFIG.admob.rewardedAndroid }); this.adReady = true; }
     catch (e) { this.adReady = false; }
     this.adBusy = false; return this.adReady;
   },
+  adsAllowed() { return !isNative() || (this.consentOk && !!Plug().AdMob); },
   async showRewarded() {
     const P = Plug();
     if (P.AdMob) {
+      if (!this.consentOk) return false;
       try {
+        if (!this.adsInit) await this.initAds();
         if (!this.adReady) { toast(t('adLoading')); await this.preloadAd(); }
         if (!this.adReady) return false;
         this.adReady = false;
@@ -1203,14 +1259,30 @@ const Platform = {
     }
     return demoAd();
   },
-  async purchase(sku) {
-    const P = Plug();
-    if (!P.Purchases) return null;
+  /* Käufe (RevenueCat). Preise kommen aus dem Store (landesrichtig, mit Währung), nie aus dem Spiel. */
+  async initRC() {
+    const P = Plug(); if (!P.Purchases || this.rcOk) return this.rcOk;
+    try { await P.Purchases.configure({ apiKey: osName() === 'ios' ? CONFIG.revenuecat.ios : CONFIG.revenuecat.android }); this.rcOk = true; }
+    catch (e) { console.warn('RevenueCat init', e); }
+    return this.rcOk;
+  },
+  async loadPrices() {
+    const P = Plug(); if (!P.Purchases || !(this.rcOk || await this.initRC())) return;
     try {
-      const { products } = await P.Purchases.getProducts({ productIdentifiers: [sku] });
-      if (!products || !products.length) return false;
-      await P.Purchases.purchaseStoreProduct({ product: products[0] });
-      return true;
+      const r = await P.Purchases.getProducts({ productIdentifiers: Object.keys(GRANTS), type: 'inapp' });
+      ((r && r.products) || []).forEach(p => { this.products[p.identifier] = p; });
+    } catch (e) { console.warn('Preise', e); }
+  },
+  priceOf(sku) { const p = this.products[sku]; return p ? p.priceString : (isNative() ? '…' : FALLBACK_PRICE[sku]); },
+  /* null = keine Store-Anbindung (Browser), 'off' = Store gerade nicht erreichbar, false = abgebrochen/fehlgeschlagen, sonst { price, currency } */
+  async purchase(sku) {
+    const P = Plug(); if (!P.Purchases) return null;
+    try {
+      if (!(this.rcOk || await this.initRC())) return 'off';
+      if (!this.products[sku]) await this.loadPrices();
+      const product = this.products[sku]; if (!product) return 'off';
+      await P.Purchases.purchaseStoreProduct({ product });
+      return { price: product.price, currency: product.currencyCode };
     } catch (e) { return false; }
   }
 };
@@ -2974,17 +3046,21 @@ const adRow = () => {
 const refillRow = () => `<div class="row"><div class="mi">${ic('bolt')}</div><div class="tx">${t('refill')}<small>${maxEnergy()} ${ic('bolt')}</small></div><button class="btn" data-act="refill">${ic('gem')} 15</button></div>`;
 function openShop() {
   const packs = [
-    !S.starter && { sku:'starter_pack', ic:'gift', name:t('starter'), d:`${ic('gem')}100 + ${ic('coin')}500 · ${t('oneTime')}`, price:'1,99 €', hl:1 },
-    { sku:'gems_small', ic:'gem', name:t('gemsS'), d:`${ic('gem')} 60`, price:'0,99 €' },
-    { sku:'gems_large', ic:'gem', name:t('gemsM'), d:`${ic('gem')} 400`, price:'4,99 €' }
+    !S.starter && { sku:'starter_pack', ic:'gift', name:t('starter'), d:`${ic('gem')}100 + ${ic('coin')}500 · ${t('oneTime')}`, hl:1 },
+    { sku:'gems_small', ic:'gem', name:t('gemsS'), d:`${ic('gem')} 60` },
+    { sku:'gems_large', ic:'gem', name:t('gemsM'), d:`${ic('gem')} 400` }
   ].filter(Boolean);
   openModal(`<h2>${ic('bag')}${t('shop')}</h2>
     <h3 class="first">${t('shopFree')}</h3>${adRow()}
     <h3>${t('shopEnergy')}</h3>${refillRow()}
     <h3>${t('gemsT')} <button class="what" data-act="gems" aria-label="${t('gemsHint')}">${ic('info')}</button></h3>
-    ${packs.map(p => `<div class="row ${p.hl ? 'hl' : ''}"><div class="mi">${ic(p.ic)}</div><div class="tx">${p.name}<small>${p.d}</small></div><button class="btn g" data-buy="${p.sku}">${p.price}</button></div>`).join('')}
+    ${packs.map(p => `<div class="row ${p.hl ? 'hl' : ''}"><div class="mi">${ic(p.ic)}</div><div class="tx">${p.name}<small>${p.d}</small></div><button class="btn g" data-buy="${p.sku}"${isNative() && !Platform.products[p.sku] ? ' disabled' : ''}>${Platform.priceOf(p.sku)}</button></div>`).join('')}
     <h3>${t('collection')}</h3>
     ${CHAINS.map((c, ci) => `<div class="chain">${c.items.map((e, ti) => `<span class="${S.seen[ci + ':' + ti] || ti === 0 ? '' : 'lock'}">${e}</span>`).join('')}</div>`).join('')}`, 'shop');
+  if (isNative() && packs.some(p => !Platform.products[p.sku])) Platform.loadPrices().then(paintPrices);      // Store-Preise nachladen und in die Knöpfe schreiben
+}
+function paintPrices() {
+  document.querySelectorAll('#modalBody [data-buy]').forEach(b => { const p = Platform.products[b.dataset.buy]; b.textContent = p ? p.priceString : '–'; b.disabled = !p; });
 }
 function openNoEnergy() {
   Sound.bonk();
@@ -3037,15 +3113,17 @@ const GRANTS = { starter_pack: { gems:100, coins:500 }, gems_small: { gems:60 },
 async function buy(sku) {
   const r = await Platform.purchase(sku);
   if (r === null) { toast(t('onlyApp')); return; }
+  if (r === 'off') { toast(t('storeOff')); return; }
   if (!r) { toast(t('purchaseFail')); return; }
   const g = GRANTS[sku]; S.gems += g.gems || 0; S.coins += g.coins || 0;
   if (sku === 'starter_pack') S.starter = true;
-  Platform.track('purchase', { sku }); once('first_purchase', { sku });
+  Platform.track('purchase', { sku, af_revenue: r.price, af_currency: r.currency }); once('first_purchase', { sku });
   Sound.giftOpen(); rain(80); toast(t('thanks')); save(); openShop(); render();
 }
 async function watchAd(place = 'shop_energy', onReward) {
   const A = adState();
   if (place === 'shop_energy' ? A.n >= AD_CAP.n : A.d >= AD_CAP.d) return false;
+  if (!Platform.adsAllowed()) { toast(t('adOff')); return false; }
   Platform.track('ad_request', { placement: place });
   const ok = await Platform.showRewarded(place);
   if (!ok) { toast(t('adFail')); return false; }
@@ -3140,7 +3218,10 @@ function openSettings() {
   openModal(`<h2>${ic('gear')}${t('settings')}</h2>
     <div class="row"><div class="mi av${avArt(S.profile.avatar)}" style="${avStyle(S.profile.avatar)}">${avatarHTML(S.profile.avatar)}</div><div class="tx">${t('profile')}<small>${esc(pname())} · ${esc(S.profile.cafe || t('defCafe'))}</small></div><button class="btn b" data-act="profile">${t('edit')}</button></div>
     ${tgl('sound', 'speaker', t('sfx'), S.sound)}${tgl('music', 'note', t('music'), S.music)}${tgl('vib', 'phone', t('vib'), S.vib)}
+    ${Platform.privacyForm ? `<div class="row"><div class="mi">${ic('tv')}</div><div class="tx">${t('adPriv')}<small>${t('adPrivD')}</small></div><button class="btn b" data-act="privopt">${t('open')}</button></div>` : ''}
     <div class="row"><div class="mi">${ic('shield')}</div><div class="tx">${t('privacy')}</div><a class="btn b" style="text-decoration:none" href="privacy.html">${ic('info')}</a></div>
+    <div class="row"><div class="mi">${ic('user')}</div><div class="tx">${t('legal')}</div><a class="btn b" style="text-decoration:none" href="impressum.html">${ic('info')}</a></div>
+    <div class="row"><div class="mi">${ic('note')}</div><div class="tx">${t('licenses')}</div><a class="btn b" style="text-decoration:none" href="licenses.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
     <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>`, 'settings');
 }
@@ -3162,6 +3243,7 @@ $('#modalBody').addEventListener('click', e => {
   else if (act === 'sound') { S.sound = !S.sound; save(); openSettings(); }
   else if (act === 'music') { S.music = !S.music; S.music ? Sound.musicOn() : Sound.musicOff(); save(); openSettings(); }
   else if (act === 'vib') { S.vib = !S.vib; save(); vibrate(30); openSettings(); }
+  else if (act === 'privopt') Platform.privacyOptions().then(() => { if (sheet === 'settings') openSettings(); });
   else if (act === 'profile') { closeModal(); showOnboarding(); }
   else if (act === 'reset') {
     if (!resetArm) { resetArm = true; a.textContent = t('resetSure'); return; }
