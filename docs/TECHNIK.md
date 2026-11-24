@@ -1,6 +1,6 @@
 # Technische Dokumentation – Noa's Bean Trail
 
-Stand: 24.11.2026. Spielversion 1.5.13 (Push auf `main` am 24.11.2026 freigegeben). Der Android-Build Nr. 13 (`versionName 1.0.13`, `versionCode 13`) ist am 24.11.2026 im CI durchgelaufen (Lauf 45487193159, Commit 48c1bc7); die Angaben zu Berechtigungen und Bibliotheken stammen aus seinem Manifest. Die Änderungen ab v1.5.8 (Einwilligung, AppsFlyer 7, Store-Preise, Sperre, Hochformat-Sperre, Test-Anzeigen im Debug-Paket) stecken damit erstmals in einem echten Android-Build und sind im Paket nachgewiesen (Paket-ID, Berechtigungen, Hochformat-Sperre, Testmarkierung, Signatur). **Auf einem Gerät oder Emulator ist der Build noch nicht gelaufen.**
+Stand: 24.11.2026. Spielversion 1.5.15 (Push auf `main` am 24.11.2026 freigegeben). Der Android-Build Nr. 13 (`versionName 1.0.13`, `versionCode 13`) ist am 24.11.2026 im CI durchgelaufen (Lauf 45487193159, Commit 48c1bc7); die Angaben zu Berechtigungen und Bibliotheken stammen aus seinem Manifest. Die Änderungen ab v1.5.8 (Einwilligung, AppsFlyer 7, Store-Preise, Sperre, Hochformat-Sperre, Test-Anzeigen im Debug-Paket) stecken damit erstmals in einem echten Android-Build und sind im Paket nachgewiesen (Paket-ID, Berechtigungen, Hochformat-Sperre, Testmarkierung, Signatur). **Auf einem Gerät oder Emulator ist der Build noch nicht gelaufen.** Seit v1.5.14 gibt es Noa's Pro (Abschnitt 5, Risiken R8 bis R11): Build 16 (Lauf 45497813780, Commit 21a6a4b) enthält den Pro-Ablauf, Build 17 (Lauf 45498986208, Commit b89a630, Spielversion 1.5.15) zusätzlich das RevenueCat-Paywall-Plugin. Beide sind im CI durchgelaufen; die Manifest-Angaben in Abschnitt 6 gelten unverändert (für Build 17 erneut gelesen).
 
 ## 1. Aufbau
 
@@ -21,7 +21,7 @@ Das Spiel läuft im Browser und, mit Capacitor verpackt, als Android-App (WebVie
 
 | Angabe | Wert | Quelle |
 |---|---|---|
-| Spielversion | `1.5.13` | `CONFIG.version` in `www/index.html` (bei jeder Änderung erhöhen) |
+| Spielversion | `1.5.15` | `CONFIG.version` in `www/index.html` (bei jeder Änderung erhöhen) |
 | Android `versionName` | `1.0.<Build-Nr.>` | `scripts/patch-android.js`, Build-Nr. = Lauf-Nr. von GitHub Actions |
 | Android `versionCode` | `<Build-Nr.>` (steigt mit jedem Lauf, wie Google Play es verlangt) | wie oben |
 | Paket-ID | `io.github.johnqpowers.beantrail` | `capacitor.config.json`, `.github/workflows/android.yml`, `.github/workflows/kpi.yml`. Vom Eigentümer am 24.11.2026 gewählt (vorher `io.github.johnqpowers.mergecafe`). **Nach dem ersten Upload in Google Play nie mehr änderbar**; sie erscheint in der Store-Adresse. Eine mit der alten ID installierte App wird nicht aktualisiert, sondern bleibt daneben bestehen (eigener Spielstand). |
@@ -34,12 +34,12 @@ Das Spiel läuft im Browser und, mit Capacitor verpackt, als Android-App (WebVie
 Auslöser: Push auf `main` (nur bei Änderungen an `www/`, `capacitor.config.json`, `package.json`, `assets/`, `scripts/` oder dem Workflow) oder manuell (mit Wahl des Play-Tracks, Standard `internal`).
 
 Ablauf in `android.yml`:
-1. `npm install` (Capacitor, AdMob, AppsFlyer, RevenueCat; **ohne Sperrdatei**).
+1. `npm install` (Capacitor, AdMob, AppsFlyer, RevenueCat samt Paywall-Plugin `@revenuecat/purchases-capacitor-ui`; **ohne Sperrdatei**).
 2. `node scripts/inject-config.js`: setzt Schlüssel aus den GitHub-Secrets ein und stellt `CONFIG.legalReady` auf `true`, **nur** wenn `privacy.html` und `impressum.html` keine Platzhalter `[[…]]` mehr enthalten (seit 24.11.2026 der Fall).
 3. `node scripts/bundle-af.js`: bündelt die AppsFlyer-Schnittstelle zu `www/af.js` (esbuild); bricht den Build ab, wenn das Paket fehlt oder die Datei zu klein ist.
 4. Versionsnachweis: `npm ls` als Artefakt `versionen-<Nr>` und in der Zusammenfassung des Laufs.
-5. `npx cap add android`, `capacitor-assets generate` (Icons, Startbild), `node scripts/patch-android.js` (AdMob-App-ID, VIBRATE, Hochformat-Sperre, Testmarkierung `build.json` nur für das Debug-Paket, Versionsnummern, Apostroph im Namen), `npx cap sync android`.
-6. Test-APK: `assembleDebug`, als Artefakt und als öffentlich herunterladbare Vorabversion `test-apk` im GitHub-Repo. Sie enthält die Datei `build.json` und zeigt deshalb nur Googles **Test**-Anzeigen (siehe R1).
+5. `npx cap add android`, `capacitor-assets generate` (Icons, Startbild), `node scripts/patch-android.js` (AdMob-App-ID, VIBRATE, Hochformat-Sperre, Testmarkierung `build.json` nur für das Debug-Paket, dort bei gesetztem Secret `REVENUECAT_TEST_KEY` auch der Test-Store-Schlüssel (R8), minSdk mindestens 24, Versionsnummern, Apostroph im Namen), `npx cap sync android`.
+6. Test-APK: `assembleDebug`, als Artefakt und als öffentlich herunterladbare Vorabversion `test-apk` im GitHub-Repo. Sie enthält die Datei `build.json` und zeigt deshalb nur Googles **Test**-Anzeigen (siehe R1) und, mit dem Secret `REVENUECAT_TEST_KEY`, die simulierten Käufe des RevenueCat-Test-Stores (siehe R8). Der Gradle-Aufruf läuft über `scripts/retry-net.sh`: bis zu drei Versuche, aber nur bei Netzwerkfehlern (HTTP 429/5xx, Zeitüberschreitung), nie bei Codefehlern (siehe R11).
 7. Store-Datei: signierte `.aab` (`npx cap build android … --androidreleasetype AAB`), nur wenn die Signier-Secrets gesetzt sind; Artefakt `noas-bean-trail-store-aab-<Nr>`.
 8. Upload nach Google Play (`r0adkll/upload-google-play`), nur wenn Signier- und Play-Secrets gesetzt sind. Track `internal`, Status `draft` (änderbar über die Repository-Variable `PLAY_RELEASE_STATUS`).
 
@@ -65,10 +65,12 @@ Lizenzen und Versionen: `docs/ASSETS_LIZENZEN.md`, Abschnitt 5. Datenflüsse im 
 | Google AdMob (Mobile Ads SDK) | belohnte Videos | Werbe-ID, IP, Geräte- und App-Angaben | erst nach Einwilligung, `Platform.initAds()` |
 | Google UMP (User Messaging Platform) | Einwilligungsfenster, „Werbe-Einstellungen“ | Einwilligungsstatus | beim Start, vor allem anderen |
 | AppsFlyer 7 (Plugin 7.0.4, JS-Kern 7.1.0) | Herkunfts- und Ereignismessung, Berichte für Almedia | Werbe-ID, IP, Geräteangaben, Ereignisse mit Zahlen | erst nach Einwilligung; stoppt beim Widerruf |
-| RevenueCat | Käufe, Preise aus dem Store | anonyme Kennung, Kaufbeleg, Produkt, Land | beim Start (nur App, nur wenn `legalReady`) |
+| RevenueCat (Kern-Plugin und Paywall-Plugin) | Käufe, Preise aus dem Store, Pro-Abo (Entitlement `noa_s_bean_trail_pro`), Paywall, Abo-Verwaltung (Customer Center) | anonyme Kennung, Kaufbeleg, Produkt, Land | beim Start (nur App, nur wenn `legalReady`) |
 | Google Play Billing | Zahlung | (nur Google) | über RevenueCat |
 
 Ohne Einwilligung bleiben AdMob und AppsFlyer aus; das Spiel bleibt vollständig spielbar. Ereignisse, die vor der Entscheidung entstehen, werden gemerkt (höchstens 60) und nur bei Zustimmung gesendet, sonst verworfen. Alle Ereignisnamen stehen in `docs/EVENTS.md` und werden nie umbenannt (Almedia rechnet darüber ab).
+
+**Noa's Pro (seit v1.5.14).** Pro ist der Zustand des RevenueCat-Entitlements `noa_s_bean_trail_pro` (`CONFIG.revenuecat.entitlement`). Die Quelle ist immer RevenueCat: Das Spiel fragt beim Start, bei der Rückkehr in die App, nach einer Änderungsmeldung des SDK und nach Paywall oder Wiederherstellen; im Spielstand steht nur der Tag des letzten Tagesgeschenks. Das Angebot kommt aus dem aktuellen Offering. Pakete werden über den Pakettyp (Monat, Jahr, Lifetime) erkannt, nicht über feste Produkt-IDs, und ohne geladenes Offering bleibt die Pro-Karte unsichtbar. Die Paywall zeigt das RevenueCat-UI-Plugin (`presentPaywallIfNeeded`), die Abo-Verwaltung das Customer Center (`presentCustomerCenter`); fehlt das Plugin oder wirft es einen Fehler, zeigt das Spiel eine eigene Paketliste bzw. einen Link zur Abo-Seite von Google Play. Vorteile (**Vorschlag, vom Eigentümer zu bestätigen**): Belohnungen ohne Video (gleiche Tageslimits) und täglich 5 Diamanten (nach dem Tutorial, einmal je UTC-Tag). Neue Ereignisse: `paywall_open`, `pro_start`, `pro_restore`; der erste Pro-Kauf zählt als `purchase` und `first_purchase`. Einzelheiten: `docs/MONETARISIERUNG.md`, Abschnitt Noa's Pro.
 
 ## 6. Berechtigungen (Manifest Build 13, am 24.11.2026 aus der Test-APK gelesen)
 
@@ -92,7 +94,7 @@ Nicht angefordert: Standort, Kamera, Mikrofon, Kontakte, Dateien, Benachrichtigu
 - **Spielstand bleibt kompatibel:** Neue Felder im Spielstand bekommen beim Laden Standardwerte; der Schlüssel `mergecafe_v1` bleibt. Vor Änderungen am Spielstand-Format `MC.state()` und einen alten Stand testen.
 - **Rückfall bei kaputtem Build:** zuerst den letzten Commit rückgängig machen, dann den Fehler beheben (`CLAUDE.md`).
 - **Jährlich:** Ziel-API-Level anheben (Capacitor-Hauptversion, AndroidX, Play Billing), Richtlinien-Änderungen von Google lesen.
-- **Abhängigkeiten festschreiben:** Capacitor und RevenueCat stehen auf `latest`. Nach dem ersten erfolgreichen Build die aufgelösten Versionen aus dem Artefakt `versionen-<Nr>` in `package.json` eintragen und `package-lock.json` einchecken.
+- **Abhängigkeiten festschreiben:** Capacitor und RevenueCat stehen auf `latest`. Nach dem ersten erfolgreichen Build die aufgelösten Versionen aus dem Artefakt `versionen-<Nr>` in `package.json` eintragen und `package-lock.json` einchecken. Kern-Plugin (`@revenuecat/purchases-capacitor`) und Paywall-Plugin (`@revenuecat/purchases-capacitor-ui`) müssen dieselbe Version haben und werden gemeinsam festgeschrieben.
 
 ## 8. Bekannte Risiken und offene Punkte
 
@@ -105,6 +107,10 @@ Nicht angefordert: Standort, Kamera, Mikrofon, Kontakte, Dateien, Benachrichtigu
 | R5 | Belohnungen werden im Spiel auf dem Gerät gutgeschrieben (kein Server). Manipulierte Geräte können sich Diamanten holen. | geringer Schaden bei einem reinen Offline-Spiel | akzeptiert; Käufe prüft RevenueCat serverseitig, die Gutschrift erfolgt trotzdem lokal |
 | R6 | AdMob-Umsatz je Anzeige geht nicht an AppsFlyer; der Werbe-ROAS muss aus dem AdMob-Bericht von Hand ergänzt werden | KPI „D7-ROAS“ ist nur teilweise automatisch | im Wochenbericht ergänzen |
 | R7 | Pflichtangaben und Konten (Impressum, Datenschutz, Play-Konto) fehlen noch | Werbung, Käufe und Messung bleiben in der App gesperrt (`legalReady`) | Eigentümer liefert Angaben |
+| R8 | **RevenueCat-Test-Store-Schlüssel (`test_…`).** Er lässt die App laut RevenueCat in jedem Release-Build (also in jedem Play-Track) beim Start absichtlich abstürzen. Er darf nie in `REVENUECAT_ANDROID_KEY` und nie in die Store-Datei. | Absturz beim Start für alle Spieler, falls doch | Er liegt nur im Secret `REVENUECAT_TEST_KEY` und kommt über `patch-android.js` ausschließlich in `build.json` des Debug-Pakets (öffentliche Test-APK; es ist ein öffentlicher SDK-Schlüssel, Käufe sind nur simuliert). Das Spiel ignoriert `test_`-Schlüssel außerhalb des Debug-Pakets (`tests/test_plattform.py`, S17), `inject-config.js` warnt bei einem `test_`-Schlüssel in `REVENUECAT_ANDROID_KEY`. `REVENUECAT_ANDROID_KEY` muss ein echter `goog_…`-Schlüssel sein. Prüfpunkt in Abschnitt 9. |
+| R9 | **Paywall-Plugin und Pro-Ablauf nur im Paket, nicht auf einem Gerät geprüft.** Build 17 ist durchgelaufen (APK 47 MB statt 34 MB, Jetpack Compose; neue Activities `PaywallActivity` und `CustomerCenterActivity`, keine neuen Berechtigungen; die Namen `presentPaywallIfNeeded` und `presentCustomerCenter` stehen im Paket). Aussehen der Paywall, Form der Ergebnisse und der Kundeninfo-Meldung sind nur aus der Dokumentation bekannt; das Spiel liest den Pro-Zustand deshalb immer aus dem Entitlement und nicht aus Ergebnistexten und hat eine eigene Paketliste als Ausweichlösung. Kern- und Paywall-Plugin stehen beide auf `latest` und können auseinanderlaufen. | Paywall bleibt leer oder zeigt Fehler | Gerätetest mit Test Store (Abschnitt 9); bei Build-Fehler zuerst den Commit mit dem Plugin zurücknehmen (`CLAUDE.md`). |
+| R10 | **RevenueCat-Dashboard noch nicht eingerichtet** (Stand: unbekannt, nicht vom Agenten prüfbar). Ohne aktuelles Angebot mit Paketen, Entitlement `noa_s_bean_trail_pro` an allen drei Produkten und eine gestaltete Paywall bleibt die Pro-Karte unsichtbar bzw. die Paywall leer. Ob das Customer Center im jetzigen RevenueCat-Tarif nutzbar ist, ist nicht geprüft. | Pro nicht kaufbar | Eigentümer richtet das Dashboard ein (Liste in `docs/MONETARISIERUNG.md`, Noa's Pro; Paywall mit Preis, Laufzeit, automatischer Verlängerung und Kündigungshinweis). Ohne Customer Center zeigt das Spiel den Link zur Abo-Seite von Google Play. |
+| R11 | **Zufallsfehler der CI-Umgebung.** Lauf 14 scheiterte an HTTP 429 von Maven Central (Gradle-Bausteine); die GitHub-Pages-Veröffentlichung scheiterte in den Läufen 18 und 20 („Fetching artifact metadata failed“: Artefakt nach dem Hochladen noch nicht abrufbar). Beides war nicht der Code. | roter Lauf ohne Codefehler | Gradle-Aufrufe wiederholen sich bei Netzwerkfehlern selbst (`scripts/retry-net.sh`). Pages: **neuen** Lauf per `workflow_dispatch` von `web.yml` starten; ein Neustart nur des fehlgeschlagenen Jobs scheitert am doppelten Artefakt. |
 
 ## 9. Nach dem ersten echten Build prüfen
 
@@ -116,6 +122,8 @@ Nicht angefordert: Standort, Kamera, Mikrofon, Kontakte, Dateien, Benachrichtigu
 - [ ] Handy im Hochformat gesperrt (Drehen ändert nichts); Tablet im Querformat: Spiel bedienbar.
 - [ ] AppsFlyer-Dashboard: Installation und `session_start` erscheinen nur nach Zustimmung.
 - [ ] Käufe mit Lizenztester (Play Console): Preis aus dem Store, Kauf, Gutschrift, `purchase` mit Umsatz im Dashboard.
+- [ ] Noa's Pro, Test-APK mit gesetztem Secret `REVENUECAT_TEST_KEY` und eingerichtetem RevenueCat-Dashboard: Pro-Karte im Shop und Zeile in den Optionen; Paywall öffnet; Kauf im Test Store (simulierter Dialog) schaltet Pro frei (Belohnung ohne Video, +5 Diamanten einmal je Tag); Abbrechen und Fehler zeigen keinen Absturz; „Käufe wiederherstellen“; „Abo verwalten“ (Customer Center oder Link zu Google Play). Optionen zeigen „Test-Paket“.
+- [ ] Die **Store-Datei** enthält keinen RevenueCat-Schlüssel mit `test_` (R8) und `REVENUECAT_ANDROID_KEY` beginnt mit `goog_`.
 - [ ] Manifest der `.aab` gegen Abschnitt 6 prüfen (keine zusätzlichen Berechtigungen); Seitengröße 16 KB für native Bibliotheken laut Play-Anforderung prüfen.
 - [ ] Hochgeladene Datei in der Play Console: App-Integrität, Signatur, Gerätekatalog.
 

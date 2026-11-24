@@ -1,6 +1,6 @@
 # Datenschutz – Datenflüsse und Entwurf für „Datensicherheit“ (Play Console)
 
-Stand: 24.11.2026, Spielversion 1.5.14. **Verbindlich für Nutzer ist `www/privacy.html`** (Deutsch und Englisch, in der App unter Optionen verlinkt). Diese Datei ist die interne Übersicht dazu und der Entwurf für das Formular „Datensicherheit“ in der Play Console. Keine Rechtsberatung. Die Angaben des Verantwortlichen (Name, ladungsfähige Anschrift, E-Mail) hat der Eigentümer am 24.11.2026 geliefert; sie stehen in `privacy.html` und `impressum.html`. Taucht dort wieder ein Platzhalter `[[…]]` auf, bleiben Werbung, Käufe und Messung in der App gesperrt (`CONFIG.legalReady`).
+Stand: 24.11.2026, Spielversion 1.5.15. **Verbindlich für Nutzer ist `www/privacy.html`** (Deutsch und Englisch, in der App unter Optionen verlinkt). Diese Datei ist die interne Übersicht dazu und der Entwurf für das Formular „Datensicherheit“ in der Play Console. Keine Rechtsberatung. Die Angaben des Verantwortlichen (Name, ladungsfähige Anschrift, E-Mail) hat der Eigentümer am 24.11.2026 geliefert; sie stehen in `privacy.html` und `impressum.html`. Taucht dort wieder ein Platzhalter `[[…]]` auf, bleiben Werbung, Käufe und Messung in der App gesperrt (`CONFIG.legalReady`).
 
 ## 1. Grundsatz
 

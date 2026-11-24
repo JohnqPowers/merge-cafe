@@ -85,13 +85,14 @@ Prüfung im Vergleich zu vorher: das Startbild unterscheidet sich nach dem Tausc
 | `@appsflyer-sdk/js-core-plugin` | `7.1.0` | JS-Schnittstelle, per esbuild nach `www/af.js` gebündelt | Lizenzfeld im Paket beim Build prüfen |
 | AppsFlyer Android SDK | über das Plugin | Messung | Bedingungen von AppsFlyer |
 | `@revenuecat/purchases-capacitor` | `latest` (**nicht festgelegt**) | Käufe | MIT |
+| `@revenuecat/purchases-capacitor-ui` | `latest` (**nicht festgelegt**; muss zur Version des Kern-Plugins passen) | RevenueCat-Paywall und Customer Center (Android, nicht Web); zieht Jetpack Compose in die App (APK +13 MB) | MIT laut Angabe des Anbieters; in `node_modules/.../package.json` beim nächsten lokalen `npm install` gegenprüfen |
 | RevenueCat Android SDK, Google Play Billing Library | Billing 9.1.0 im Build 13 | Käufe | MIT (RevenueCat); Billing nach Google-Bedingungen |
 | AndroidX, Kotlin-Bibliotheken | von Gradle aufgelöst | Android-Grundlagen | Apache License 2.0 |
 | `esbuild` | `^0.25.0` | nur Build-Werkzeug (nicht in der App) | MIT |
 | Playwright, Python-Bibliotheken (Pillow, OpenCV, NumPy) | lokal | nur Tests und Bild-Skripte (nicht in der App) | verschiedene freie Lizenzen |
 
 **Offen:**
-- `latest` bei Capacitor und RevenueCat bedeutet: jeder Build zieht die aktuelle Version. Nach dem ersten erfolgreichen Build die aufgelöste `package-lock.json` (liegt im Artefakt `versionen-<Nr>` als `npm-tree.txt`, bzw. lokal per `npm install`) festschreiben und `latest` durch feste Versionen ersetzen (`docs/TECHNIK.md`, Abschnitt Updates).
+- `latest` bei Capacitor und den beiden RevenueCat-Plugins (Kern und Paywall, gemeinsam festschreiben) bedeutet: jeder Build zieht die aktuelle Version. Nach dem ersten erfolgreichen Build die aufgelöste `package-lock.json` (liegt im Artefakt `versionen-<Nr>` als `npm-tree.txt`, bzw. lokal per `npm install`) festschreiben und `latest` durch feste Versionen ersetzen (`docs/TECHNIK.md`, Abschnitt Updates).
 - Eine vollständige Lizenzliste inklusive aller Unterbibliotheken (npm und Gradle) erzeugen und auf der Lizenzseite verlinken (z. B. mit `license-checker` für npm und dem Google-OSS-Licenses-Plugin für Gradle). Das ist ohne Netz nicht prüfbar und wird beim ersten CI-Lauf nachgeholt.
 
 ## 6. Pflege

@@ -1,13 +1,13 @@
 # Test- und Qualitätsbericht – Noa's Bean Trail
 
-Stand: 24.11.2026. Spielversion 1.5.12 (lokal committet, nicht veröffentlicht). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
+Stand: 24.11.2026. Spielversion 1.5.15 (Push auf `main` am 24.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
 
 ## 1. Kurzfazit
 
 | Bereich | Stand |
 |---|---|
-| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24 (beide Fenstergrößen), 54/54, 11/11, 20/20, 91/91, 16/16 und ein Ablaufprotokoll ohne Fehler (Abschnitt 3) |
-| Echter Android-Build ab Version 1.5.8 | **durchgelaufen** am 24.11.2026 (CI, Build 13, Commit 48c1bc7); Paket geprüft, aber **auf keinem Gerät gelaufen** (Abschnitt 6, Punkt Q1) |
+| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24 (beide Fenstergrößen), 106/106, 11/11, 20/20, 91/91, 16/16 und ein Ablaufprotokoll ohne Fehler (Abschnitt 3) |
+| Echter Android-Build ab Version 1.5.8 | **durchgelaufen** am 24.11.2026 (CI, Build 13 bis 17; zuletzt Build 17, Commit b89a630, Spielversion 1.5.15 mit Pro und Paywall-Plugin; Build 14 scheiterte an einem Netzwerkfehler von Maven Central, nicht am Code); Paket geprüft, aber **auf keinem Gerät gelaufen** (Abschnitt 6, Punkt Q1) |
 | Echte Geräte | Der Eigentümer hat Test-APKs bis Build 12 selbst gespielt (Rückmeldungen stehen in `reports/weekly/`). **Gerätemodell, Android-Version und Build sind nicht dokumentiert**, es gibt kein Gerätetest-Protokoll. Die Lücke ist offen. Build 13 (neue Paket-ID) liegt dem Eigentümer seit dem 24.11.2026 vor, die Rückmeldung steht aus. |
 | Abstürze | **Keine Daten.** Im Spiel ist keine Absturzmeldung eingebaut, und die App war nie im Store. Bekannte Fehler stammen aus Tests und Rückmeldungen. |
 | Werbung, Käufe, Messung, Einwilligung | nur mit **nachgebauten Plugins** geprüft, nie mit echten Konten (Abschnitt 6, Q3) |
@@ -23,12 +23,12 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 - Der Spielstand `tests/state.json` (Level 12, Paris) wird für Tests ab Level 12 eingespielt.
 - Konsolenfehler und fehlende Bilder zählen als Testfehler.
 
-## 3. Automatische Tests (Lauf vom 24.11.2026, Version 1.5.13)
+## 3. Automatische Tests (Lauf vom 24.11.2026, Version 1.5.15)
 
 | Datei | Ergebnis | Inhalt |
 |---|---|---|
 | `tests/test_gesamt.py` | **24/24** bei 390×844 und bei 360×640 | Start, Profil, Tutorial bis zur ersten Lieferung (inkl. Merge), Spiel bis Level 6 (dabei Stadtwechsel Hamburg → Wien bei Level 5), Geschenk-Fach, Verdoppeln per Demo-Werbung, „Keine Energie“-Fenster, Energie-Werbung (Zähler), Auffüllen mit Diamanten, Zutaten kaufen, Tagesbonus, Münzen-Verdoppeln-Chip, Erklär-Fenster „Diamanten“, Ausbau kaufen, Neustart mit erhaltenem Spielstand, Chancen-Anzeige im Diamanten-Fenster, keine Konsolenfehler |
-| `tests/test_plattform.py` | **54/54** | Einwilligung vor Werbung und Messung, Ablehnen/Zustimmen/Widerruf, Werbe-Einstellungen, Ereignis-Warteschlange (verwerfen oder senden), Store-Preise statt Platzhalter, Kauf und Gutschrift, Kauf abgebrochen, Browser-Variante ohne Plugins, **Sperre bei unvollständigen Rechtstexten** (S9), **Debug-Paket mit Test-Anzeigenblock** (S10), **Store-Paket ohne Testmarkierung** (S11) |
+| `tests/test_plattform.py` | **106/106** | Einwilligung vor Werbung und Messung, Ablehnen/Zustimmen/Widerruf, Werbe-Einstellungen, Ereignis-Warteschlange (verwerfen oder senden), Store-Preise statt Platzhalter, Kauf und Gutschrift, Kauf abgebrochen, Browser-Variante ohne Plugins, **Sperre bei unvollständigen Rechtstexten** (S9), **Debug-Paket mit Test-Anzeigenblock** (S10), **Store-Paket ohne Testmarkierung** (S11), **Noa's Pro** (S12 bis S18: Paywall und Kauf, Pro schon beim Start, Kundeninfo-Meldung in beiden Formen, Tagesgeschenk einmal je Tag, eigene Paketliste, Abbruch auch als Fehlercode, Wiederherstellen, Customer Center und Ausweich-Hinweis, Schlüsselregeln für `test_`-Schlüssel, Fehlerfälle) |
 | `tests/test_ausrichtung.py` | **11/11** | Dreh-Hinweis nur bei Querformat und sehr niedrigen Fenstern (844×390, 700×520), nicht bei Handy hochkant und nicht bei Tablets (1024×600, 1280×800, 810×1080); Deutsch und Englisch; Hinweis deckt alles ab und liegt oben |
 | `tests/test_spielstand.py` | **20/20** | Update-Sicherheit des Spielstands: alter, unvollständiger Spielstand lädt (neue Felder bekommen Standardwerte, alte Emoji-Figur wird auf die neue Kennung umgestellt), Zusatzfelder bleiben, kaputter Text, fremde Version, falsche Brettgröße, leeres Profil und unbekannte Figur starten ein neues Spiel bzw. Ersatzwerte ohne Absturz, Level-12-Stand lädt bei 360×640 |
 | `tests/test_store.py` | **91/91** | Store-Unterlagen ohne Browser: Titel höchstens 30, Kurzbeschreibung 80, Beschreibung 4000 Zeichen, Alt-Texte höchstens 140; keine Werbewörter, Emojis oder Fremdnamen im Titel; Zahlen im Text (22 Leckereien, 3 Ketten, 9 Welten, 12 Figuren, 7 Bonus-Tage, Automaten, Städte) stimmen mit `www/index.html`; Icon 512×512 mit Alpha, Feature-Grafiken 1024×500 ohne Alpha, 6 Screenshots je Sprache 1080×1920 ohne Alpha, deutsche und englische Fassung verschieden, keine Reste mit altem Namen in `store/`. Mit absichtlich falschem Text geprüft: schlägt dann fehl. |
@@ -80,6 +80,7 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 | Q10 | Belohnungen werden auf dem Gerät gutgeschrieben, ohne Server (siehe `docs/TECHNIK.md`, R5). | niedrig | akzeptiert |
 | Q11 | Ohne vollständige Rechtstexte bleiben Werbung, Käufe und Messung in der App gesperrt (`legalReady`). Seit dem 24.11.2026 sind Impressum und Datenschutz ausgefüllt, und der Android-Build 13 setzt `legalReady` auf true (in der Test-APK nachgewiesen). Ohne Konten und Schlüssel zeigt das Debug-Paket nur Googles Test-Anzeigen, es gibt keine Käufe und keine Messung. | – | erledigt; offen sind Konten und Schlüssel (Q3) |
 | Q12 | Ein unlesbarer oder fremder Spielstand (kaputter Text, andere Versionsnummer, falsche Brettgröße) wird nicht repariert, das Spiel startet neu und überschreibt ihn beim nächsten Speichern. Es gibt keine Sicherungskopie. Relevant erst, wenn eine spätere Version das Format ändert (`v` erhöhen) und jemand zur alten Version zurückkehrt. | niedrig | akzeptiert; bei einer Formatänderung vorher eine Sicherungskopie des alten Textes anlegen |
+| Q13 | **Noa's Pro (Paywall, Kauf, Wiederherstellen, Abo-Verwaltung) ist nur mit nachgebauten Plugins getestet.** Die echte Paywall-Oberfläche, die Form der Plugin-Antworten (Kundeninfo-Meldung, Paywall-Ergebnis) und der Ablauf mit dem Test Store sind nicht auf einem Gerät gelaufen; im Paket (Build 17) sind nur die Aufrufnamen und die neuen Activities nachgewiesen. Das Spiel liest den Pro-Zustand aus dem Entitlement, nicht aus Ergebnistexten. Dazu: Das RevenueCat-Dashboard (Angebot, Entitlement, Paywall) ist nicht eingerichtet bzw. nicht prüfbar. | hoch | Gerätetest (Abschnitt 8, Punkt 6) mit Test-APK und gesetztem Secret `REVENUECAT_TEST_KEY`; Dashboard einrichten (`docs/TECHNIK.md`, R9 und R10) |
 
 ### Behobene Fehler (Auswahl, mit Version)
 
@@ -119,7 +120,7 @@ Ablauf je Gerät (jeweils Test-APK ohne und mit Rechtstexten):
 3. Ton und Musik aus und an, Vibration, Katze streicheln.
 4. Werbung: Test-Anzeige bis zum Ende (Belohnung kommt), Anzeige vorzeitig schließen (keine Belohnung), ohne Netz (keine Anzeige, kein Absturz).
 5. Einwilligung (Gerät im EWR): Fenster erscheint, Ablehnen sperrt Werbung und Messung, „Werbe-Einstellungen“ in den Optionen ändern.
-6. Shop: Preis kommt aus dem Store, Kauf mit Lizenztester, Gutschrift, Kauf abbrechen.
+6. Shop: Preis kommt aus dem Store, Kauf mit Lizenztester, Gutschrift, Kauf abbrechen. Noa's Pro: Pro-Karte im Shop und Zeile in den Optionen, Paywall öffnet, Kauf im Test Store, Pro aktiv (Belohnung ohne Video, +5 Diamanten einmal je Tag), „Käufe wiederherstellen“, „Abo verwalten“.
 7. App in den Hintergrund, Anruf, Bildschirm aus und an; Neustart; Spielstand erhalten; Flugmodus-Start.
 8. Systemschrift und Anzeigegröße auf „groß“; Sprache Englisch; Drehen (Handy bleibt hochkant); TalkBack kurz anschalten.
 

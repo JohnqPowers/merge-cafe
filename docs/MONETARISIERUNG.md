@@ -1,6 +1,6 @@
 # Monetarisierungsdokumentation – Noa's Bean Trail
 
-Stand: 24.11.2026, Spielversion 1.5.14 (Noa's Pro neu). Alle Zahlen stammen aus `www/index.html`; die Fundstellen stehen in Klammern. Keine Rechtsberatung. **Die Sperre `CONFIG.legalReady` (Werbung, Käufe und Messung) ist seit 24.11.2026 offen, weil Impressum und Datenschutz keine Platzhalter mehr enthalten. Echte Werbung und echte Käufe laufen erst mit Konten und Schlüsseln (GitHub-Secrets); das Test-Paket zeigt nur Googles Testanzeigen.** Es wurde kein Konto angelegt, kein Preis eingestellt und kein Geld ausgegeben.
+Stand: 24.11.2026, Spielversion 1.5.15 (Noa's Pro seit 1.5.14, Paywall-Plugin seit 1.5.15). Alle Zahlen stammen aus `www/index.html`; die Fundstellen stehen in Klammern. Keine Rechtsberatung. **Die Sperre `CONFIG.legalReady` (Werbung, Käufe und Messung) ist seit 24.11.2026 offen, weil Impressum und Datenschutz keine Platzhalter mehr enthalten. Echte Werbung und echte Käufe laufen erst mit Konten und Schlüsseln (GitHub-Secrets); das Test-Paket zeigt nur Googles Testanzeigen.** Es wurde kein Konto angelegt, kein Preis eingestellt und kein Geld ausgegeben.
 
 ## 1. Modell in Kürze
 
