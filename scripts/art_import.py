@@ -256,8 +256,10 @@ def frame_asset(im):
 
 
 def floor_asset(im):
-    """Boden: deckend, auf FLOOR_W Breite (quadratisch wie geliefert)."""
-    im = im.convert('RGB')
+    """Boden: auf FLOOR_W Breite (quadratisch wie geliefert). Deckend; nur wenn die Datei selbst Transparenz
+    mitbringt (z. B. weich auslaufende Oberkante), bleibt sie erhalten und die gebaute Szene scheint durch."""
+    has_a = im.mode in ('RGBA', 'LA', 'PA') and im.convert('RGBA').getchannel('A').getextrema()[0] < 255
+    im = im.convert('RGBA' if has_a else 'RGB')
     k = FLOOR_W / im.size[0]
     return im.resize((FLOOR_W, round(im.size[1] * k)), Image.LANCZOS) if k < 1 else im
 

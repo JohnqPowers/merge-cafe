@@ -1,6 +1,6 @@
 # Kunst-Briefing Merge Café
 
-**Stand 24.11. (v1.5.3): Alle 49 Bilder (22 Teile, 3 Automaten, 12 Figuren, 12 Gäste) sind im Spiel, dazu Brett-Rahmen und Boden Hamburg (erster Entwurf, eingebaut). Offen: Etappe 2 unten (Böden der anderen Städte, 12 Einzugs-Posen, Effekte).** Dieses Dokument bleibt die Vorlage für Neues (weitere Gäste und Figuren, Katze, Stadt-Hintergründe, Brett-Rahmen). Die Reihenfolge unten ist damit erledigt.
+**Stand 24.11. (v1.5.4): Alle 49 Bilder (22 Teile, 3 Automaten, 12 Figuren, 12 Gäste) sind im Spiel, dazu Brett-Rahmen und die Böden Hamburg, Wien, Paris, Rom (Wien, Paris, Rom vorläufig aus Entwürfen). Offen: Etappe 2 unten (Böden Istanbul, Kyoto, New York, Rio, Sternecafé, Wien/Paris/Rom im Hamburg-Stil, 12 Einzugs-Posen, Effekte).** Dieses Dokument bleibt die Vorlage für Neues (weitere Gäste und Figuren, Katze, Stadt-Hintergründe, Brett-Rahmen). Die Reihenfolge unten ist damit erledigt.
 
 Ziel: Die 22 Teile und 3 Automaten, die heute noch Emoji sind, sowie die **Spielerfiguren und Café-Gäste** durch eigene Bilder im Candy-Look ersetzen. Reihenfolge der Wichtigkeit (Stand 24.11.): **1. Teile Kette 1, 2. Gäste (12), 3. Spielerfiguren (12), 4. Kette 2 und 3**, danach Brett-Rahmen, Stadt-Hintergründe, Katze/Logo.
 
@@ -149,7 +149,7 @@ Was das Importskript aus den gelieferten Figuren und Gästen macht: **Figuren** 
 Gesamt: 22 Teile + 3 Automaten + 12 Figuren + 12 Gäste = 49 Bilder.
 
 ## Etappe 2 (24.11.): Brett-Rahmen, Böden, Einzugs-Posen, Effekte
-**Status:** `frame.png` (Gold-Holz-Rahmen) und `f0_hamburg.png` sind eingebaut (v1.5.3) und sehen auf dem Handy gut aus. Alles Folgende ist optional, das Spiel hat für jedes Bild einen gebauten Ersatz.
+**Status:** `frame.png` (Gold-Holz-Rahmen) und `f0_hamburg.png` sind eingebaut (v1.5.3) und sehen auf dem Handy gut aus; in v1.5.4 kamen Wien, Paris und Rom als vorläufige Böden dazu (siehe Böden). Alles Folgende ist optional, das Spiel hat für jedes Bild einen gebauten Ersatz.
 
 ### Brett-Rahmen (`frame.png`)
 - Wie der erste Entwurf: quadratisch, **außen und im Fenster reines Magenta #FF00FF**, keine Schatten im Bild (den Schatten baut der Import).
@@ -163,6 +163,11 @@ Gesamt: 22 Teile + 3 Automaten + 12 Figuren + 12 Gäste = 49 Bilder.
 - Oberkante: darf eine Kante/ein Balken sein (Hamburg: Balken mit Eisenbändern), sie ist meist hinter dem Rahmen.
 - Städte-Thema: Wien Kaffeehaus-Parkett/Karo mit Café-Requisiten, Paris Pflaster mit Bistro-Stühlen und Blumenkästen, Rom Terrakotta mit Zitronentöpfen, Istanbul Fliesen mit Teegläsern und Teppichkante, Kyoto Holzdielen/Tatami mit Steinlaterne und Kirschblüten, New York Asphalt/Gehweg mit Hydrant und Taxi-Kante, Rio Wellenpflaster mit Palmen und Surfbrett, Sternecafé dunkler Marmor mit Gold und Sternen.
 - Ohne Bild bleibt der gebaute Boden aus der Szene (Planken, Kacheln, Licht, kleine Requisiten).
+- **Die Nummer bestimmt die Stadt, nicht der Dateiname.** Genau diese neun Städte, nicht mehr und nicht weniger; ein Bild pro Nummer. Bitte nicht umsortieren oder andere Städte nehmen (die Spielwelten, Szenen und Texte hängen daran).
+- **Lieferstand 24.11. (erste Entwurfsrunde, 8 Dateien):** `f1_berlin` ist das Vorbild für alle weiteren: gleiche Machart wie Hamburg, deckend, randlos, Requisiten nur an den Rändern, ruhige Mitte. Berlin ist aber keine Spielwelt, darum steht es **vorläufig als Boden von Wien** im Spiel (Berliner Bär am Poller übermalt). `f2_paris` und `f3_rom` passen zur Welt, sind aber hochskalierte Ausschnitte mit dunkel-blauem Rand, runden Ecken und Himmel/Skyline oben; sie sind mit `scripts/floor_prep.py` gesäubert und als Platzhalter eingebaut. `f4`…`f8` zeigen andere Städte als ihr Name (Park Güell/Barcelona, Lissabon, Athen, Amsterdam, Kopenhagen; Istanbul fehlt) und sind **nicht** eingebaut.
+- **Bitte so (aus der Entwurfsrunde gelernt):** quadratisch 1024×1024 in echter Auflösung (nicht hochskaliert); **kein** Himmel, keine Skyline, kein Horizont, keine Gebäude; **keine** dunklen Ränder oder runden Ecken, das Bild läuft bis an alle vier Kanten; keine Menschen, kein Text, keine zweite Szene im Bild; Mitte ruhig und gleichmäßig, Requisiten nur an den Rändern.
+- **Vorlage-Text für das Bild-Tool (Stadt und Requisiten einsetzen):** „Bodenfläche einer Café-Terrasse in <Stadt>, Blick von oben leicht schräg von vorn, Candy-Cartoon-Stil wie f1_berlin, kräftige weiche Farben, quadratisch, randlos bis an alle Kanten, Mitte ruhiger gleichmäßiger Boden, Requisiten nur am linken und rechten Rand und in den unteren Ecken: <Requisiten>. Kein Himmel, kein Horizont, keine Gebäude, keine Menschen, kein Text, keine dunklen Ränder, keine runden Ecken.“ Requisiten je Welt: Wien Schachbrett-Parkett, Thonet-Stühle, Marmortisch mit Melange und Sachertorte; Istanbul türkis-weiße Fliesen mit Teppichkante, Teegläser auf Messingtablett, Kupferkanne, Mosaiklampe; Kyoto Holzdielen mit Tatami-Kante, Steinlaterne, Kirschblütenblätter, Teeschale; New York Gehwegplatten, Hydrant, Gullydeckel mit Dampf, Zeitungsständer; Rio Wellenpflaster schwarz-weiß, Palme, Surfbrett, Kokosnuss; Sternecafé dunkler Marmor mit Goldadern, Sterne-Intarsien, goldene Kerzenständer.
+- **Weicher Auslauf oben ist erlaubt:** Hat die Datei Transparenz (z. B. oben 6–13 % auslaufend), behält der Import sie, und der gebaute Boden der Szene scheint durch. Das verdeckt harte Schnittkanten an den Rändern.
 
 ### Einzugs-Posen (`e1_baristina.png` … `e12_robo.png`)
 - Beim Einzug nach der Wahl der Figur läuft/rollt/fliegt die Figur groß ins Bild (andere Bewegung je Figur, schon im Spiel). Heute ist das noch die Kachel; mit Pose kommt die **ganze Figur** (Beine, Rollschuhe, Flügel).

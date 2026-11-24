@@ -970,7 +970,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.3',
+  version: '1.5.4',
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -1216,7 +1216,7 @@ const ic = (n, c = '') => `<svg class="ic ${c}"><use href="#i-${n}"/></svg>`;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const itemName = it => it.g !== undefined ? CHAINS[it.g].genName[LANG] : CHAINS[it.c][LANG][it.t];
 /* Bilder statt Emoji: ART = Teile mit fertigem Bild (Liste pflegt scripts/art_import.py). Alles ohne Bild bleibt Emoji. */
-const ART = new Set(['a1', 'a10', 'a11', 'a12', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'c1', 'c10', 'c11', 'c12', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'f0', 'frame', 'g1', 'g2', 'g3', 'k1_s1', 'k1_s2', 'k1_s3', 'k1_s4', 'k1_s5', 'k1_s6', 'k1_s7', 'k2_s1', 'k2_s2', 'k2_s3', 'k2_s4', 'k2_s5', 'k2_s6', 'k2_s7', 'k2_s8', 'k3_s1', 'k3_s2', 'k3_s3', 'k3_s4', 'k3_s5', 'k3_s6', 'k3_s7']);
+const ART = new Set(['a1', 'a10', 'a11', 'a12', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'c1', 'c10', 'c11', 'c12', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'f0', 'f1', 'f2', 'f3', 'frame', 'g1', 'g2', 'g3', 'k1_s1', 'k1_s2', 'k1_s3', 'k1_s4', 'k1_s5', 'k1_s6', 'k1_s7', 'k2_s1', 'k2_s2', 'k2_s3', 'k2_s4', 'k2_s5', 'k2_s6', 'k2_s7', 'k2_s8', 'k3_s1', 'k3_s2', 'k3_s3', 'k3_s4', 'k3_s5', 'k3_s6', 'k3_s7']);
 const artKey = it => it.g !== undefined ? 'g' + (it.g + 1) : 'k' + (it.c + 1) + '_s' + (it.t + 1);
 const hasArt = it => ART.has(artKey(it));
 const artImg = key => `<img class="art" src="art/${key}.webp" alt="" draggable="false" decoding="async">`;
