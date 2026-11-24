@@ -7,6 +7,12 @@ einheitliche Sprites in www/art/<key>.webp. Drei Arten, erkannt am Dateinamen:
   - Figuren (Spieler) a1_baristina.png                     -> 208x208, Kachel einheitlich 176 px mit gleich abgerundeten Ecken;
                                                                Huete/Haare, die ueber die Kachel ragen, bleiben erhalten
   - Gaeste           c1_kapitaen_hein.png                  -> 240x270, Halbfigur steht unten buendig (Bildausschnitt bleibt wie gezeichnet)
+  - Einzugs-Posen    e1_baristina.png                      -> 576x864, Ganzkoerper-Pose fuer den Einzug (ersetzt dort die Kachel)
+  - Boden            f0_hamburg.png                        -> 1024x1024, deckend (Boden unter dem Brett, Stadt 0 = Hamburg ... f8)
+  - Rahmen           frame.png                             -> Magenta (#FF00FF) aussen und im Fenster wird transparent; der Rahmen wird auf
+                                                               das Brett-Verhaeltnis umgebaut (Ecken bleiben, Mittelstuecke werden gedehnt) und
+                                                               bekommt einen weichen Schatten -> frame.webp. Masse stehen in FR_* und im CSS (#board).
+  - Effekte          fx_puff.png, fx_star.png ...          -> 160x160, ohne Schatten (puff, star, drop, flame, leaf, ring, glow, excl)
 Fuer alle: Freistellen (echte Transparenz wird uebernommen, sonst wird der einfarbige Hintergrund entfernt),
 zuschneiden, einheitlich skalieren, als kleines WebP speichern und das Manifest `const ART = new Set([...])`
 in www/index.html aktualisieren.
@@ -21,19 +27,29 @@ import cv2
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
-KEY = re.compile(r'^(g\d|k\d_s\d|[ac]\d{1,2})(?:[_.]|$)')
+KEY = re.compile(r'^(g\d|k\d_s\d|[ace]\d{1,2}|f\d|frame|fx_[a-z0-9]+)(?:[_.]|$)')
 AV_W = AV_H = 208                                                       # Figuren: Leinwand (Platz fuer Huete ueber der Kachel)
 AV_TILE = 176                                                           # Kantenlaenge der Kachel auf der Leinwand
 GU_W, GU_H = 240, 270                                                    # Gaeste: Seitenverhaeltnis wie die Vorlage (512x576)
+PO_W, PO_H = 576, 864                                                    # Einzugs-Posen (Ganzkoerper, 2:3)
+FX_S = 160                                                               # Effekt-Sprites
+FLOOR_W = 1024                                                           # Boeden: Breite (quadratisch)
+FR_W, FR_T = 1000, 0.068                                                 # Rahmen: Aussenbreite (Referenz) und Dicke als Anteil der Breite
+FR_H = round(FR_W * (1 - 2 * FR_T) * 8 / 7 + 2 * FR_W * FR_T)            # Fenster 7:8 -> Aussenhoehe (1123); CSS: aspect-ratio 1000/1123
+FR_PAD = (30, 16, 30, 52)                                                # Schattenrand links, oben, rechts, unten (CSS: inset -3% -1.425% -4.63% -3%)
 
 
 def key_of(name):
     m = KEY.match(Path(name).name.lower())
-    return re.sub(r'^([ac])0+(\d)', r'\1\2', m.group(1)) if m else None      # a01 -> a1
+    return re.sub(r'^([ace])0+(\d)', r'\1\2', m.group(1)) if m else None     # a01 -> a1
 
 
 def kind_of(key):
-    return 'avatar' if key[0] == 'a' else 'guest' if key[0] == 'c' else 'item'
+    if key == 'frame':
+        return 'frame'
+    if key.startswith('fx_'):
+        return 'fx'
+    return {'a': 'avatar', 'c': 'guest', 'e': 'pose', 'f': 'floor'}.get(key[0], 'item')
 
 
 def cutout(im):
@@ -173,6 +189,79 @@ def guest(im):
     return big.crop((-shift, big.size[1] - GU_H, GU_W - shift, big.size[1]))
 
 
+def key_magenta(im):
+    """Magenta (#FF00FF) -> Transparenz, mit entmischter Kantenfarbe (kein rosa Saum). Gibt RGBA zurueck."""
+    src = np.array(im.convert('RGB')).astype(np.float32)
+    R, G, B = src[..., 0], src[..., 1], src[..., 2]
+    m = np.clip((np.minimum(R, B) - G) / 255.0, 0, 1)                    # 1 = reines Magenta, <= 0 = Rahmenfarbe
+    alpha = np.where(m > .9, 0, np.clip(1.0 - m * 1.12, 0, 1))
+    col = np.clip((src - (1 - alpha)[..., None] * np.array([255, 0, 255], np.float32)) / np.maximum(alpha, 1e-3)[..., None], 0, 255)
+    edge = (alpha > 0) & (alpha < .98)
+    col[..., 2] = np.where(edge, np.minimum(col[..., 2], col[..., 1] + 20), col[..., 2])
+    return Image.fromarray(np.dstack([col, alpha * 255]).astype(np.uint8))
+
+
+def frame_asset(im):
+    """Rahmen auf das Brett-Verhaeltnis umbauen: Ecken bleiben unveraendert (nur gleichmaessig skaliert), die glatten Mittelstuecke
+    werden gedehnt, die kleinen Mittelbeschlaege bleiben unverzerrt. Dazu ein weicher Schatten. Ergebnis: Rahmen in FR_W x FR_H
+    plus Schattenrand FR_PAD (links, oben, rechts, unten)."""
+    k = key_magenta(im)
+    a = np.array(k)[:, :, 3]
+    ys, xs = np.where(a > 128)
+    k = k.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+    a = np.array(k)[:, :, 3]
+    h, w = a.shape
+    n, lab = cv2.connectedComponents((a <= 128).astype(np.uint8), connectivity=4)
+    border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
+    win = (a <= 128) & ~np.isin(lab, list(border))
+    wy, wx = np.where(win)
+    if not len(wx):
+        raise ValueError('Rahmen hat kein Fenster (Magenta im Inneren fehlt)')
+    t_src = (wx.min() + (w - 1 - wx.max()) + wy.min() + (h - 1 - wy.max())) / 4      # mittlere Dicke des Rahmenbands
+    s = FR_W * FR_T / t_src
+    S = k.resize((round(w * s), round(h * s)), Image.LANCZOS)
+    sw, sh = S.size
+    c = round(2.4 * t_src * s)                                          # Eckstueck (Beschlag samt Rand)
+    keep = round(.58 * t_src * s)                                       # Mittelbeschlag: so viel bleibt unverzerrt
+    out = Image.new('RGBA', (FR_W, FR_H), (0, 0, 0, 0))
+    for (sx, sy, ox, oy) in ((0, 0, 0, 0), (sw - c, 0, FR_W - c, 0), (0, sh - c, 0, FR_H - c), (sw - c, sh - c, FR_W - c, FR_H - c)):
+        out.alpha_composite(S.crop((sx, sy, sx + c, sy + c)), (ox, oy))
+    def strip(box, size, pos):
+        out.alpha_composite(S.crop(box).resize(size, Image.LANCZOS), pos)
+    la = (FR_W - 2 * c - 2 * keep) // 2                                 # waagerechte Kanten: Planke | Beschlag | Planke
+    lb = FR_W - 2 * c - 2 * keep - la
+    lv = (FR_H - 2 * c - 2 * keep) // 2                                 # senkrechte Kanten
+    lw = FR_H - 2 * c - 2 * keep - lv
+    xm, ym = sw // 2, sh // 2
+    for y0, y1, oy in ((0, c, 0), (sh - c, sh, FR_H - c)):               # oben, unten
+        strip((c, y0, xm - keep, y1), (la, c), (c, oy))
+        out.alpha_composite(S.crop((xm - keep, y0, xm + keep, y1)), (c + la, oy))
+        strip((xm + keep, y0, sw - c, y1), (lb, c), (c + la + 2 * keep, oy))
+    for x0, x1, ox in ((0, c, 0), (sw - c, sw, FR_W - c)):               # links, rechts
+        strip((x0, c, x1, ym - keep), (c, lv), (ox, c))
+        out.alpha_composite(S.crop((x0, ym - keep, x1, ym + keep)), (ox, c + lv))
+        strip((x0, ym + keep, x1, sh - c), (c, lw), (ox, c + lv + 2 * keep))
+    pl, pt, pr, pb = FR_PAD
+    canvas = Image.new('RGBA', (FR_W + pl + pr, FR_H + pt + pb), (0, 0, 0, 0))
+    al = out.getchannel('A')
+    for blur, dy, op in ((7, 9, .55), (20, 24, .30)):                    # naher harter + weiter weicher Schatten
+        sh_a = Image.new('L', canvas.size, 0)
+        sh_a.paste(al, (pl, pt + dy))
+        sh_a = sh_a.filter(ImageFilter.GaussianBlur(blur)).point(lambda v: int(v * op))
+        layer = Image.new('RGBA', canvas.size, (24, 8, 30, 0))
+        layer.putalpha(sh_a)
+        canvas.alpha_composite(layer)
+    canvas.alpha_composite(out, (pl, pt))
+    return canvas
+
+
+def floor_asset(im):
+    """Boden: deckend, auf FLOOR_W Breite (quadratisch wie geliefert)."""
+    im = im.convert('RGB')
+    k = FLOOR_W / im.size[0]
+    return im.resize((FLOOR_W, round(im.size[1] * k)), Image.LANCZOS) if k < 1 else im
+
+
 def sources(path):
     p = Path(path)
     if p.is_dir():
@@ -228,13 +317,21 @@ def main():
                     sp = portrait(cutout(im), AV_W, AV_H, 0.96, False)
             elif kd == 'guest':
                 sp = guest(cutout(im))
+            elif kd == 'pose':
+                sp = portrait(cutout(im), PO_W, PO_H, 0.96, False)
+            elif kd == 'fx':
+                sp = portrait(cutout(im), FX_S, FX_S, 0.96, False)
+            elif kd == 'floor':
+                sp = floor_asset(im)
+            elif kd == 'frame':
+                sp = frame_asset(im)
             else:
                 sp = sprite(cutout(im), a.size, a.fill)
         except Exception as e:                                           # ein kaputtes Bild stoppt nicht den Rest
             print('FEHLER', name, '->', e)
             continue
         f = out / (key + '.webp')
-        sp.save(f, 'WEBP', quality=85, alpha_quality=92, method=6)
+        sp.save(f, 'WEBP', quality=86 if kd in ('floor', 'frame') else 85, alpha_quality=95 if kd == 'frame' else 92, method=6)
         total += f.stat().st_size
         done.append(key)
         print('ok  %-26s -> art/%s.webp (%d KB)' % (name, key, f.stat().st_size // 1024))

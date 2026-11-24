@@ -1,6 +1,6 @@
 # Kunst-Briefing Merge Café
 
-**Stand 24.11. (v1.5.2): Alle 49 Bilder (22 Teile, 3 Automaten, 12 Figuren, 12 Gäste) sind geliefert und im Spiel.** Dieses Dokument bleibt die Vorlage für Neues (weitere Gäste und Figuren, Katze, Stadt-Hintergründe, Brett-Rahmen). Die Reihenfolge unten ist damit erledigt.
+**Stand 24.11. (v1.5.3): Alle 49 Bilder (22 Teile, 3 Automaten, 12 Figuren, 12 Gäste) sind im Spiel, dazu Brett-Rahmen und Boden Hamburg (erster Entwurf, eingebaut). Offen: Etappe 2 unten (Böden der anderen Städte, 12 Einzugs-Posen, Effekte).** Dieses Dokument bleibt die Vorlage für Neues (weitere Gäste und Figuren, Katze, Stadt-Hintergründe, Brett-Rahmen). Die Reihenfolge unten ist damit erledigt.
 
 Ziel: Die 22 Teile und 3 Automaten, die heute noch Emoji sind, sowie die **Spielerfiguren und Café-Gäste** durch eigene Bilder im Candy-Look ersetzen. Reihenfolge der Wichtigkeit (Stand 24.11.): **1. Teile Kette 1, 2. Gäste (12), 3. Spielerfiguren (12), 4. Kette 2 und 3**, danach Brett-Rahmen, Stadt-Hintergründe, Katze/Logo.
 
@@ -147,6 +147,30 @@ Ab 6 Gast-Bildern zeigt das Spiel nur noch Bild-Gäste (einheitlicher Look), vor
 Was das Importskript aus den gelieferten Figuren und Gästen macht: **Figuren** sind Kacheln mit Hintergrundfarbe und abgerundeten Ecken, die Kochmütze darf oben herausragen. Das Skript erkennt die Kachel, rundet alle vier Ecken gleich (die Vorlagen sind teils seitlich angeschnitten) und bringt alle Kacheln auf dieselbe Größe (208×208 mit Platz für die Mütze). **Gäste** behalten den gezeichneten Ausschnitt (240×270, Unterkante bündig, der Tresen deckt sie ab).
 
 Gesamt: 22 Teile + 3 Automaten + 12 Figuren + 12 Gäste = 49 Bilder.
+
+## Etappe 2 (24.11.): Brett-Rahmen, Böden, Einzugs-Posen, Effekte
+**Status:** `frame.png` (Gold-Holz-Rahmen) und `f0_hamburg.png` sind eingebaut (v1.5.3) und sehen auf dem Handy gut aus. Alles Folgende ist optional, das Spiel hat für jedes Bild einen gebauten Ersatz.
+
+### Brett-Rahmen (`frame.png`)
+- Wie der erste Entwurf: quadratisch, **außen und im Fenster reines Magenta #FF00FF**, keine Schatten im Bild (den Schatten baut der Import).
+- **Das Rahmenband bitte höchstens so dick wie im Entwurf (ca. 9–10 % der Bildbreite)**, lieber dünner: Im Spiel wird es auf 6,8 % der Brettbreite verkleinert, damit die Felder groß genug bleiben.
+- Der Import formt das Quadrat auf das Brett (7×8) um: **Ecken bleiben unverändert, die glatten Mittelstücke werden gestreckt, die kleinen Mittelbeschläge bleiben unverzerrt.** Darum: Ecken mit Beschlag, dazwischen schlichtes Holz ohne Muster, das sich dehnen lässt.
+- Der Rahmen gilt für alle Städte; die Farbe des Bretts im Fenster kommt pro Stadt aus dem Spiel (Hamburg blau, Wien braun, Kyoto rosa …).
+
+### Böden (`f<Stadt>_<name>.png`)
+- Nummern: f0 Hamburg ✅, f1 Wien, f2 Paris, f3 Rom, f4 Istanbul, f5 Kyoto, f6 New York, f7 Rio, f8 Sternecafé. Quadratisch (1024×1024), deckend, gleiche Machart wie `f0_hamburg.png`.
+- **Wo man den Boden sieht:** Er liegt unten bündig am Bildschirm, so breit wie der Schirm. Das Brett mit Rahmen deckt die Mitte (ca. 90 % der Breite). Sichtbar bleiben ein **Streifen links und rechts (ca. 5–8 %, auf kleinen Handys bis 15 % der Breite)**, ein schmaler Streifen oben unter der Szene und unten zwischen den Knöpfen. **Requisiten also an den Rändern und in den Ecken, die Mitte ruhig und leer** (wie bei Hamburg).
+- Oberkante: darf eine Kante/ein Balken sein (Hamburg: Balken mit Eisenbändern), sie ist meist hinter dem Rahmen.
+- Städte-Thema: Wien Kaffeehaus-Parkett/Karo mit Café-Requisiten, Paris Pflaster mit Bistro-Stühlen und Blumenkästen, Rom Terrakotta mit Zitronentöpfen, Istanbul Fliesen mit Teegläsern und Teppichkante, Kyoto Holzdielen/Tatami mit Steinlaterne und Kirschblüten, New York Asphalt/Gehweg mit Hydrant und Taxi-Kante, Rio Wellenpflaster mit Palmen und Surfbrett, Sternecafé dunkler Marmor mit Gold und Sternen.
+- Ohne Bild bleibt der gebaute Boden aus der Szene (Planken, Kacheln, Licht, kleine Requisiten).
+
+### Einzugs-Posen (`e1_baristina.png` … `e12_robo.png`)
+- Beim Einzug nach der Wahl der Figur läuft/rollt/fliegt die Figur groß ins Bild (andere Bewegung je Figur, schon im Spiel). Heute ist das noch die Kachel; mit Pose kommt die **ganze Figur** (Beine, Rollschuhe, Flügel).
+- **Hochformat 2:3 (z. B. 1024×1536), Ganzkörper in der Pose, Hintergrund Magenta #FF00FF, kein Boden, kein Schatten.** Figur und Stil exakt wie das Kachel-Bild (Kachel-Bild als Referenz mitgeben), Figur ca. 70 % der Bildhöhe, die Unterseite (Füße, Rollschuhe, Schubdüsen) komplett sichtbar. Die Bewegung macht das Spiel, das Bild zeigt nur die Haltung.
+- Posen: 1 Baristina auf rosa Rollschuhen im Gleiten, Arme leicht seitlich · 2 Ben im Sprint · 3 Felix im Sprung · 4 Bruno stampfend, Brust raus · 5 Mimi im Sprung auf Pfoten · 6 Pina zusammengerollt wie ein Ball · 7 Luna im Galopp, Regenbogenmähne weht · 8 Drago im Flug, Flügel offen · 9 Otto auf dem Rücken liegend wie auf einer Welle · 10 Rocky halb versteckt, schaut vorsichtig · 11 Pablo auf dem Bauch rutschend · 12 Robo schwebend mit Schubdüsen.
+
+### Effekte (`fx_puff.png`, `fx_star.png`, `fx_drop.png`, `fx_flame.png`, `fx_leaf.png`, `fx_ring.png`, `fx_glow.png`, `fx_excl.png`)
+- Kleine Sprites für den Einzug (Staubwolke, Stern, Tropfen, Flamme, Blatt, Ring, Leuchten, „!“). Je 256×256, Hintergrund Magenta, im selben Stil. Optional; ohne Bild zeichnet das Spiel sie selbst.
 
 ## Was ich damit mache
 Ansehen und Rückmeldung zu Stil/Lesbarkeit, Freistellen, Zuschneiden und Vereinheitlichen, Umwandeln in kleine WebP-Dateien, Einbau statt Emoji (Fallback auf Emoji, falls ein Bild fehlt), Glanz/Rand/Leuchten/Effekte im Code, danach Messung (Ruckeln, App-Größe), Veröffentlichung und neue APK.
