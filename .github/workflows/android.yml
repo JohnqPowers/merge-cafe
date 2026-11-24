@@ -55,7 +55,7 @@ jobs:
           npx cap sync android
 
       - name: Test-APK bauen (zum direkten Installieren)
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+        run: cd android && chmod +x gradlew && bash ../scripts/retry-net.sh ./gradlew assembleDebug   # wiederholt bei Netzwerkfehlern von Maven Central (HTTP 429), nicht bei Codefehlern
       - uses: actions/upload-artifact@v4
         with:
           name: noas-bean-trail-test-apk-${{ github.run_number }}
@@ -74,7 +74,7 @@ jobs:
         if: env.HAS_KEYSTORE == 'true'
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
-          npx cap build android \
+          bash scripts/retry-net.sh npx cap build android \
             --keystorepath "$RUNNER_TEMP/release.jks" \
             --keystorepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
             --keystorealias "${{ secrets.ANDROID_KEY_ALIAS }}" \
