@@ -25,8 +25,11 @@ Alle Events werden über `Platform.track()` an AppsFlyer gesendet, und zwar **nu
 | `spend_gems` (params `what`: `energy`, `order_items`; `amount`) | nein | Diamanten ausgegeben | Analyse |
 | `first_gem_spend` | ja | erste Diamanten-Ausgabe | Analyse |
 | `gift_open` (param `reward`) | nein | Geschenk aus dem Geschenk-Fach geöffnet | Analyse |
-| `purchase` (param `sku`) | nein | In-App-Kauf | ROAS |
-| `first_purchase` | ja | erster Kauf | **Kauf-Schritt** |
+| `purchase` (params `sku`, `af_revenue`, `af_currency`) | nein | In-App-Kauf (Diamanten, Startpaket) oder Pro-Kauf (`sku` = Store-Produkt des gekauften Pakets, z. B. `monthly`, `yearly`, `lifetime`) | ROAS |
+| `first_purchase` | ja | erster Kauf (auch der erste Pro-Kauf) | **Kauf-Schritt** |
+| `paywall_open` (param `place`: `shop`, `settings`) | nein | Pro-Fenster geöffnet (RevenueCat-Paywall oder eigene Liste); Trichter `paywall_open` → `pro_start` | Analyse |
+| `pro_start` (param `sku`) | ja | Pro erstmals aktiv (Kauf oder Wiederherstellung; nach Neuinstallation erneut) | Analyse |
+| `pro_restore` (param `sku`) | nein | Pro über „Käufe wiederherstellen“ oder die Paywall zurückgeholt (kein Umsatz) | Analyse |
 
 Hinweis Umsatz: Das Spiel sendet `purchase` selbst, mit `af_revenue` (Preis aus dem Store) und `af_currency`. **Die serverseitige Weitergabe von RevenueCat an AppsFlyer nicht zusätzlich einschalten**, sonst wird derselbe Umsatz doppelt gezählt (`docs/MONETARISIERUNG.md`, Punkt M4).
 
@@ -35,3 +38,5 @@ Hinweis Namen: Bestehende Event-Namen niemals umbenennen, Almedia rechnet darüb
 Hinweis 24.11.2026: Die Zeilen `order_complete`, `daily_claim` und `onboarding_complete` fehlten im Katalog, obwohl der Code sie sendet; nachgetragen, Namen unverändert.
 
 Hinweis v1.5.0: Bestehende Event-Namen wurden nicht umbenannt; es kamen nur die Zeilen `ad_request`, `first_ad`, `first_gem_spend` (und neue Parameterwerte) hinzu.
+
+Hinweis v1.5.14 (Noa's Pro): Es kamen nur die Zeilen `paywall_open`, `pro_start`, `pro_restore` hinzu; kein Name wurde geändert. Pro-Spieler holen Belohnungen ohne Video ab und erzeugen deshalb **kein** `ad_request`/`ad_rewarded` (Annahmequote nur über Nicht-Pro-Spieler lesen). Das Spiel sendet `purchase` nur beim **ersten** Kauf eines Pro-Pakets (Preis des Pakets, brutto); Verlängerungen eines Abos sendet es nicht. Abo-Umsatz im Zeitverlauf steht im RevenueCat-Dashboard. Die Weitergabe von RevenueCat an AppsFlyer bleibt aus (sonst Doppelzählung des ersten Kaufs).

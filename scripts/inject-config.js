@@ -11,6 +11,7 @@ const map = {
   'ca-app-pub-3940256099942544/5224354917': process.env.ADMOB_REWARDED_ANDROID,
   'ca-app-pub-3940256099942544/1712485313': process.env.ADMOB_REWARDED_IOS
 };
+if (/^test_/.test(process.env.REVENUECAT_ANDROID_KEY || '')) console.warn('WARNUNG: REVENUECAT_ANDROID_KEY ist ein Test-Store-Schluessel (test_…). Die App ignoriert ihn in Store-Paketen; fuer Produktion den goog_-Schluessel eintragen, den Test-Schluessel nur als REVENUECAT_TEST_KEY.');
 for (const [k, v] of Object.entries(map)) if (v) { s = s.split(k).join(v); console.log('gesetzt:', k.slice(0, 22) + '…'); }
 // Rechtstexte vollständig? Dann Werbung, Käufe und Messung in der App freischalten (CONFIG.legalReady).
 // Platzhalter in den Rechtstexten sind mit [[…]] markiert (www/privacy.html, www/impressum.html).
