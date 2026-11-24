@@ -992,7 +992,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.11',
+  version: '1.5.12',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
@@ -1081,8 +1081,10 @@ Object.assign(STR.de, {
   gemsT:'Diamanten', gemsIntro:'Deine Premium-Währung: Diamanten sparen Zeit. Spielen kannst du alles auch ohne sie.',
   gemsHave:'Du hast', gemsUse:'Dafür sind sie da', gemsEarn:'So bekommst du welche – gratis', gemsBuy:'Diamanten kaufen',
   useRefill:'Energie sofort voll', useRefillD:'Ohne Wartezeit weiterspielen',
+  chancesT:'Chancen im Spiel', chGift:'Geschenk (gratis)', chGiftD:'{c} % Münzen · {e} % Energie · {g} % Diamanten',
+  chSpawn:'Zutat erzeugen', chSpawnD:'Stufe 2 mit {p} % Chance, sonst Stufe 1. Mehr mit „Bessere Zutaten“.',
   useIng:'Fehlende Zutaten kaufen', useIngD:'Tippe auf einen Auftrag, der noch nicht fertig ist',
-  earnLevel:'Level aufsteigen', earnLevelD:'+3 bis +7 pro Level', earnCity:'Neue Stadt erreichen', earnCityD:'bis zu +15',
+  earnLevel:'Level aufsteigen', earnLevelD:'+3, mit höherem Level mehr', earnCity:'Neue Stadt erreichen', earnCityD:'bis zu +15',
   earnDaily:'Täglicher Bonus', earnDailyD:'bis zu +25 am 7. Tag', earnGift:'Geschenke & Entdeckungen', earnGiftD:'immer wieder +1 bis +5',
   gemTip:'Tipp: Tippe oben auf den Diamanten – dort steht, wofür er gut ist.',
   orderT:'Auftrag', orderP:'Das braucht dein Gast. Was fehlt, kannst du sofort kaufen.', orderOk:'Alles da – tippe auf „Liefern“!', buyIng:'Zutaten kaufen',
@@ -1097,8 +1099,10 @@ Object.assign(STR.en, {
   gemsT:'Gems', gemsIntro:'Your premium currency: gems save you time. You can play everything without them.',
   gemsHave:'You have', gemsUse:'What they are for', gemsEarn:'How to get them – for free', gemsBuy:'Buy gems',
   useRefill:'Refill energy instantly', useRefillD:'Keep playing without waiting',
+  chancesT:'Odds in the game', chGift:'Gift (free)', chGiftD:'{c}% coins · {e}% energy · {g}% gems',
+  chSpawn:'Producing an ingredient', chSpawnD:'Tier 2 with a {p}% chance, otherwise tier 1. Higher with "Better Ingredients".',
   useIng:'Buy missing ingredients', useIngD:'Tap an order that is not ready yet',
-  earnLevel:'Level up', earnLevelD:'+3 to +7 per level', earnCity:'Reach a new city', earnCityD:'up to +15',
+  earnLevel:'Level up', earnLevelD:'+3, more at higher levels', earnCity:'Reach a new city', earnCityD:'up to +15',
   earnDaily:'Daily bonus', earnDailyD:'up to +25 on day 7', earnGift:'Gifts & discoveries', earnGiftD:'now and then +1 to +5',
   gemTip:'Tip: tap the gem at the top – it shows what gems are for.',
   orderT:'Order', orderP:'This is what your guest wants. You can buy what is missing right away.', orderOk:'All set – tap “Serve”!', buyIng:'Buy ingredients',
@@ -2553,7 +2557,7 @@ function showGift() {
       if (taps < 3) return;
       opened = true; S.gifts = Math.max(0, (S.gifts | 0) - 1); updateFab();
       const r = Math.random();
-      reward = r < .4 ? { k: 'coins', v: rnd(15, 30) + S.level * 4 } : r < .75 ? { k: 'energy', v: rnd(15, 30) } : { k: 'gems', v: rnd(2, 5) };
+      reward = r < GIFT_P.coins ? { k: 'coins', v: rnd(15, 30) + S.level * 4 } : r < GIFT_P.coins + GIFT_P.energy ? { k: 'energy', v: rnd(15, 30) } : { k: 'gems', v: rnd(2, 5) };
       give(reward);
       b.innerHTML = ic(reward.k === 'coins' ? 'coin' : reward.k === 'energy' ? 'bolt' : 'gem'); b.style.animation = 'wordPop2 .5s cubic-bezier(.3,1.8,.5,1)';
       Sound.giftOpen(); burst(p.x, p.y, 50, GOLD, 8); vibrate([20, 30, 40]);
@@ -2583,7 +2587,7 @@ function spawn(gi) {
   if (p < 0) { toast(t('boardFull')); Sound.bonk(); $('#trash').classList.add('hintw'); setTimeout(() => $('#trash').classList.remove('hintw'), 1600); showMergeHint(); render(); return; }
   const free = S.tut < 3;
   if (!free && !spendEnergy(1)) { openNoEnergy(); return; }
-  const chance = .1 + .05 * S.up.gen;
+  const chance = spawnChance();
   const it = { c: g.g, t: S.tut < 3 ? 0 : (Math.random() < chance ? 1 : 0) };
   S.b[p] = it; S.seen[it.c + ':' + it.t] = 1;
   S.stats.spawns++;
@@ -3062,6 +3066,9 @@ $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeM
 const AD_CAP = { n: 6, d: 8 };
 function adState() { if (S.ads.day !== today()) S.ads = { day: today(), n: 0, d: 0 }; S.ads.d = S.ads.d | 0; return S.ads; }
 const wishCost = tr => Math.max(2, Math.ceil(Math.pow(2, tr) * .35));
+const GIFT_P = { coins: .40, energy: .35 };                    // Geschenk-Inhalt: Rest (25 %) sind Diamanten; die Chancen-Anzeige in „Was sind Diamanten?“ liest dieselben Werte
+const spawnChance = () => .1 + .05 * S.up.gen;                 // Chance auf Stufe 2 beim Erzeugen (Ausbau „Bessere Zutaten“ +5 % je Stufe)
+const pct = x => Math.round(x * 100);
 const regenTxt = () => { const s = String(Math.round(CONFIG.energyRegenMs / 6000) / 10); return LANG === 'de' ? s.replace('.', ',') : s; };
 const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const adRow = () => {
@@ -3105,6 +3112,8 @@ function openGems() {
     ${rowE('wand', t('useIng'), t('useIngD'))}
     <h3>${t('gemsEarn')}</h3>
     ${rowE('rosette', t('earnLevel'), t('earnLevelD'))}${rowE('star', t('earnCity'), t('earnCityD'))}${rowE('gift', t('earnDaily'), t('earnDailyD'))}${rowE('heart', t('earnGift'), t('earnGiftD'))}
+    <h3>${t('chancesT')}</h3>
+    ${rowE('gift', t('chGift'), t('chGiftD', { c: pct(GIFT_P.coins), e: pct(GIFT_P.energy), g: 100 - pct(GIFT_P.coins) - pct(GIFT_P.energy) }))}${rowE('star', t('chSpawn'), t('chSpawnD', { p: pct(spawnChance()) }))}
     <div class="center" style="margin-top:12px"><button class="btn g" data-act="shop">${ic('bag')} ${t('gemsBuy')}</button></div>`, 'gems');
 }
 function openOrder(idx) {
