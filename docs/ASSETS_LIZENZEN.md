@@ -85,7 +85,7 @@ Prüfung im Vergleich zu vorher: das Startbild unterscheidet sich nach dem Tausc
 | `@appsflyer-sdk/js-core-plugin` | `7.1.0` | JS-Schnittstelle, per esbuild nach `www/af.js` gebündelt | Lizenzfeld im Paket beim Build prüfen |
 | AppsFlyer Android SDK | über das Plugin | Messung | Bedingungen von AppsFlyer |
 | `@revenuecat/purchases-capacitor` | `latest` (**nicht festgelegt**) | Käufe | MIT |
-| RevenueCat Android SDK, Google Play Billing Library | Billing 9.1.0 im Build 12 | Käufe | MIT (RevenueCat); Billing nach Google-Bedingungen |
+| RevenueCat Android SDK, Google Play Billing Library | Billing 9.1.0 im Build 13 | Käufe | MIT (RevenueCat); Billing nach Google-Bedingungen |
 | AndroidX, Kotlin-Bibliotheken | von Gradle aufgelöst | Android-Grundlagen | Apache License 2.0 |
 | `esbuild` | `^0.25.0` | nur Build-Werkzeug (nicht in der App) | MIT |
 | Playwright, Python-Bibliotheken (Pillow, OpenCV, NumPy) | lokal | nur Tests und Bild-Skripte (nicht in der App) | verschiedene freie Lizenzen |

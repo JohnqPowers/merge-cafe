@@ -127,7 +127,7 @@ Textvorschlag für eine spätere Seite „Käufe“ (vom Eigentümer fachlich pr
 | M5 | Reale Anzeigenerlöse sind unbekannt (Füllrate, Preis je 1000 Ansichten). Es gibt keine Prognose im Repo. | nach den ersten Tagen mit Echtdaten im Wochenbericht ergänzen |
 | M6 | AdMob und Play Console prüfen Konten und Apps (Genehmigung, Auszahlungsgrenze, Steuerangaben). Ablauf und Dauer sind hier nicht bekannt. | Eigentümer legt Konten an; Steuer- und Zahlungsangaben nur er |
 | M7 | AdMob empfiehlt eine `app-ads.txt` auf der Entwickler-Website (Domain-Wurzel). Mit der Seite unter `johnqpowers.github.io/merge-cafe/` geht das nur über ein Repo `johnqpowers.github.io` oder eine eigene Domain. | prüfen, wenn AdMob eine Warnung zeigt |
-| M8 | Echte Käufe und Anzeigen sind nie gelaufen (nur nachgebaute Plugins). | Prüfliste `docs/TECHNIK.md`, Abschnitt 9, und Gerätetest |
+| M8 | Echte Käufe und Anzeigen sind auf keinem Gerät gelaufen (der Android-Build 13 vom 24.11.2026 enthält die echten Plugins, ist aber nur im Paket geprüft). | Prüfliste `docs/TECHNIK.md`, Abschnitt 9, und Gerätetest |
 
 ## 10. Einrichtung vor dem Start (Eigentümer; der Agent legt keine Konten an und gibt kein Geld aus)
 

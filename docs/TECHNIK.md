@@ -1,6 +1,6 @@
 # Technische Dokumentation – Noa's Bean Trail
 
-Stand: 24.11.2026. Spielversion 1.5.13 (Push auf `main` am 24.11.2026 freigegeben). Der letzte bis zum Push tatsächlich gebaute und geprüfte Android-Build ist Nr. 12 (`versionName 1.0.12`); die Angaben zu Berechtigungen und Bibliotheken stammen aus dessen Manifest. Die Änderungen ab v1.5.8 (Einwilligung, AppsFlyer 7, Store-Preise, Sperre, Hochformat-Sperre, Test-Anzeigen im Debug-Paket) sind in diesem Stand nur im Browser mit nachgebauten Plugins geprüft, **nicht** in einem echten Android-Build.
+Stand: 24.11.2026. Spielversion 1.5.13 (Push auf `main` am 24.11.2026 freigegeben). Der Android-Build Nr. 13 (`versionName 1.0.13`, `versionCode 13`) ist am 24.11.2026 im CI durchgelaufen (Lauf 45487193159, Commit 48c1bc7); die Angaben zu Berechtigungen und Bibliotheken stammen aus seinem Manifest. Die Änderungen ab v1.5.8 (Einwilligung, AppsFlyer 7, Store-Preise, Sperre, Hochformat-Sperre, Test-Anzeigen im Debug-Paket) stecken damit erstmals in einem echten Android-Build und sind im Paket nachgewiesen (Paket-ID, Berechtigungen, Hochformat-Sperre, Testmarkierung, Signatur). **Auf einem Gerät oder Emulator ist der Build noch nicht gelaufen.**
 
 ## 1. Aufbau
 
@@ -26,8 +26,8 @@ Das Spiel läuft im Browser und, mit Capacitor verpackt, als Android-App (WebVie
 | Android `versionCode` | `<Build-Nr.>` (steigt mit jedem Lauf, wie Google Play es verlangt) | wie oben |
 | Paket-ID | `io.github.johnqpowers.beantrail` | `capacitor.config.json`, `.github/workflows/android.yml`, `.github/workflows/kpi.yml`. Vom Eigentümer am 24.11.2026 gewählt (vorher `io.github.johnqpowers.mergecafe`). **Nach dem ersten Upload in Google Play nie mehr änderbar**; sie erscheint in der Store-Adresse. Eine mit der alten ID installierte App wird nicht aktualisiert, sondern bleibt daneben bestehen (eigener Spielstand). |
 | App-Name | Noa's Bean Trail | `APP_NAME`, Manifest, `capacitor.config.json` |
-| minSdk / targetSdk / compileSdk | 24 (Android 7.0) / 36 / 36 | Build 12. Google Play verlangt seit 31.08.2026 für neue Apps und Updates das Ziel-API-Level 36 (Android 16); erfüllt. Jährlich im August neu prüfen. |
-| Play Billing Library | 9.1.0 | Build 12 (über RevenueCat) |
+| minSdk / targetSdk / compileSdk | 24 (Android 7.0) / 36 / 36 | Build 13 (minSdk und targetSdk im Manifest gelesen). Google Play verlangt seit 31.08.2026 für neue Apps und Updates das Ziel-API-Level 36 (Android 16); erfüllt. Jährlich im August neu prüfen. |
+| Play Billing Library | 9.1.0 | Build 13 (über RevenueCat; im Manifest gelesen) |
 
 ## 3. Android-Paket und Build
 
@@ -70,7 +70,7 @@ Lizenzen und Versionen: `docs/ASSETS_LIZENZEN.md`, Abschnitt 5. Datenflüsse im 
 
 Ohne Einwilligung bleiben AdMob und AppsFlyer aus; das Spiel bleibt vollständig spielbar. Ereignisse, die vor der Entscheidung entstehen, werden gemerkt (höchstens 60) und nur bei Zustimmung gesendet, sonst verworfen. Alle Ereignisnamen stehen in `docs/EVENTS.md` und werden nie umbenannt (Almedia rechnet darüber ab).
 
-## 6. Berechtigungen (Manifest Build 12, plus VIBRATE ab v1.5.8)
+## 6. Berechtigungen (Manifest Build 13, am 24.11.2026 aus der Test-APK gelesen)
 
 | Berechtigung | Wofür | Herkunft |
 |---|---|---|
@@ -83,7 +83,7 @@ Ohne Einwilligung bleiben AdMob und AppsFlyer aus; das Spiel bleibt vollständig
 | `…DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | Schutz interner Empfänger | AndroidX |
 | `VIBRATE` | Vibration (Einstellung im Spiel) | `scripts/patch-android.js` |
 
-Nicht angefordert: Standort, Kamera, Mikrofon, Kontakte, Dateien, Benachrichtigungen, Telefon. Weitere Manifest-Fakten: `allowBackup=true` (Android-Geräte-Sicherung kann den Spielstand in das Google-Konto sichern; in der Datenschutzseite genannt), `MainActivity` ist als Start-Aktivität exportiert, der Amazon-Empfänger gehört zu RevenueCat und ist bei Google Play ohne Funktion.
+Nicht angefordert: Standort, Kamera, Mikrofon, Kontakte, Dateien, Benachrichtigungen, Telefon. Weitere Manifest-Fakten: `allowBackup=true` (Android-Geräte-Sicherung kann den Spielstand in das Google-Konto sichern; in der Datenschutzseite genannt), `MainActivity` ist als Start-Aktivität exportiert und auf Hochformat gesperrt (`screenOrientation=portrait`), der Amazon-Empfänger gehört zu RevenueCat und ist bei Google Play ohne Funktion. Ohne Secret trägt das Paket Googles öffentliche Beispiel-App-ID von AdMob (`ca-app-pub-3940256099942544~3347511713`); das Debug-Paket enthält zusätzlich `assets/public/build.json` (siehe R1).
 
 ## 7. Updates und Wartung
 
@@ -98,8 +98,8 @@ Nicht angefordert: Standort, Kamera, Mikrofon, Kontakte, Dateien, Benachrichtigu
 
 | Nr. | Punkt | Folge | Plan |
 |---|---|---|---|
-| R1 | **Test-APK und echte Anzeigen** (behoben in v1.5.11, im echten Build noch ungeprüft). Die öffentliche Test-APK hätte dieselbe Konfiguration wie die Store-Datei und damit echte Anzeigen gezeigt, sobald der echte AdMob-Anzeigenblock als Secret gesetzt ist. Eigene Klicks auf echte Anzeigen zählen bei AdMob als ungültiger Verkehr und können das Konto sperren. | Konto-Risiko | `patch-android.js` legt `android/app/src/debug/assets/public/build.json` an (nur Debug-Paket). Das Spiel liest die Datei beim Start (`Platform.buildInfo`) und startet AdMob dann mit `initializeForTesting` und Googles Test-Anzeigenblock `ca-app-pub-3940256099942544/5224354917`; die Optionen zeigen „Test-Paket“. Das Store-Paket enthält die Datei nicht (Prüfpunkt in Abschnitt 9). Test im Browser mit nachgebauten Plugins: `tests/test_plattform.py`, S10 und S11. **Zusatzrisiko:** Die Test-APK sendet trotzdem Messdaten an AppsFlyer (nach Einwilligung) und verfälscht damit die KPIs. Vor dem Start der Werbung die Test-APK nicht an Fremde weitergeben oder im AppsFlyer-Dashboard nach App-Version filtern. |
-| R2 | **Der Android-Build mit Version 1.5.8 und später ist nie gelaufen.** AppsFlyer-Bündelung, Einwilligungsfenster und Plugin-Versionen sind nur mit nachgebauten Plugins geprüft. | Build kann beim ersten Lauf scheitern | Erster Lauf nach Freigabe beobachten; Fehlerbild und Korrektur im Wochenbericht. |
+| R1 | **Test-APK und echte Anzeigen** (behoben in v1.5.11; im Build 13 liegt die Testmarkierung `build.json` in der Test-APK, die Anzeige selbst ist auf einem Gerät noch ungeprüft). Die öffentliche Test-APK hätte dieselbe Konfiguration wie die Store-Datei und damit echte Anzeigen gezeigt, sobald der echte AdMob-Anzeigenblock als Secret gesetzt ist. Eigene Klicks auf echte Anzeigen zählen bei AdMob als ungültiger Verkehr und können das Konto sperren. | Konto-Risiko | `patch-android.js` legt `android/app/src/debug/assets/public/build.json` an (nur Debug-Paket). Das Spiel liest die Datei beim Start (`Platform.buildInfo`) und startet AdMob dann mit `initializeForTesting` und Googles Test-Anzeigenblock `ca-app-pub-3940256099942544/5224354917`; die Optionen zeigen „Test-Paket“. Das Store-Paket enthält die Datei nicht (Prüfpunkt in Abschnitt 9). Test im Browser mit nachgebauten Plugins: `tests/test_plattform.py`, S10 und S11. **Zusatzrisiko:** Die Test-APK sendet trotzdem Messdaten an AppsFlyer (nach Einwilligung) und verfälscht damit die KPIs. Vor dem Start der Werbung die Test-APK nicht an Fremde weitergeben oder im AppsFlyer-Dashboard nach App-Version filtern. |
+| R2 | **Der Android-Build ab Version 1.5.8 ist am 24.11.2026 erstmals durchgelaufen (Build 13), aber auf keinem Gerät gelaufen.** AppsFlyer-Bündel (`www/af.js`) und Testmarkierung sind im Paket nachgewiesen; Einwilligungsfenster, AppsFlyer-Start, Test-Anzeigen und Käufe lassen sich nur auf einem Gerät prüfen. | Fehler zeigen sich erst auf dem Gerät | Eigentümer installiert die Test-APK (neue Paket-ID, läuft neben der alten App) und meldet Auffälligkeiten; Ergebnis im Wochenbericht. |
 | R3 | `latest` bei Capacitor und RevenueCat | Build ändert sich ohne eigenes Zutun | siehe Abschnitt 7 |
 | R4 | Käufe und Anzeigen funktionieren erst mit echten Konten: Play Console (Produkte `starter_pack`, `gems_small`, `gems_large` als Verbrauchsgüter), RevenueCat (Produkte und Android-Schlüssel), AdMob (App und Anzeigenblock, Einwilligungsnachricht), AppsFlyer (Dev-Key) | ohne sie bleibt alles aus oder zeigt Testwerte | Eigentümer legt Konten an und trägt die Secrets ein (Liste in `README.md`) |
 | R5 | Belohnungen werden im Spiel auf dem Gerät gutgeschrieben (kein Server). Manipulierte Geräte können sich Diamanten holen. | geringer Schaden bei einem reinen Offline-Spiel | akzeptiert; Käufe prüft RevenueCat serverseitig, die Gutschrift erfolgt trotzdem lokal |

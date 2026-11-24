@@ -49,7 +49,7 @@ Stand: 24.11.2026, Spielversion 1.5.13 (Push auf `main` vom Eigentümer am 24.11
 
 ## 5. Bekannte Lücken, die kein Dokument schließt
 
-- Echte Geräte und echte Konten fehlen noch. Der CI-Build der Versionen ab 1.5.8 läuft erstmals mit dem Push vom 24.11.2026 (Ergebnis: Wochenbericht und `docs/QUALITAET.md`, Abschnitt 6).
+- Echte Geräte und echte Konten fehlen noch. Der CI-Build der Versionen ab 1.5.8 ist mit dem Push vom 24.11.2026 erstmals durchgelaufen (Build 13, Test-APK); auf einem Gerät ist er noch nicht gelaufen (Ergebnis: Wochenbericht und `docs/QUALITAET.md`, Abschnitt 6).
 - Böden der Welten 4 bis 9 und viele Einzugs-Posen fehlen als Bilder; das Spiel zeigt dort gebaute Ersatzgrafik (`CLAUDE.md`, Abschnitt Bilder).
 - Das Verdopplungs-Angebot nach einer Lieferung steht 7 Sekunden über der unteren Leiste; im Gerätetest beobachten, ob es versehentlich angetippt wird (`docs/MONETARISIERUNG.md`, Punkt M2).
 - Herkunft der KI-erzeugten Bilder (Icon, Figuren, Katze, Teile) ist erklärt und im Verzeichnis erfasst, aber nicht lückenlos belegt: kein Prompt je Bild, kein Tarif, keine Modellversion; Rechte an Referenzmaterial sind nicht geprüft (`docs/HERKUNFT_BILDER.md`).
