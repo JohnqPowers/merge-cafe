@@ -16,15 +16,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: www }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      # Die Artefakt-Liste von GitHub ist direkt nach dem Hochladen noch leer ("Found 0 artifact(s)"):
+      # eigener Job (wie die GitHub-Vorlage) plus kurze Wartezeit. Siehe docs/TECHNIK.md, R11.
+      - name: Kurz warten, bis das Artefakt abrufbar ist
+        run: sleep 20
       - id: deploy
         uses: actions/deploy-pages@v4
