@@ -1,6 +1,6 @@
 # Monetarisierungsdokumentation – Noa's Bean Trail
 
-Stand: 24.11.2026, Spielversion 1.5.12 (lokal committet, nicht veröffentlicht). Alle Zahlen stammen aus `www/index.html`; die Fundstellen stehen in Klammern. Keine Rechtsberatung. **In der App ist Werbung und Kaufen gesperrt, solange Impressum und Datenschutz Platzhalter enthalten (`CONFIG.legalReady`).** Es wurde kein Konto angelegt, kein Preis eingestellt und kein Geld ausgegeben.
+Stand: 24.11.2026, Spielversion 1.5.13 (Push auf `main` freigegeben). Alle Zahlen stammen aus `www/index.html`; die Fundstellen stehen in Klammern. Keine Rechtsberatung. **Die Sperre `CONFIG.legalReady` (Werbung, Käufe und Messung) ist seit 24.11.2026 offen, weil Impressum und Datenschutz keine Platzhalter mehr enthalten. Echte Werbung und echte Käufe laufen erst mit Konten und Schlüsseln (GitHub-Secrets); das Test-Paket zeigt nur Googles Testanzeigen.** Es wurde kein Konto angelegt, kein Preis eingestellt und kein Geld ausgegeben.
 
 ## 1. Modell in Kürze
 
@@ -131,7 +131,7 @@ Textvorschlag für eine spätere Seite „Käufe“ (vom Eigentümer fachlich pr
 
 ## 10. Einrichtung vor dem Start (Eigentümer; der Agent legt keine Konten an und gibt kein Geld aus)
 
-1. Impressum und Datenschutz: Platzhalter `[[…]]` in `www/privacy.html` und `www/impressum.html` ersetzen. Erst dann schaltet der Build Werbung, Käufe und Messung frei.
+1. Impressum und Datenschutz: erledigt am 24.11.2026 (keine Platzhalter `[[…]]` mehr in `www/privacy.html` und `www/impressum.html`). Damit schaltet der Build Werbung, Käufe und Messung frei, sobald Schlüssel vorhanden sind.
 2. **Google Play Console:** App anlegen, drei Produkte mit genau diesen IDs und Typ „einmalig, verbrauchbar“: `gems_small`, `gems_large`, `starter_pack`; Preise festlegen (Vorschläge in Abschnitt 3); Lizenztester eintragen.
 3. **RevenueCat:** Projekt, Android-App mit der Paket-ID, Dienstkonto, die drei Produkte; den öffentlichen Android-Schlüssel als GitHub-Secret `REVENUECAT_ANDROID_KEY` eintragen.
 4. **AdMob:** App und Belohnungs-Anzeigenblock anlegen; Secrets `ADMOB_APP_ID_ANDROID` und `ADMOB_REWARDED_ANDROID`; in der Konsole die **EU-Einwilligungsnachricht (UMP)** einrichten und Testgeräte eintragen.

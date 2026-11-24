@@ -1,8 +1,8 @@
 # Store-Eintrag – Noa's Bean Trail
 
-Stand: 24.11.2026, Spielversion 1.5.12. Entwurf für die Google Play Console. Keine Rechtsberatung.
+Stand: 24.11.2026, Spielversion 1.5.13. Entwurf für die Google Play Console. Keine Rechtsberatung.
 
-> **Nicht hochladen, solange offen ist:** (1) die Namensfreigabe des Eigentümers (`docs/RECHT_UND_NAMEN.md`, Abschnitt 5.3), (2) die Platzhalter in `www/privacy.html` und `www/impressum.html`. Texte und Bilder sind vorbereitet, es wurde nichts eingereicht und kein Text für Almedia oder andere Werbekanäle erstellt.
+> **Stand:** Namensfreigabe (24.11.2026) und Rechtstexte ohne Platzhalter (24.11.2026) liegen vor. Texte und Bilder sind vorbereitet, es wurde nichts eingereicht und kein Text für Almedia oder andere Werbekanäle erstellt. Offen sind die Punkte in Abschnitt 8.
 
 Prüfung per Skript: `python3 -I tests/test_store.py` (Zeichenlängen, Bildformate, Alt-Texte, Zahlen im Text gegen den Code, Fremdnamen-Liste).
 
@@ -18,7 +18,7 @@ Prüfung per Skript: `python3 -I tests/test_store.py` (Zeichenlängen, Bildforma
 | Tags | In der Console aus der vorgegebenen Liste wählen (passend: Merge, Casual, Puzzle, Kochen, falls vorhanden). Die Liste ändert sich; hier steht keine feste Auswahl. | beim Ausfüllen |
 | Preis | kostenlos, mit In-App-Käufen und Werbung („Enthält Werbung“ und „In-App-Käufe“ ankreuzen) | siehe `docs/MONETARISIERUNG.md` |
 | Kontakt | E-Mail-Adresse (Pflicht, öffentlich sichtbar), Website optional | **Eigentümer**, gleiche Adresse wie im Impressum |
-| Datenschutzerklärung (URL) | `https://johnqpowers.github.io/merge-cafe/privacy.html` | erst nach Ersetzen der Platzhalter |
+| Datenschutzerklärung (URL) | `https://johnqpowers.github.io/merge-cafe/privacy.html` | Rechtstexte seit 24.11.2026 ohne Platzhalter; die Adresse gilt, sobald die Web-Version mit Version 1.5.13 veröffentlicht ist |
 | Zielgruppe und Inhalt | 16–17 und 18+ (keine Kinder-Altersgruppen) | Empfehlung, siehe `docs/ALTERSFREIGABE.md` |
 | Inhaltseinstufung (IARC) | Fragebogen ausfüllen, erwartet USK 0 / PEGI 3 | siehe `docs/ALTERSFREIGABE.md` |
 | Datensicherheit | Entwurf der Antworten | siehe `docs/PRIVACY.md` |
@@ -173,11 +173,11 @@ Jede Zahl und jede Funktion im Text muss im Spiel stimmen. Die Zahlen prüft `te
 
 ## 8. Offen (nur der Eigentümer kann das)
 
-1. **Namensfreigabe** eintragen (`docs/RECHT_UND_NAMEN.md`, Abschnitt 5.3). Ohne sie kein Upload und keine Werbetexte.
-2. **Impressum und Datenschutz** mit echten Angaben füllen (Platzhalter `[[…]]` in `www/impressum.html`, `www/privacy.html`), dazu die Kontakt-E-Mail der Console. Ohne das bleiben Werbung und Käufe aus.
+1. **Namensfreigabe:** erteilt am 24.11.2026 (`docs/RECHT_UND_NAMEN.md`, Abschnitt 5.3). Erledigt.
+2. **Impressum und Datenschutz:** mit den Angaben des Eigentümers gefüllt (24.11.2026). Offen: in der Console dieselbe Kontakt-E-Mail eintragen (öffentlich sichtbar).
 3. **Zielgruppe „ab 16“** bestätigen oder ändern; danach den Satz „Für Spieler ab 16 Jahren“ anpassen.
 4. **Standardsprache, Kategorie und Tags** in der Console bestätigen; Texte erst nach der Freigabe einfügen.
-5. **Icon und Spielbilder:** Herkunft und Nutzungsrechte der mit einem Bildwerkzeug erzeugten Bilder (Icon, Figuren, Katze, Teile) bestätigen (`docs/ASSETS_LIZENZEN.md`).
+5. **Icon und Spielbilder:** Herkunft erklärt (Eigentümer, 24.11.2026; `docs/HERKUNFT_BILDER.md`). Offen: Prompt, Modellversion und Tarif je Bild, Rechte am Referenzmaterial, fachkundige Einordnung der Nutzungsbedingungen des Bildwerkzeugs. In Texten und Anzeigen nicht behaupten, die Bilder seien exklusiv geschützt oder einzeln rechtlich geprüft.
 6. **Screenshots vom Gerät** nach dem ersten Test-APK gegenprüfen (Abschnitt 5).
 
 ## Quellen

@@ -1,6 +1,6 @@
 # Altersfreigabe und Jugendschutz – Noa's Bean Trail
 
-Stand: 24.11.2026, Spielversion 1.5.12. Entwurf für die Play Console (Abschnitte „Zielgruppe und Inhalt“ und „Inhaltseinstufung“). Keine Rechtsberatung. Verbindlich ist, was der Einstufungs-Fragebogen (IARC) am Ende ergibt; der Wortlaut der Fragen ändert sich, beim Ausfüllen gilt die dann aktuelle Fassung.
+Stand: 24.11.2026, Spielversion 1.5.13. Entwurf für die Play Console (Abschnitte „Zielgruppe und Inhalt“ und „Inhaltseinstufung“). Keine Rechtsberatung. Verbindlich ist, was der Einstufungs-Fragebogen (IARC) am Ende ergibt; der Wortlaut der Fragen ändert sich, beim Ausfüllen gilt die dann aktuelle Fassung.
 
 ## 1. Entscheidung
 
@@ -15,7 +15,7 @@ Die Zielgruppe ist eine Empfehlung des Agenten. Der Eigentümer trägt sie in de
 
 **Risiko:** Google prüft selbst, ob Bildsprache und Wortwahl Kinder ansprechen, unabhängig von der Angabe in der Konsole (siehe Quellen). Die Candy-Optik ist freundlich und bunt. Stuft Google die Zielgruppe als gemischt ein, drohen Auflagen (neutrale Altersabfrage, nur nicht-personalisierte Werbung für Kinder). Plan B steht in Abschnitt 5.
 
-## 2. Inhalte (Fakten aus dem Code, v1.5.12)
+## 2. Inhalte (Fakten aus dem Code, v1.5.13)
 
 | Merkmal | Stand |
 |---|---|
@@ -46,13 +46,15 @@ Die Zielgruppe ist eine Empfehlung des Agenten. Der Eigentümer trägt sie in de
 | Nutzerkommunikation, Nutzerinhalte, Standort? | **Nein** | – |
 | Teilen persönlicher Daten mit Dritten? | **Ja (Gerätekennungen)** | Nur nach Einwilligung: AdMob (Werbung), AppsFlyer (Messung). Details: `docs/PRIVACY.md`. |
 
+**Wo steht der Fragebogen?** In der Google Play Console, nicht im Spiel und nicht im Repo. Die App muss dort zuerst angelegt sein. Dann: Play Console › Richtlinie (Bereich „Überwachen und verbessern“, Eintrag „Richtlinie und Programme“) › **App-Inhalte**. Dort liegen zwei Aufgaben: **„Zielgruppe und Inhalt“** (Zielgruppe wählen, Empfehlung: 16–17 und 18+) und die **Inhaltseinstufung** (IARC-Fragebogen, Start, E-Mail-Adresse eintragen, Kategorie „Spiel“ wählen, Fragen nach den Antworten in diesem Abschnitt beantworten, am Ende Einstufung speichern). Die Menüführung kann sich ändern; maßgeblich ist, was die Console zeigt.
+
 ## 4. Jugendschutz im Spiel (was schon da ist)
 
 - **Kein Konto, keine Kommunikation, keine fremden Inhalte:** Kinder und Jugendliche können im Spiel nicht angesprochen werden.
 - **Keine Kaufaufforderung an Kinder:** Käufe nur im Shop, nur auf Tipp; Preise kommen vom Store (kein versteckter Preis); der Kauf läuft über Google Play und dessen Familienfunktionen (Kaufsperre, Passwort-Abfrage).
 - **Werbung freiwillig und begrenzt:** nur auf Tipp des Spielers, das Angebot „Münzen verdoppeln“ nie im Tutorial und erst ab Level 3, höchstens 6 Energie-Videos und 8 Verdopplungen am Tag (`AD_CAP` im Code); Inhaltsstufe „ParentalGuidance“.
 - **Einwilligung zuerst:** Bei Start in der App erscheint das Google-Einwilligungsfenster (UMP). Ohne Einwilligung werden weder Werbung angefordert noch Messdaten gesendet. Später widerrufbar unter Optionen → Werbe-Einstellungen.
-- **Sperre bei unvollständigen Rechtstexten:** Solange Impressum oder Datenschutz Platzhalter enthalten, bleiben Werbung, Käufe und Messung in der App aus (`CONFIG.legalReady`).
+- **Sperre bei unvollständigen Rechtstexten:** Solange Impressum oder Datenschutz Platzhalter enthalten, bleiben Werbung, Käufe und Messung in der App aus (`CONFIG.legalReady`). Stand 24.11.2026: keine Platzhalter mehr, die Sperre ist offen.
 - **Keine Dark Patterns:** keine versteckten Kosten, keine falschen Zeitgeber, keine Schuldzuweisung beim Ablehnen von Werbung, kein Verlust von Spielfortschritt (nur die Serie des Tagesbonus beginnt nach einem verpassten Tag neu, siehe Abschnitt 3).
 
 ## 5. Plan B, falls Google die Zielgruppe als gemischt einstuft

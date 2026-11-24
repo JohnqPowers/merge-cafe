@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TOKEN: ${{ secrets.APPSFLYER_API_TOKEN }}
-      APP_ID: io.github.johnqpowers.mergecafe
+      APP_ID: io.github.johnqpowers.beantrail
     steps:
       - uses: actions/checkout@v5
       - name: Berichte der letzten 30 Tage laden

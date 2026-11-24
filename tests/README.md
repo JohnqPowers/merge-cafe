@@ -9,8 +9,9 @@ Automatische Tests mit Playwright (Python) und Chrome. Sie laufen ohne Handy; ec
 | `test_ausrichtung.py` | Dreh-Hinweis im Querformat auf dem Handy, keiner bei Tablets und Hochformat (11 Prüfungen) |
 | `test_spielstand.py` | alte, unvollständige, kaputte und fremde Spielstände laden ohne Absturz (20 Prüfungen) |
 | `test_katze.py` | Katze Mocha: Sprung, Landung, Streicheln, Rückkehr, Sonderfälle |
+| `test_herkunft.py` | Herkunftsnachweise ohne Browser: Manifest der ausgelieferten Dateien (`docs/herkunft/ausgelieferte_dateien.csv`) ist aktuell, Verzeichnis des Eigentümers und Paketlisten stimmig, keine Namen anderer Spiele in den Herkunftsdateien (16 Prüfungen, braucht nur Pillow) |
 | `test_store.py` | Store-Unterlagen ohne Browser: Zeichenlängen und Regeln der Texte in `docs/STORE_LISTING.md`, Zahlen im Text gegen den Code, Alt-Texte, Bildformate in `store/` (91 Prüfungen, braucht nur Pillow) |
 
-Aufruf aus dem Projektordner: `python3 -I tests/test_gesamt.py 390 844` (zweite Größe z. B. `360 640`), `python3 -I tests/test_plattform.py`, `python3 -I tests/test_ausrichtung.py`, `python3 -I tests/test_spielstand.py`, `python3 -I tests/test_store.py`, `python3 -I tests/test_katze.py` (druckt ein Ablaufprotokoll, keine Zählung).
+Aufruf aus dem Projektordner: `python3 -I tests/test_gesamt.py 390 844` (zweite Größe z. B. `360 640`), `python3 -I tests/test_plattform.py`, `python3 -I tests/test_ausrichtung.py`, `python3 -I tests/test_spielstand.py`, `python3 -I tests/test_store.py`, `python3 -I tests/test_herkunft.py`, `python3 -I tests/test_katze.py` (druckt ein Ablaufprotokoll, keine Zählung).
 Voraussetzung: `pip install playwright` und ein installiertes Chrome (Pfad per Umgebungsvariable `CHROME`, Standard `/usr/bin/google-chrome`).
 `state.json` ist ein Spielstand auf Level 12 (Paris), den die Tests einspielen.

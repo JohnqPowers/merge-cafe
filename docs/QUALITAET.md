@@ -6,7 +6,7 @@ Stand: 24.11.2026. Spielversion 1.5.12 (lokal committet, nicht veröffentlicht).
 
 | Bereich | Stand |
 |---|---|
-| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24, 54/54, 11/11, 20/20 und ein Ablaufprotokoll ohne Fehler (Abschnitt 3) |
+| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24 (beide Fenstergrößen), 54/54, 11/11, 20/20, 91/91, 16/16 und ein Ablaufprotokoll ohne Fehler (Abschnitt 3) |
 | Echter Android-Build ab Version 1.5.8 | **nie gelaufen** (Abschnitt 6, Punkt Q1) |
 | Echte Geräte | Der Eigentümer hat Test-APKs bis Build 12 selbst gespielt (Rückmeldungen stehen in `reports/weekly/`). **Gerätemodell, Android-Version und Build sind nicht dokumentiert**, es gibt kein Gerätetest-Protokoll. Die Lücke ist offen. |
 | Abstürze | **Keine Daten.** Im Spiel ist keine Absturzmeldung eingebaut, und die App war nie im Store. Bekannte Fehler stammen aus Tests und Rückmeldungen. |
@@ -23,7 +23,7 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 - Der Spielstand `tests/state.json` (Level 12, Paris) wird für Tests ab Level 12 eingespielt.
 - Konsolenfehler und fehlende Bilder zählen als Testfehler.
 
-## 3. Automatische Tests (Lauf vom 24.11.2026, Version 1.5.12)
+## 3. Automatische Tests (Lauf vom 24.11.2026, Version 1.5.13)
 
 | Datei | Ergebnis | Inhalt |
 |---|---|---|
@@ -32,7 +32,10 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 | `tests/test_ausrichtung.py` | **11/11** | Dreh-Hinweis nur bei Querformat und sehr niedrigen Fenstern (844×390, 700×520), nicht bei Handy hochkant und nicht bei Tablets (1024×600, 1280×800, 810×1080); Deutsch und Englisch; Hinweis deckt alles ab und liegt oben |
 | `tests/test_spielstand.py` | **20/20** | Update-Sicherheit des Spielstands: alter, unvollständiger Spielstand lädt (neue Felder bekommen Standardwerte, alte Emoji-Figur wird auf die neue Kennung umgestellt), Zusatzfelder bleiben, kaputter Text, fremde Version, falsche Brettgröße, leeres Profil und unbekannte Figur starten ein neues Spiel bzw. Ersatzwerte ohne Absturz, Level-12-Stand lädt bei 360×640 |
 | `tests/test_store.py` | **91/91** | Store-Unterlagen ohne Browser: Titel höchstens 30, Kurzbeschreibung 80, Beschreibung 4000 Zeichen, Alt-Texte höchstens 140; keine Werbewörter, Emojis oder Fremdnamen im Titel; Zahlen im Text (22 Leckereien, 3 Ketten, 9 Welten, 12 Figuren, 7 Bonus-Tage, Automaten, Städte) stimmen mit `www/index.html`; Icon 512×512 mit Alpha, Feature-Grafiken 1024×500 ohne Alpha, 6 Screenshots je Sprache 1080×1920 ohne Alpha, deutsche und englische Fassung verschieden, keine Reste mit altem Namen in `store/`. Mit absichtlich falschem Text geprüft: schlägt dann fehl. |
+| `tests/test_herkunft.py` | **16/16** | Herkunftsnachweise ohne Browser: Manifest der ausgelieferten Dateien (`docs/herkunft/ausgelieferte_dateien.csv`) ist aktuell und stimmt mit den Dateien überein (Pfad, Größe, SHA-256), jedes Spielbild hat eine Quelle, Verzeichnis des Eigentümers und Paketlisten sind stimmig, keine Namen anderer Spiele in den Herkunftsdateien |
 | `tests/test_katze.py` | Ablaufprotokoll A–H, **kein Fehler** | Katze Mocha: Tutorial (Katze aus), fehlende Bilder (gezeichnete Katze bleibt), Sprung und Landung bei 360×640, 5 Gästeplätze (Katze ausgeblendet), Streicheln mit Ton, Tippen, Tab-Wechsel, Adressleiste, Querformat, Ton aus. Dieser Test druckt Messwerte; er hat keine feste Bestanden/Durchgefallen-Zählung, ich lese die Ausgabe. |
+
+**Zusatzprüfung zu 1.5.13:** `scripts/inject-config.js` wurde auf einer Kopie von `www/` ausgeführt (Rechtstexte ohne Platzhalter, deshalb `legalReady: true`). Die Seite lädt in Chrome (390×844) ohne Konsolen- oder Seitenfehler, Impressum und Datenschutz zeigen die Anbieterangaben ohne Platzhalter. Das ist die Browser-Schicht des CI-Builds; der Android-Teil bleibt ungeprüft (Q1).
 
 Frühere Einzelprüfungen, die **nicht** im Repo liegen (Wegwerf-Skripte, damals bei 390×844 und 360×640 bestanden): Figuren und Gäste 13/13, Level-Chips 18/18, Ablauf Onboarding → Einzug → Tutorial 34/34, Namenstest 12/12, Sie sind in den Wochenberichten belegt, aber nicht wiederholbar, bis sie ins Repo wandern.
 
@@ -69,7 +72,7 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 | Q4 | Tablets und Faltgeräte: Android 16 ignoriert die Hochformat-Sperre ab 600 dp. Im Querformat bei 1024×600 ist das Brett klein (Felder 26–32 px), das Spiel bleibt bedienbar. | mittel | akzeptiert, bei Bedarf Seitenlayout für Querformat |
 | Q5 | Handy im Querformat: Start-Knopf und Brett wären nicht erreichbar. Behoben: Sperre im Manifest plus Dreh-Hinweis. | – | behoben in v1.5.10, im echten Build ungeprüft |
 | Q6 | Bilder: Böden für Wien, Paris und Rom sind Platzhalter (Wien ist der Berlin-Entwurf), Böden 4 bis 8 fehlen (gebauter Ersatz im Spiel), die zwölf Einzugs-Posen fehlen (Kachel statt Pose). Fünf Teile-Bilder sind am Rand leicht angeschnitten (Donut, Brot, Croissant, Salat, Weizen). | niedrig | offen, braucht neue Bilder des Eigentümers |
-| Q7 | Katze Mocha: Frames teils abgewandelte Kopien, `purr.wav` ist ein Platzhalter; Herkunft und Rechte der Bilder vom Eigentümer zu bestätigen (`docs/ASSETS_LIZENZEN.md`). | niedrig | offen |
+| Q7 | Katze Mocha: Frames teils abgewandelte Kopien, `purr.wav` ist ein Platzhalter. Herkunft der Bilder vom Eigentümer erklärt (24.11.2026), aber nicht lückenlos belegt: Prompt, Modellversion und Tarif je Bild fehlen, Rechte am Referenzmaterial sind nicht geprüft (`docs/HERKUNFT_BILDER.md`, `docs/ASSETS_LIZENZEN.md`). | niedrig | offen |
 | Q8 | Bedienungshilfen (TalkBack, große Schrift, Farbenblindheit) nicht geprüft. Das Spiel nutzt kaum beschriftete Elemente (7 Stellen mit `aria-label` oder `role`). | mittel | offen, in den Gerätetest aufnehmen |
 | Q9 | Sprachen: Deutsch und Englisch. Bei anderen Gerätesprachen zeigt das Spiel Englisch (so festgelegt, nicht in jeder Sprache geprüft). | niedrig | akzeptiert |
 | Q10 | Belohnungen werden auf dem Gerät gutgeschrieben, ohne Server (siehe `docs/TECHNIK.md`, R5). | niedrig | akzeptiert |
@@ -92,7 +95,7 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 **Vor dem ersten Upload nach `internal`** (Eigentümer entscheidet, Push erst nach Freigabe):
 - [ ] Alle Tests aus Abschnitt 3 grün auf dem Stand, der gebaut wird.
 - [ ] Build grün; Artefakte `noas-bean-trail-test-apk-<Nr>`, `noas-bean-trail-store-aab-<Nr>`, `versionen-<Nr>` vorhanden (`docs/TECHNIK.md`, Abschnitt 9).
-- [ ] Namensfreigabe (`docs/RECHT_UND_NAMEN.md`, 5.3) und vollständige Rechtstexte.
+- [x] Namensfreigabe (`docs/RECHT_UND_NAMEN.md`, 5.3) und vollständige Rechtstexte (beides erledigt am 24.11.2026).
 
 **Vor dem geschlossenen Test mit Testern:**
 - [ ] Gerätetest (Abschnitt 8) auf mindestens drei Geräten ohne Absturz in 20 Minuten Spielzeit.

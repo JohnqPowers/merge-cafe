@@ -97,7 +97,7 @@ All in `www/index.html` → `CONFIG` and in `capacitor.config.json`:
 | RevenueCat API keys | `CONFIG.revenuecat` | RevenueCat dashboard |
 | In-app products | `starter_pack`, `gems_small`, `gems_large` | create identically in Play Console / App Store Connect + RevenueCat |
 | Privacy policy and Impressum | `www/privacy.html`, `www/impressum.html`: replace every `[[…]]`. While any remains, ads, purchases and measurement stay off in the app (`CONFIG.legalReady`). | owner's real details; see `docs/PRIVACY.md` |
-| App ID `io.github.johnqpowers.mergecafe` | `capacitor.config.json` | your own reverse domain |
+| App ID `io.github.johnqpowers.beantrail` | `capacitor.config.json` | your own reverse domain |
 
 ## 5. Native plugin notes
 - All SDKs are optional at runtime – the game checks `window.Capacitor.Plugins.*` and falls back gracefully.

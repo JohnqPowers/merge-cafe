@@ -1,6 +1,6 @@
 # Technische Dokumentation – Noa's Bean Trail
 
-Stand: 24.11.2026. Spielversion 1.5.12 (lokal committet, nicht veröffentlicht). Der letzte tatsächlich gebaute und geprüfte Android-Build ist Nr. 12 (`versionName 1.0.12`); die Angaben zu Berechtigungen und Bibliotheken stammen aus dessen Manifest. Die Änderungen ab v1.5.8 (Einwilligung, AppsFlyer 7, Store-Preise, Sperre, Hochformat-Sperre, Test-Anzeigen im Debug-Paket) sind in diesem Stand nur im Browser mit nachgebauten Plugins geprüft, **nicht** in einem echten Android-Build.
+Stand: 24.11.2026. Spielversion 1.5.13 (Push auf `main` am 24.11.2026 freigegeben). Der letzte bis zum Push tatsächlich gebaute und geprüfte Android-Build ist Nr. 12 (`versionName 1.0.12`); die Angaben zu Berechtigungen und Bibliotheken stammen aus dessen Manifest. Die Änderungen ab v1.5.8 (Einwilligung, AppsFlyer 7, Store-Preise, Sperre, Hochformat-Sperre, Test-Anzeigen im Debug-Paket) sind in diesem Stand nur im Browser mit nachgebauten Plugins geprüft, **nicht** in einem echten Android-Build.
 
 ## 1. Aufbau
 
@@ -11,7 +11,7 @@ Stand: 24.11.2026. Spielversion 1.5.12 (lokal committet, nicht veröffentlicht).
 | `www/privacy.html`, `impressum.html`, `licenses.html`, `ofl/` | Rechtstexte, in Deutsch und Englisch |
 | `www/sw.js`, `www/manifest.webmanifest` | Web-Version (Service Worker: Netz zuerst, Cache nur als Reserve; in der App läuft keiner) |
 | `capacitor.config.json` | Paket-ID, App-Name, AdMob-Platzhalter |
-| `scripts/` | `inject-config.js` (Schlüssel einsetzen, Rechtstext-Schalter), `bundle-af.js` und `af-entry.js` (AppsFlyer-Schnittstelle bündeln), `patch-android.js` (Manifest und Versionsnummer), `art_import.py`, `cat_import.py`, `floor_prep.py` (Bilder) |
+| `scripts/` | `inject-config.js` (Schlüssel einsetzen, Rechtstext-Schalter), `bundle-af.js` und `af-entry.js` (AppsFlyer-Schnittstelle bündeln), `patch-android.js` (Manifest und Versionsnummer), `art_import.py`, `cat_import.py`, `floor_prep.py` (Bilder), `asset_manifest.py` (Manifest der ausgelieferten Dateien, `docs/herkunft/`), `herkunft_pakete.py` (Dateilisten gelieferter Pakete) |
 | `.github/workflows/` | `android.yml` (APK, AAB, Play-Upload), `web.yml` (GitHub Pages), `kpi.yml` (tägliche AppsFlyer-Berichte) |
 | `tests/` | Browser-Tests (siehe `docs/QUALITAET.md`) |
 
@@ -21,10 +21,10 @@ Das Spiel läuft im Browser und, mit Capacitor verpackt, als Android-App (WebVie
 
 | Angabe | Wert | Quelle |
 |---|---|---|
-| Spielversion | `1.5.12` | `CONFIG.version` in `www/index.html` (bei jeder Änderung erhöhen) |
+| Spielversion | `1.5.13` | `CONFIG.version` in `www/index.html` (bei jeder Änderung erhöhen) |
 | Android `versionName` | `1.0.<Build-Nr.>` | `scripts/patch-android.js`, Build-Nr. = Lauf-Nr. von GitHub Actions |
 | Android `versionCode` | `<Build-Nr.>` (steigt mit jedem Lauf, wie Google Play es verlangt) | wie oben |
-| Paket-ID | `io.github.johnqpowers.mergecafe` | `capacitor.config.json`. **Vor dem ersten Upload noch änderbar, danach nie mehr**; sie erscheint in der Store-Adresse und enthält den alten Spielnamen. Entscheidung des Eigentümers. |
+| Paket-ID | `io.github.johnqpowers.beantrail` | `capacitor.config.json`, `.github/workflows/android.yml`, `.github/workflows/kpi.yml`. Vom Eigentümer am 24.11.2026 gewählt (vorher `io.github.johnqpowers.mergecafe`). **Nach dem ersten Upload in Google Play nie mehr änderbar**; sie erscheint in der Store-Adresse. Eine mit der alten ID installierte App wird nicht aktualisiert, sondern bleibt daneben bestehen (eigener Spielstand). |
 | App-Name | Noa's Bean Trail | `APP_NAME`, Manifest, `capacitor.config.json` |
 | minSdk / targetSdk / compileSdk | 24 (Android 7.0) / 36 / 36 | Build 12. Google Play verlangt seit 31.08.2026 für neue Apps und Updates das Ziel-API-Level 36 (Android 16); erfüllt. Jährlich im August neu prüfen. |
 | Play Billing Library | 9.1.0 | Build 12 (über RevenueCat) |
@@ -35,7 +35,7 @@ Auslöser: Push auf `main` (nur bei Änderungen an `www/`, `capacitor.config.jso
 
 Ablauf in `android.yml`:
 1. `npm install` (Capacitor, AdMob, AppsFlyer, RevenueCat; **ohne Sperrdatei**).
-2. `node scripts/inject-config.js`: setzt Schlüssel aus den GitHub-Secrets ein und stellt `CONFIG.legalReady` auf `true`, **nur** wenn `privacy.html` und `impressum.html` keine Platzhalter `[[…]]` mehr enthalten.
+2. `node scripts/inject-config.js`: setzt Schlüssel aus den GitHub-Secrets ein und stellt `CONFIG.legalReady` auf `true`, **nur** wenn `privacy.html` und `impressum.html` keine Platzhalter `[[…]]` mehr enthalten (seit 24.11.2026 der Fall).
 3. `node scripts/bundle-af.js`: bündelt die AppsFlyer-Schnittstelle zu `www/af.js` (esbuild); bricht den Build ab, wenn das Paket fehlt oder die Datei zu klein ist.
 4. Versionsnachweis: `npm ls` als Artefakt `versionen-<Nr>` und in der Zusammenfassung des Laufs.
 5. `npx cap add android`, `capacitor-assets generate` (Icons, Startbild), `node scripts/patch-android.js` (AdMob-App-ID, VIBRATE, Hochformat-Sperre, Testmarkierung `build.json` nur für das Debug-Paket, Versionsnummern, Apostroph im Namen), `npx cap sync android`.

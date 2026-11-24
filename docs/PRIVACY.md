@@ -1,6 +1,6 @@
 # Datenschutz – Datenflüsse und Entwurf für „Datensicherheit“ (Play Console)
 
-Stand: 24.11.2026, Spielversion 1.5.12. **Verbindlich für Nutzer ist `www/privacy.html`** (Deutsch und Englisch, in der App unter Optionen verlinkt). Diese Datei ist die interne Übersicht dazu und der Entwurf für das Formular „Datensicherheit“ in der Play Console. Keine Rechtsberatung. Die Platzhalter `[[…]]` in `privacy.html` und `impressum.html` (Name, ladungsfähige Anschrift, E-Mail) liefert der Eigentümer; solange sie fehlen, bleiben Werbung, Käufe und Messung in der App gesperrt (`CONFIG.legalReady`).
+Stand: 24.11.2026, Spielversion 1.5.13. **Verbindlich für Nutzer ist `www/privacy.html`** (Deutsch und Englisch, in der App unter Optionen verlinkt). Diese Datei ist die interne Übersicht dazu und der Entwurf für das Formular „Datensicherheit“ in der Play Console. Keine Rechtsberatung. Die Angaben des Verantwortlichen (Name, ladungsfähige Anschrift, E-Mail) hat der Eigentümer am 24.11.2026 geliefert; sie stehen in `privacy.html` und `impressum.html`. Taucht dort wieder ein Platzhalter `[[…]]` auf, bleiben Werbung, Käufe und Messung in der App gesperrt (`CONFIG.legalReady`).
 
 ## 1. Grundsatz
 
@@ -59,7 +59,7 @@ Quellen der Angaben: Hinweise von Google zum Werbe-SDK, von AppsFlyer und von Re
 
 ## 5. Verträge und Pflichtunterlagen (Eigentümer)
 
-- [ ] Platzhalter in `privacy.html` und `impressum.html` ersetzen (Name oder Firma, ladungsfähige Anschrift, E-Mail).
+- [x] Platzhalter in `privacy.html` und `impressum.html` ersetzt (Name, ladungsfähige Anschrift, E-Mail; 24.11.2026).
 - [ ] Datenverarbeitungsverträge (Auftragsverarbeitung) bzw. Datenschutzbedingungen der Anbieter in den jeweiligen Konten annehmen oder abschließen: AppsFlyer, RevenueCat; für AdMob die Google-Bedingungen zur Datennutzung. Welche Rolle (Auftragsverarbeiter oder eigener Verantwortlicher) jeweils gilt, fachlich prüfen lassen.
 - [ ] Kurzes Verzeichnis der Verarbeitungstätigkeiten anlegen (Tabelle aus Abschnitt 2 als Grundlage); ob eine Datenschutz-Folgenabschätzung nötig ist, fachlich prüfen und die Begründung festhalten.
 - [ ] Einwilligungsnachricht (UMP) in der AdMob-Konsole einrichten (`docs/MONETARISIERUNG.md`, Abschnitt 10).
