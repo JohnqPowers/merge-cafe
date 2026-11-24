@@ -986,7 +986,8 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.8',
+  version: '1.5.9',
+  legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -1022,6 +1023,7 @@ const STR = {
     sfx:'Soundeffekte', music:'Musik', vib:'Vibration', on:'An', off:'Aus',
     reset:'Fortschritt löschen', resetSure:'Wirklich? Nochmal tippen.',
     privacy:'Datenschutz', legal:'Impressum', licenses:'Lizenzen', adPriv:'Werbe-Einstellungen', adPrivD:'Einwilligung ansehen oder ändern', open:'Öffnen',
+    testBuild:'Testversion: Werbung, Käufe und Messung sind aus, bis Impressum und Datenschutz vollständig sind.',
     adOff:'Werbung ist aus. Du kannst das unter Optionen ändern.', storeOff:'Käufe sind gerade nicht verfügbar.', collection:'Sammlung', adPlaying:'Werbung läuft …', adDemo:'(Demo-Werbung im Browser)',
     energyFull:'Energie voll', thanks:'Danke für deinen Kauf!',
     purchaseFail:'Kauf abgebrochen.', adFail:'Gerade keine Werbung verfügbar.', limitAds:'Tageslimit erreicht',
@@ -1052,6 +1054,7 @@ const STR = {
     sfx:'Sound effects', music:'Music', vib:'Vibration', on:'On', off:'Off',
     reset:'Reset progress', resetSure:'Sure? Tap again.',
     privacy:'Privacy', legal:'Legal notice', licenses:'Licenses', adPriv:'Ad choices', adPrivD:'Review or change your consent', open:'Open',
+    testBuild:'Test build: ads, purchases and measurement are off until the legal notice and privacy policy are complete.',
     adOff:'Ads are off. You can change this under Settings.', storeOff:'Purchases are not available right now.', collection:'Collection', adPlaying:'Ad playing …', adDemo:'(demo ad in browser)',
     energyFull:'Energy full', thanks:'Thanks for your purchase!',
     purchaseFail:'Purchase cancelled.', adFail:'No ad available right now.', limitAds:'Daily limit reached',
@@ -1168,12 +1171,13 @@ const FALLBACK_PRICE = { starter_pack: '1,99 €', gems_small: '0,99 €', gems_
    Ereignisse, die vor dem Start anfallen (z. B. session_start), warten in einer Warteschlange und gehen erst nach start() raus;
    wird keine Messung erlaubt, werden sie verworfen. */
 const Platform = {
-  consentOk: false, privacyForm: false, decided: false,
+  consentOk: false, privacyForm: false, decided: false, locked: false,
   adsInit: false, adReady: false, adBusy: false,
   afReady: false, afOn: false, afInit: false, afPending: true, evq: [],
   rcOk: false, products: {},
   async init() {
     if (!isNative()) { this.consentOk = true; this.decided = true; this.dropQueue(); return; }
+    if (!CONFIG.legalReady) { this.locked = true; this.decided = true; this.dropQueue(); return; }       // Rechtstexte unvollständig: weder Werbung noch Käufe noch Messung
     const rc = this.initRC();                                                                        // Käufe unabhängig von der Werbe-Einwilligung
     try { if (await loadScript('af.js')) await Promise.race([this.afPrepare(), new Promise(r => setTimeout(r, 8000))]); } catch (e) { console.warn('AppsFlyer', e); }   // hängt die Vorbereitung, blockiert sie die Einwilligung nicht
     await this.consent();                                                                            // fragt bei Bedarf (EU/UK) den Nutzer
@@ -1242,7 +1246,7 @@ const Platform = {
     catch (e) { this.adReady = false; }
     this.adBusy = false; return this.adReady;
   },
-  adsAllowed() { return !isNative() || (this.consentOk && !!Plug().AdMob); },
+  adsAllowed() { return !isNative() || (!this.locked && this.consentOk && !!Plug().AdMob); },
   async showRewarded() {
     const P = Plug();
     if (P.AdMob) {
@@ -1267,7 +1271,7 @@ const Platform = {
     return this.rcOk;
   },
   async loadPrices() {
-    const P = Plug(); if (!P.Purchases || !(this.rcOk || await this.initRC())) return;
+    const P = Plug(); if (this.locked || !P.Purchases || !(this.rcOk || await this.initRC())) return;
     try {
       const r = await P.Purchases.getProducts({ productIdentifiers: Object.keys(GRANTS), type: 'inapp' });
       ((r && r.products) || []).forEach(p => { this.products[p.identifier] = p; });
@@ -1277,6 +1281,7 @@ const Platform = {
   /* null = keine Store-Anbindung (Browser), 'off' = Store gerade nicht erreichbar, false = abgebrochen/fehlgeschlagen, sonst { price, currency } */
   async purchase(sku) {
     const P = Plug(); if (!P.Purchases) return null;
+    if (this.locked) return 'off';
     try {
       if (!(this.rcOk || await this.initRC())) return 'off';
       if (!this.products[sku]) await this.loadPrices();
@@ -3223,7 +3228,8 @@ function openSettings() {
     <div class="row"><div class="mi">${ic('user')}</div><div class="tx">${t('legal')}</div><a class="btn b" style="text-decoration:none" href="impressum.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('note')}</div><div class="tx">${t('licenses')}</div><a class="btn b" style="text-decoration:none" href="licenses.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
-    <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>`, 'settings');
+    <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
+    ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}`, 'settings');
 }
 $('#modalBody').addEventListener('click', e => {
   const wc = e.target.closest('[data-world]');

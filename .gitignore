@@ -6,3 +6,6 @@ ios/
 .env
 www/af.js
 npm-tree.txt
+
+__pycache__/
+*.pyc

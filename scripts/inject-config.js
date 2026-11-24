@@ -12,4 +12,13 @@ const map = {
   'ca-app-pub-3940256099942544/1712485313': process.env.ADMOB_REWARDED_IOS
 };
 for (const [k, v] of Object.entries(map)) if (v) { s = s.split(k).join(v); console.log('gesetzt:', k.slice(0, 22) + '…'); }
+// Rechtstexte vollständig? Dann Werbung, Käufe und Messung in der App freischalten (CONFIG.legalReady).
+// Platzhalter in den Rechtstexten sind mit [[…]] markiert (www/privacy.html, www/impressum.html).
+const legal = ['www/privacy.html', 'www/impressum.html'];
+const offen = legal.filter(p => !fs.existsSync(p) || /\[\[/.test(fs.readFileSync(p, 'utf8')));
+if (!offen.length) {
+  if (!s.includes('legalReady: false')) { console.error('legalReady-Schalter nicht gefunden'); process.exit(1); }
+  s = s.replace('legalReady: false', 'legalReady: true');
+  console.log('Rechtstexte vollständig: Werbung, Käufe und Messung freigeschaltet');
+} else console.log('Platzhalter in ' + offen.join(', ') + ': Werbung, Käufe und Messung bleiben aus (Testversion)');
 fs.writeFileSync(f, s);
