@@ -179,6 +179,14 @@ Gesamt: 22 Teile + 3 Automaten + 12 Figuren + 12 Gäste = 49 Bilder.
 ### Effekte (`fx_puff.png`, `fx_star.png`, `fx_drop.png`, `fx_flame.png`, `fx_leaf.png`, `fx_ring.png`, `fx_glow.png`, `fx_excl.png`)
 - Kleine Sprites für den Einzug (Staubwolke, Stern, Tropfen, Flamme, Blatt, Ring, Leuchten, „!“). Je 256×256, Hintergrund Magenta, im selben Stil. Optional; ohne Bild zeichnet das Spiel sie selbst.
 
+## Katze Mocha (v1.5.7): Frames austauschen
+- Die Katze sitzt oben rechts im Bestellbereich, springt auf Tippen über das Brett (wird dabei größer), lässt sich streicheln und kehrt nach 8 s ohne Streicheln zurück. Das Brett bleibt dabei unberührt, die Katze fängt Berührungen nur in ihrer sichtbaren Trefferfläche ab. Bilder liegen in `www/art/cat/` (`c01`…`c22.webp`, Herzen `h1`…`h3.webp`, `purr.wav`).
+- **Der Eigentümer lieferte 24 Frames** als Paket (`Noas_Bean_Trail_Katze_Claude_Paket.zip`, 512×512 mit Magenta-Rand, Tabelle der Zustände in `animation_manifest.json`). Einige Frames sind nur abgewandelte Kopien (Sprung, Rückkehr). Eigene Frames je Zustand machen die Bewegung weicher.
+- **Zustände und Frames:** Ruhe (4, Schleife) · Sprung (4) · Landung (4) · Streicheln (8, Schleife) · Rückkehr (4). Gleiche Katze, gleicher Maßstab und gleiche Standlinie in allen Frames, damit nichts springt; Hintergrund einfarbig Magenta #FF00FF oder echte Transparenz.
+- **Austausch:** neue Dateien in einen Ordner legen (gleiche Dateinamen oder neue `animation_manifest.json`), dann `python3 -I scripts/cat_import.py <ZIP-oder-Ordner>`. Das Skript schneidet zu (Breite 320 px, WebP), entfernt doppelte Frames, schreibt `purr.wav` und trägt die Tabelle `CAT` in `www/index.html` ein. Danach Version erhöhen und testen.
+- **Schnurren:** `purr.wav` ist ein synthetischer Platzhalter. Ein echtes Schnurr-Geräusch (Schleife, ca. 1,5 s, nahtlos, ohne Rechte Dritter) ersetzt ihn. Das Spiel lädt die Datei beim ersten Streicheln; bis dahin und wenn sie fehlt, schnurrt ein leises Ersatzrauschen. Bei ausgeschaltetem Ton bleibt es still.
+- **Rechte:** Der Eigentümer vermerkt zur Herkunft der Bilder, dass sie aus der bisherigen Projektarbeit stammen. Vor der Veröffentlichung Tool, Datum und Nutzungsbedingungen je Bild festhalten (siehe Asset-Verzeichnis).
+
 ## Was ich damit mache
 Ansehen und Rückmeldung zu Stil/Lesbarkeit, Freistellen, Zuschneiden und Vereinheitlichen, Umwandeln in kleine WebP-Dateien, Einbau statt Emoji (Fallback auf Emoji, falls ein Bild fehlt), Glanz/Rand/Leuchten/Effekte im Code, danach Messung (Ruckeln, App-Größe), Veröffentlichung und neue APK.
 

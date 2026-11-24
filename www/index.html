@@ -125,6 +125,20 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .catc .ch2{left:14px;top:6px;font-size:16px}
 .catc.happy .ch2{animation:ch2 1.2s ease-out}
 @keyframes ch2{0%{opacity:0;transform:translateY(8px) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translateY(-16px) scale(1.2)}}
+/* Mocha mit Bildern (art/cat, Import: scripts/cat_import.py): kleines Bild im Bestellbereich, Sprung/Streicheln in #catFly.
+   Ohne Bilder bleibt die gezeichnete Katze oben. Bewegt wird nur per transform; Treffer nur in der sichtbaren Katze (.cf-hit). */
+.catc .cat-sp{display:none;position:absolute;right:-3px;bottom:22px;width:50px;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.catc.sprite .cat-svg,.catc.sprite .zz{display:none}
+.catc.sprite .cat-sp{display:block}
+.catc.sprite.away .cat-sp{visibility:hidden}
+.catc.sprite.hop .cat-sp{animation:catHop .85s}
+#catFly{position:fixed;inset:0;z-index:42;pointer-events:none;contain:layout paint}
+.cf-box{position:absolute;left:0;top:0;transform-origin:50% 50%;will-change:transform;visibility:hidden}
+.cf-box.on{visibility:visible}
+.cf-img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.cf-hit{position:absolute;border-radius:44%;pointer-events:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.cf-box.hit .cf-hit{pointer-events:auto}
+.cf-heart{position:absolute;width:30px;height:auto;pointer-events:none;user-select:none;will-change:transform,opacity}
 @media (prefers-reduced-motion:reduce){.cus svg,.cus img,.ey,.cat-svg *,.order.ready .plate button{animation:none!important}}
 #hint{min-height:0;font-size:13px;text-align:center;color:var(--accent);font-weight:500;margin-bottom:4px}
 #boardWrap{flex:1;display:flex;align-items:flex-end;justify-content:center;min-height:0;position:relative}
@@ -972,7 +986,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.6',
+  version: '1.5.7',
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -1016,7 +1030,7 @@ const STR = {
     cafeName:'Wie soll dein Café heißen?', cafePh:'Name deines Cafés', pickAv:'Wähle deine Figur', letsGo:'Los geht’s!', entHi:'Willkommen,', entSkip:'Tippen zum Überspringen', entWatch:'Einzug ansehen',
     profile:'Profil & Café', edit:'Ändern', defName:'Chef', defCafe:'Mein Café',
     newFound:'Neu entdeckt!', great:'Super!', gift:'Überraschung!', tapOpen:'Tippe auf das Geschenk!',
-    giftGot:'Du bekommst', catTap:'Mocha schnurrt 💕', nextCity1:'Nur noch 1 Level bis {c}!', nextCityN:'Noch {n} Level bis {c}!', chapterNew:'Dein Café zieht um', worlds:'Deine Weltreise', passport:'Reisepass', pcNew:'Neue Postkarte!', pcTrip:'Station', pcBonus:'Reisebonus', here:'Du bist hier', fromLv:'ab Level', welcomeW:'Willkommen {w}!', pickWorld:'Tippe auf eine bereiste Stadt, um dorthin zurückzukehren.', thanksName:'Danke, {n}!', level:'LEVEL'
+    giftGot:'Du bekommst', catTap:'Mocha schnurrt 💕', catPet:'Streichle Mocha: wisch über sie 💕', nextCity1:'Nur noch 1 Level bis {c}!', nextCityN:'Noch {n} Level bis {c}!', chapterNew:'Dein Café zieht um', worlds:'Deine Weltreise', passport:'Reisepass', pcNew:'Neue Postkarte!', pcTrip:'Station', pcBonus:'Reisebonus', here:'Du bist hier', fromLv:'ab Level', welcomeW:'Willkommen {w}!', pickWorld:'Tippe auf eine bereiste Stadt, um dorthin zurückzukehren.', thanksName:'Danke, {n}!', level:'LEVEL'
   },
   en: {
     shop:'Shop', upgrades:'Upgrades', sell:'Sell', daily:'Bonus', settings:'Options',
@@ -1045,7 +1059,7 @@ const STR = {
     cafeName:'What should your café be called?', cafePh:'Your café’s name', pickAv:'Pick your character', letsGo:'Let’s go!', entHi:'Welcome,', entSkip:'Tap to skip', entWatch:'Watch entrance',
     profile:'Profile & Café', edit:'Edit', defName:'Chef', defCafe:'My Café',
     newFound:'New discovery!', great:'Great!', gift:'Surprise!', tapOpen:'Tap the gift!',
-    giftGot:'You get', catTap:'Mocha purrs 💕', nextCity1:'Just 1 level to {c}!', nextCityN:'Just {n} levels to {c}!', chapterNew:'Your café is moving', worlds:'Your world trip', passport:'Passport', pcNew:'New postcard!', pcTrip:'Stop', pcBonus:'Travel bonus', here:'You are here', fromLv:'from level', welcomeW:'Welcome to {w}!', pickWorld:'Tap a city you have visited to go back there.', thanksName:'Thanks, {n}!', level:'LEVEL'
+    giftGot:'You get', catTap:'Mocha purrs 💕', catPet:'Pet Mocha: swipe over her 💕', nextCity1:'Just 1 level to {c}!', nextCityN:'Just {n} levels to {c}!', chapterNew:'Your café is moving', worlds:'Your world trip', passport:'Passport', pcNew:'New postcard!', pcTrip:'Stop', pcBonus:'Travel bonus', here:'You are here', fromLv:'from level', welcomeW:'Welcome to {w}!', pickWorld:'Tap a city you have visited to go back there.', thanksName:'Thanks, {n}!', level:'LEVEL'
   }
 };
 Object.assign(STR.de, {
@@ -1755,6 +1769,33 @@ const Sound = (() => {
       nextT += e; step++;
     }
   }
+  /* Schnurren (Katze Mocha): Schleife aus art/cat/purr.wav; lädt das Spiel sie nicht (z. B. file://), schnurrt ein leises Ersatzrauschen.
+     Respektiert die Stummschaltung (ok() = Ton an), weicher Ein- und Ausblender. */
+  let purrBuf = null, purrTried = false, purrN = null;
+  function purrLoad() {
+    if (purrTried || !ctx) return; purrTried = true;
+    try { fetch('art/cat/purr.wav').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => new Promise((res, rej) => ctx.decodeAudioData(b, res, rej))).then(b => { purrBuf = b; }).catch(() => {}); } catch (e) {}
+  }
+  function purr(on, fadeMs = 180) {
+    if (!ctx) return;
+    if (!on) {
+      if (!purrN) return;
+      const n = purrN, t = ctx.currentTime; purrN = null;
+      try { n.g.gain.cancelScheduledValues(t); n.g.gain.setValueAtTime(n.g.gain.value, t); n.g.gain.linearRampToValueAtTime(0, t + fadeMs / 1000); n.stop(t + fadeMs / 1000 + .05); } catch (e) {}
+      return;
+    }
+    if (!ok() || purrN) return;
+    purrLoad();
+    const t = ctx.currentTime, g = ctx.createGain(), src = [];
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.4, t + .12); g.connect(sfxBus);
+    if (purrBuf) { const s = ctx.createBufferSource(); s.buffer = purrBuf; s.loop = true; s.connect(g); s.start(t); src.push(s); }
+    else {   // Ersatz: tiefes Rauschen, mit 24 Hz im Takt gepulst
+      const s = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), am = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      s.buffer = noiseBuf; s.loop = true; lp.type = 'lowpass'; lp.frequency.value = 240; am.gain.value = .5; lfo.frequency.value = 24; lg.gain.value = .5;
+      lfo.connect(lg); lg.connect(am.gain); s.connect(lp); lp.connect(am); am.connect(g); s.start(t); lfo.start(t); src.push(s, lfo);
+    }
+    purrN = { g, stop: when => src.forEach(s => { try { s.stop(when); } catch (e) {} }) };
+  }
   function setWorld(i) { sty = STY[i] || STY[0]; }
   function musicOn() {
     if (!ctx || musicTimer) return;
@@ -1767,7 +1808,7 @@ const Sound = (() => {
   function pause() { if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {}); }
   function resume() { if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); }
   function state() { return ctx ? ctx.state : 'none'; }
-  return Object.assign(fx, { unlock, init, musicOn, musicOff, duck, pause, resume, state, setWorld });
+  return Object.assign(fx, { unlock, init, musicOn, musicOff, duck, pause, resume, state, setWorld, purr });
 })();
 function vibrate(p) { if (!S.vib) return; try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
 
@@ -2674,7 +2715,7 @@ let drag = null, lastAct = Date.now();
 /* Animations-Regler: dekorative Endlos-Animationen (Szene, Gaeste, Katze, Pulse) ruhen, solange gespielt wird.
    Das gibt dem Ziehen und Mergen auf schwachen Handys das volle Frame-Budget; danach laufen sie von selbst weiter. */
 const Calm = (() => {
-  let held = [], timer = 0, locked = false;
+  let held = [], timer = 0, locked = false, until = 0;
   const pauseAll = () => {
     try {
       for (const a of document.getAnimations()) {
@@ -2688,10 +2729,12 @@ const Calm = (() => {
     if (drag) { timer = setTimeout(wake, 500); return; }
     held.forEach(a => { try { if (a.playState === 'paused') a.play(); } catch (_) {} }); held = [];
   };
-  const hush = (ms = 1500) => { pauseAll(); clearTimeout(timer); timer = setTimeout(wake, ms); };
+  const hush = (ms = 1500) => { until = Math.max(until, Date.now() + ms); pauseAll(); clearTimeout(timer); timer = setTimeout(wake, ms); };
   /* lock: unter Fenstern/Splash ruhen die Endlos-Animationen dauerhaft (Web-Animations-API statt CSS-Klasse auf body) */
   const lock = on => { locked = on; if (on) hush(600); else { clearTimeout(timer); timer = setTimeout(wake, 120); } };
-  return { hush, wake, lock };
+  /* quiet: gilt auch für Animationen, die per Skript laufen (Katze): beim Ziehen, unter Fenstern und kurz nach Aktionen nicht weiterschalten */
+  const quiet = () => locked || !!drag || Date.now() < until;
+  return { hush, wake, lock, quiet };
 })();
 if (document.body.classList.contains('splashing')) Calm.lock(true);
 function targetAt(x, y) {
@@ -2749,7 +2792,166 @@ $('#orders').addEventListener('click', e => {
   else if (S.tut >= 3) { Sound.click(); openOrder(idx); }
   else { Sound.bonk(); card.classList.remove('nope'); void card.offsetWidth; card.classList.add('nope'); setTimeout(() => card.classList.remove('nope'), 380); }
 });
-$('#cat').addEventListener('click', () => { lastAct = Date.now(); Sound.meow(); catReact('happy', 1600); toast(t('catTap')); vibrate(12); });
+/* ---------------- Katze Mocha: Sprung aufs Brett, Streicheln, Rückkehr ----------------
+   Bilder, Frames und Zeiten: www/art/cat (Import: scripts/cat_import.py schreibt die Tabelle CAT). Das Brett wird nie angefasst:
+   Mocha liegt als eigene Ebene (#catFly) darüber und fängt Berührungen nur in ihrer sichtbaren Trefferfläche ab (.cf-hit).
+   Ablauf: Tippen auf die Katze oben rechts → Sprung per Bézier-Kurve übers Brett (wird dabei größer) → Landung → Streichen mit dem
+   Finger = Schnurren + Herzen → 8 s ohne Streicheln: Rückkehr zum frisch gemessenen Platz oben rechts. Fenster/Werbung/Tab-Wechsel
+   holen sie sofort zurück. Ton nur bei eingeschaltetem Ton (Sound.purr). Ohne Bilder bleibt die gezeichnete Katze mit altem Verhalten. */
+const CAT = /*CAT_DATA*/{"v":1,"w":320,"h":430,"files":["c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13","c14","c15","c16","c17","c18","c19","c20","c21","c22"],"map":[0,1,2,1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,10,19,20,21],"hit":[0.113,0.179,0.919,0.949],"hearts":["h1","h2","h3"],"purr":true,"states":{"IDLE":{"f":[1,2,3,4],"ms":220,"loop":1},"JUMPING":{"f":[5,6,7,8],"ms":110,"loop":0},"LANDING":{"f":[9,10,11,12],"ms":135,"loop":0},"PETTING":{"f":[13,14,15,16,17,18,19,20],"ms":180,"loop":1},"RETURNING":{"f":[21,22,23,24],"ms":120,"loop":0}},"idleReturnMs":8000,"fadeOutMs":180}/*END_CAT_DATA*/;
+const CatFx = (() => {
+  const OFF = { get on() { return false; }, get away() { return false; }, init() {}, launch: () => false, abort() {}, mode: () => 'off' };
+  const C = CAT; if (!C || !C.files || !C.states) return OFF;
+  const IDLE = C.states.IDLE, JUMP = C.states.JUMPING, LAND = C.states.LANDING, PET = C.states.PETTING, BACK = C.states.RETURNING;
+  const FLY = 720, FLYBACK = 680, imgs = [];
+  let mode = 'off', layer, box, big, hitEl, homeEl, bw = 0, bh = 0, cx = 0, cy = 0;
+  let vw0 = 0, vh0 = 0, idleT = 0, idleI = 0, stepT = 0, retT = 0, raf = 0, petDown = false, petLast = 0, petDist = 0, petI = 0, px = 0, py = 0, heartT = 0, heartN = 0;
+  const pre = k => { const f = C.map[k - 1]; if (f === undefined) return null; if (!imgs[f]) { const i = new Image(); i.src = 'art/cat/' + C.files[f] + '.webp'; imgs[f] = i; } return imgs[f]; };
+  const loaded = k => { const i = pre(k); return !!i && i.complete && i.naturalWidth > 0; };
+  const show = (el, k) => { if (!el || el._k === k || !loaded(k)) return; el._k = k; el.src = pre(k).src; };
+  const easeIO = p => p < .5 ? 2 * p * p : 1 - Math.pow(2 - 2 * p, 2) / 2, easeOut = p => 1 - (1 - p) * (1 - p);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const bez = (a, c, b, t) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * c + t * t * b;
+  const place = (x, y, s) => { cx = x; cy = y; box.style.transform = `translate3d(${(x - bw / 2).toFixed(1)}px,${(y - bh / 2).toFixed(1)}px,0) scale(${s.toFixed(4)})`; };
+  const lastLand = () => LAND.f[LAND.f.length - 1];
+  const canGo = () => started && S.tut >= 3 && !drag && $('#modal').hidden && $('#ov').hidden && $('#adOverlay').hidden && !oBusy && !document.hidden;
+
+  /* Daheim: kleines Bild im Bestellbereich, vier Frames im Kreis (ruht per Calm.quiet wie alle Endlos-Animationen) */
+  function idleLoop() {
+    clearTimeout(idleT); idleT = setTimeout(idleLoop, IDLE.ms);
+    if (mode !== 'home' || document.hidden || Calm.quiet()) return;
+    idleI = (idleI + 1) % IDLE.f.length; show(homeEl, IDLE.f[idleI]);
+  }
+  function init() {
+    const c = $('#cat'); if (mode !== 'off' || !c) return;
+    const first = pre(IDLE.f[0]); if (!first) return;
+    const go = () => {
+      if (mode !== 'off') return;
+      homeEl = document.createElement('img'); homeEl.className = 'cat-sp'; homeEl.alt = ''; homeEl.draggable = false;
+      c.appendChild(homeEl); show(homeEl, IDLE.f[0]); c.classList.add('sprite'); mode = 'home';
+      IDLE.f.forEach(pre); idleLoop();
+      setTimeout(() => { for (let k = 1; k <= C.map.length; k++) pre(k); }, 1500);          // den Rest laden, wenn das Spiel läuft
+    };
+    if (first.decode) first.decode().then(go, () => {}); else first.onload = go;
+  }
+  function build() {
+    if (layer) return;
+    layer = document.createElement('div'); layer.id = 'catFly'; layer.setAttribute('aria-hidden', 'true');
+    box = document.createElement('div'); box.className = 'cf-box';
+    big = document.createElement('img'); big.className = 'cf-img'; big.alt = ''; big.draggable = false;
+    hitEl = document.createElement('div'); hitEl.className = 'cf-hit';
+    box.append(big, hitEl); layer.appendChild(box); document.body.appendChild(layer);
+    hitEl.addEventListener('pointerdown', onDown); hitEl.addEventListener('pointermove', onMove);
+    hitEl.addEventListener('pointerup', onUp); hitEl.addEventListener('pointercancel', onUp);
+  }
+  /* Flug auf einer Bézier-Kurve (Start, Ziel, Bogen nach oben); Größe und Frames laufen mit. Nur transform, kein left/top. */
+  function flight(a, b, ms, st, ease, then) {
+    const t0 = performance.now(), mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - 110;
+    cancelAnimationFrame(raf);
+    const step = now => {
+      const p = clamp((now - t0) / ms, 0, 1), e = ease(p);
+      place(bez(a.x, mx, b.x, e), bez(a.y, my, b.y, e), a.s + (b.s - a.s) * e);
+      show(big, st.f[Math.min(st.f.length - 1, Math.floor((now - t0) / st.ms))]);
+      if (p < 1) raf = requestAnimationFrame(step); else then();
+    };
+    raf = requestAnimationFrame(step);
+  }
+  function launch() {
+    if (mode !== 'home' || !canGo()) return false;
+    build();
+    const hc = homeEl.getBoundingClientRect(), bd = $('#board').getBoundingClientRect();
+    if (!hc.width || !bd.width) return false;
+    bw = Math.round(clamp(bd.width * .45, 110, 176)); bh = Math.round(bw * C.h / C.w);
+    box.style.width = bw + 'px'; box.style.height = bh + 'px';
+    const h = C.hit; hitEl.style.cssText = `left:${h[0] * 100}%;top:${h[1] * 100}%;width:${(h[2] - h[0]) * 100}%;height:${(h[3] - h[1]) * 100}%`;
+    const a = { x: hc.left + hc.width / 2, y: hc.top + hc.height / 2, s: hc.width / bw };
+    const b = { x: clamp(bd.left + bd.width / 2, bw / 2 + 6, innerWidth - bw / 2 - 6), y: clamp(bd.top + bd.height * .36, bh / 2 + 70, innerHeight - bh / 2 - 90), s: 1 };
+    mode = 'jump'; lastAct = Date.now(); petDown = false; idleI = 0; vw0 = innerWidth; vh0 = innerHeight;
+    $('#cat').classList.add('away'); box.classList.remove('hit'); box.classList.add('on'); big._k = 0;
+    show(big, JUMP.f[0]); place(a.x, a.y, a.s);
+    Sound.unlock(); Sound.meow(); vibrate(10);
+    flight(a, b, FLY, JUMP, easeOut, land);
+    return true;
+  }
+  function land() {
+    mode = 'land'; Sound.plop(); vibrate(14);
+    burst(cx, cy + bh * .4, 12, GOLD, 4);
+    let i = 0; clearTimeout(stepT);
+    const next = () => { show(big, LAND.f[i]); if (++i < LAND.f.length) stepT = setTimeout(next, LAND.ms); else stepT = setTimeout(sit, LAND.ms); };
+    next();
+  }
+  function sit() {
+    mode = 'sit'; show(big, lastLand()); box.classList.add('hit'); arm();
+    if ((S.stats.catHint | 0) < 2) { S.stats.catHint = (S.stats.catHint | 0) + 1; toast(t('catPet')); save(); }
+  }
+  const arm = () => { clearTimeout(retT); retT = setTimeout(back, C.idleReturnMs || 8000); };
+  /* Streicheln: Wischen über die sichtbare Katze (Zeiger gefangen, gezählt wird nur Bewegung innerhalb der Trefferfläche) */
+  const inside = (x, y) => { const r = hitEl.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
+  function onDown(e) {
+    if (mode !== 'sit' && mode !== 'pet') return;
+    petDown = true; px = e.clientX; py = e.clientY; petDist = 0; clearTimeout(retT); lastAct = Date.now();
+    try { hitEl.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!petDown || (mode !== 'sit' && mode !== 'pet')) return;
+    const d = Math.hypot(e.clientX - px, e.clientY - py); px = e.clientX; py = e.clientY;
+    if (d < .5) return;
+    petDist += d; lastAct = Date.now();
+    if (inside(e.clientX, e.clientY)) { petLast = performance.now(); if (petDist > 10 && mode === 'sit') startPet(); }
+  }
+  function onUp(e) {
+    if (!petDown) return; petDown = false;
+    try { hitEl.releasePointerCapture(e.pointerId); } catch (_) {}
+    if (petDist <= 10 && mode === 'sit') { petLast = performance.now(); startPet(); }          // einfaches Tippen = kurzes Streicheln
+    if (mode === 'sit') arm();
+  }
+  function startPet() {
+    mode = 'pet'; petI = 0; clearTimeout(retT); Sound.purr(true, C.fadeOutMs); heart(); heartT = performance.now(); petStep();
+  }
+  function petStep() {
+    clearTimeout(stepT); if (mode !== 'pet') return;
+    const now = performance.now();
+    if (now - petLast > (petDown ? 600 : 380)) { endPet(); return; }                           // nur solange wirklich gestreichelt wird
+    show(big, PET.f[petI++ % PET.f.length]);
+    if (now - heartT > 650) { heart(); heartT = now; }
+    stepT = setTimeout(petStep, PET.ms);
+  }
+  function endPet() { if (mode !== 'pet') return; Sound.purr(false, C.fadeOutMs); mode = 'sit'; show(big, lastLand()); arm(); }
+  function heart() {
+    if (!C.hearts || !C.hearts.length || !layer) return;
+    const el = document.createElement('img'); el.className = 'cf-heart'; el.alt = ''; el.draggable = false;
+    el.src = 'art/cat/' + C.hearts[heartN++ % C.hearts.length] + '.webp';
+    el.style.left = (cx + (Math.random() - .5) * bw * .55).toFixed(0) + 'px'; el.style.top = (cy - bh * .34 + Math.random() * 16).toFixed(0) + 'px';
+    layer.appendChild(el);
+    const dy = 56 + Math.random() * 26, an = el.animate([{ transform: 'translate(-50%,-50%) scale(.5)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .22 }, { transform: `translate(-50%,calc(-50% - ${dy.toFixed(0)}px)) scale(1.12)`, opacity: 0 }], { duration: 1150, easing: 'ease-out' });
+    an.onfinish = an.oncancel = () => el.remove();
+  }
+  function back() {
+    if (mode !== 'sit' && mode !== 'pet') return;
+    if (mode === 'pet') Sound.purr(false, C.fadeOutMs);
+    clearTimeout(stepT); clearTimeout(retT); petDown = false; mode = 'back'; box.classList.remove('hit');
+    const hc = homeEl.getBoundingClientRect();                                                    // Ursprung frisch messen: das Layout kann sich verschoben haben
+    if (!hc.width) { finish(); return; }
+    flight({ x: cx, y: cy, s: 1 }, { x: hc.left + hc.width / 2, y: hc.top + hc.height / 2, s: hc.width / bw }, FLYBACK, BACK, easeIO, finish);
+  }
+  function finish() {
+    cancelAnimationFrame(raf); clearTimeout(stepT); clearTimeout(retT); petDown = false; Sound.purr(false, 120);
+    if (box) { box.classList.remove('on', 'hit'); box.style.transform = ''; }
+    const c = $('#cat'); if (c) c.classList.remove('away');
+    if (homeEl) { show(homeEl, IDLE.f[0]); idleI = 0; }
+    if (mode !== 'off') mode = 'home';
+  }
+  const abort = () => { if (mode !== 'off' && mode !== 'home') finish(); };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) abort(); });
+  addEventListener('resize', () => { if (Math.abs(innerWidth - vw0) > 40 || Math.abs(innerHeight - vh0) > 160) abort(); }); addEventListener('orientationchange', abort);
+  return { get on() { return mode !== 'off'; }, get away() { return mode !== 'off' && mode !== 'home'; }, init, launch, abort, mode: () => mode };
+})();
+$('#cat').addEventListener('click', () => {
+  lastAct = Date.now();
+  if (CatFx.launch() || CatFx.away) return;                                                       // Mocha ist unterwegs: Tipp auf den leeren Platz bleibt still
+  Sound.meow(); catReact('happy', 1600); toast(t('catTap')); vibrate(12);
+});
 setInterval(() => { const c = $('#cat'); if (c) c.classList.toggle('sleep', started && Date.now() - lastAct > 25000); }, 2000);
 
 /* ---------------- Modals ---------------- */
@@ -2971,7 +3173,7 @@ document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click'
 }));
 $('#resEnergy').onclick = openShop; $('#resGems').onclick = openGems; $('#resCoins').onclick = openUpgrades;
 $('#giftFab').onclick = () => showGift();
-{ let was = false; const sync = () => { const on = !$('#ov').hidden || !$('#modal').hidden || !$('#adOverlay').hidden; if (on !== was) { was = on; if (started) Calm.lock(on); } }; const mo = new MutationObserver(sync);
+{ let was = false; const sync = () => { const on = !$('#ov').hidden || !$('#modal').hidden || !$('#adOverlay').hidden; if (on !== was) { was = on; if (on) CatFx.abort(); if (started) Calm.lock(on); } }; const mo = new MutationObserver(sync);
   ['#ov', '#modal', '#adOverlay'].forEach(q => mo.observe($(q), { attributes: true, attributeFilter: ['hidden'] })); }
 $('#brand').onclick = e => { if (e.target.closest('#bChap')) openWorlds(); else showOnboarding(); };
 document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
@@ -3281,7 +3483,7 @@ setInterval(() => {
 
 window.MC = { ent: (id, o) => playEntrance(id, o), cust: l => custSVG(l), seats: () => seatEls, fill: () => { fillOrders(); render(); }, render: () => render(), close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state(), world: L => { S.level = L; S.worldPick = null; applyChapter(true); render(); }, levelUp: L => { S.level = L - 1; S.xp = 0; addXP(xpNeed(L - 1)); }, scene: (i, vb, still) => Scenes.svg(i, vb, still),
   disc: (c, tr) => showDiscovery(c, tr), gift: () => addGift(), dbl: o => offerDouble(o || { coins: 80 }), shop: () => openShop(), gems: () => openGems(), noEnergy: () => openNoEnergy(),
-  order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; } };
+  order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx };
 
 /* ---------------- Boot ---------------- */
 S = load();
@@ -3297,6 +3499,7 @@ applyChapter(); fillOrders(); render(); save(); setupSplash();
 afterPaint(() => {
   lastChapter = null; applyChapter();
   setTimeout(() => idle(sizeFx), 350); setTimeout(() => idle(() => Sound.init()), 1000);
+  setTimeout(() => idle(() => CatFx.init()), 800);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layoutScene());
 });
 Platform.init();
