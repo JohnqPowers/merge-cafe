@@ -1,0 +1,129 @@
+# Test- und Qualitätsbericht – Noa's Bean Trail
+
+Stand: 24.11.2026. Spielversion 1.5.12 (lokal committet, nicht veröffentlicht). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
+
+## 1. Kurzfazit
+
+| Bereich | Stand |
+|---|---|
+| Automatische Browser-Tests (Chrome, Handy-Fenstergrößen) | **grün**: 24/24, 54/54, 11/11, 20/20 und ein Ablaufprotokoll ohne Fehler (Abschnitt 3) |
+| Echter Android-Build ab Version 1.5.8 | **nie gelaufen** (Abschnitt 6, Punkt Q1) |
+| Echte Geräte | Der Eigentümer hat Test-APKs bis Build 12 selbst gespielt (Rückmeldungen stehen in `reports/weekly/`). **Gerätemodell, Android-Version und Build sind nicht dokumentiert**, es gibt kein Gerätetest-Protokoll. Die Lücke ist offen. |
+| Abstürze | **Keine Daten.** Im Spiel ist keine Absturzmeldung eingebaut, und die App war nie im Store. Bekannte Fehler stammen aus Tests und Rückmeldungen. |
+| Werbung, Käufe, Messung, Einwilligung | nur mit **nachgebauten Plugins** geprüft, nie mit echten Konten (Abschnitt 6, Q3) |
+| Leistung | im Browser mit gedrosselter CPU gemessen, **nicht auf echten Handys** (Abschnitt 4) |
+
+Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test reicht der jetzige Stand, sobald der erste echte Build grün ist. Für die Produktion fehlen die Gerätetests und die Werte aus Android vitals (Abschnitt 7).
+
+## 2. Testumgebung und Methode
+
+- Chrome for Testing 153 (headless) mit Playwright (Python), lokaler Webserver auf `www/`. Fenstergrößen wie Handys: 390×844 und 360×640 (Standard der Tests), dazu 320×568, 412×915, 768×1024, 810×1080, 844×390 (quer), 1024×600 und 1280×800 für Sonderfälle.
+- Capacitor-Plugins (AdMob, AppsFlyer, RevenueCat, Einwilligung) sind im Test **nachgebaut** (`tests/test_plattform.py`). Sie prüfen die Reihenfolge und die Aufrufe des Spiels, nicht das Verhalten der echten Bibliotheken.
+- Leistungsmessungen mit gedrosselter CPU (4× bis 8×), um ein Einsteiger-Handy nachzustellen. Das ist eine Näherung.
+- Der Spielstand `tests/state.json` (Level 12, Paris) wird für Tests ab Level 12 eingespielt.
+- Konsolenfehler und fehlende Bilder zählen als Testfehler.
+
+## 3. Automatische Tests (Lauf vom 24.11.2026, Version 1.5.12)
+
+| Datei | Ergebnis | Inhalt |
+|---|---|---|
+| `tests/test_gesamt.py` | **24/24** bei 390×844 und bei 360×640 | Start, Profil, Tutorial bis zur ersten Lieferung (inkl. Merge), Spiel bis Level 6 (dabei Stadtwechsel Hamburg → Wien bei Level 5), Geschenk-Fach, Verdoppeln per Demo-Werbung, „Keine Energie“-Fenster, Energie-Werbung (Zähler), Auffüllen mit Diamanten, Zutaten kaufen, Tagesbonus, Münzen-Verdoppeln-Chip, Erklär-Fenster „Diamanten“, Ausbau kaufen, Neustart mit erhaltenem Spielstand, Chancen-Anzeige im Diamanten-Fenster, keine Konsolenfehler |
+| `tests/test_plattform.py` | **54/54** | Einwilligung vor Werbung und Messung, Ablehnen/Zustimmen/Widerruf, Werbe-Einstellungen, Ereignis-Warteschlange (verwerfen oder senden), Store-Preise statt Platzhalter, Kauf und Gutschrift, Kauf abgebrochen, Browser-Variante ohne Plugins, **Sperre bei unvollständigen Rechtstexten** (S9), **Debug-Paket mit Test-Anzeigenblock** (S10), **Store-Paket ohne Testmarkierung** (S11) |
+| `tests/test_ausrichtung.py` | **11/11** | Dreh-Hinweis nur bei Querformat und sehr niedrigen Fenstern (844×390, 700×520), nicht bei Handy hochkant und nicht bei Tablets (1024×600, 1280×800, 810×1080); Deutsch und Englisch; Hinweis deckt alles ab und liegt oben |
+| `tests/test_spielstand.py` | **20/20** | Update-Sicherheit des Spielstands: alter, unvollständiger Spielstand lädt (neue Felder bekommen Standardwerte, alte Emoji-Figur wird auf die neue Kennung umgestellt), Zusatzfelder bleiben, kaputter Text, fremde Version, falsche Brettgröße, leeres Profil und unbekannte Figur starten ein neues Spiel bzw. Ersatzwerte ohne Absturz, Level-12-Stand lädt bei 360×640 |
+| `tests/test_store.py` | **91/91** | Store-Unterlagen ohne Browser: Titel höchstens 30, Kurzbeschreibung 80, Beschreibung 4000 Zeichen, Alt-Texte höchstens 140; keine Werbewörter, Emojis oder Fremdnamen im Titel; Zahlen im Text (22 Leckereien, 3 Ketten, 9 Welten, 12 Figuren, 7 Bonus-Tage, Automaten, Städte) stimmen mit `www/index.html`; Icon 512×512 mit Alpha, Feature-Grafiken 1024×500 ohne Alpha, 6 Screenshots je Sprache 1080×1920 ohne Alpha, deutsche und englische Fassung verschieden, keine Reste mit altem Namen in `store/`. Mit absichtlich falschem Text geprüft: schlägt dann fehl. |
+| `tests/test_katze.py` | Ablaufprotokoll A–H, **kein Fehler** | Katze Mocha: Tutorial (Katze aus), fehlende Bilder (gezeichnete Katze bleibt), Sprung und Landung bei 360×640, 5 Gästeplätze (Katze ausgeblendet), Streicheln mit Ton, Tippen, Tab-Wechsel, Adressleiste, Querformat, Ton aus. Dieser Test druckt Messwerte; er hat keine feste Bestanden/Durchgefallen-Zählung, ich lese die Ausgabe. |
+
+Frühere Einzelprüfungen, die **nicht** im Repo liegen (Wegwerf-Skripte, damals bei 390×844 und 360×640 bestanden): Figuren und Gäste 13/13, Level-Chips 18/18, Ablauf Onboarding → Einzug → Tutorial 34/34, Namenstest 12/12, Sie sind in den Wochenberichten belegt, aber nicht wiederholbar, bis sie ins Repo wandern.
+
+Aufruf: siehe `tests/README.md`.
+
+## 4. Leistung (Messwerte, Chrome mit gedrosselter CPU)
+
+| Messung | Ergebnis | Quelle |
+|---|---|---|
+| Start, CPU 4× | erstes Bild nach ca. 0,4 s (vorher 0,8 s); Startbild im Leerlauf 60 fps | Wochenbericht v1.5.0 |
+| Spielfluss (Ziehen, Mergen, Automat, Lieferung), CPU 8× | Frames über 33 ms: 64–71 → 19–23; mittlere Frame-Zeit 25–27 ms → 19–20 ms | v1.5.1 (Endlos-Animationen ruhen beim Spielen, Zieh-Schatten per `transform`) |
+| 16 Übergänge × 3 Läufe, CPU 6× | Frames über 33 ms: 185 → 154; mittlerer Spitzen-Frame 86 → 69 ms; Merge und Automat tippen weiter bei 80–120 ms (Rauschen ±30 %) | v1.5.2 |
+| Ziehen, CPU 4× | Mittel 16,9 ms, 95 % der Frames bei 16,8 ms | v1.5.3 |
+| Katze, CPU 4× | keine Ausreißer über 50 ms | v1.5.7 |
+
+Größe: `www/` hat 3,7 MB (davon `index.html` 437 KB mit eingebetteten Schriften, der Rest Bilder und Ton). Die Größe der APK und der `.aab` ist erst nach dem ersten Build bekannt.
+
+Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch spürbar sein (Spitzen bis 120 ms im gedrosselten Test). Ob das auf echten Geräten stört, zeigt nur der Gerätetest.
+
+## 5. Spielfortschritt
+
+- Aufbau: 9 Städte, Stadtwechsel bei Level 1, 5, 10, 15, 20, 25, 30, 40 und 50 (Hamburg, Wien, Paris, Rom, Istanbul, Kyoto, New York, Rio, Sternecafé), dazu Ränge. Der Spielstand liegt nur auf dem Gerät (`localStorage`, Schlüssel `mergecafe_v1`).
+- **Geprüft:** Tutorial bis zur ersten Lieferung; Spielen bis Level 6; ein Spielstand auf Level 12 (Paris) lädt und läuft; Neustart behält den Spielstand; alte, unvollständige und kaputte Spielstände (`tests/test_spielstand.py`).
+- **Nicht geprüft:** Durchspielen der Level 13 bis 50, Dauer bis Level 10 oder 20 mit echten Spielern, Balance der Energie über mehrere Tage, Tagesbonus über 7 Tage am Stück (nur ein Abholen und das Verdoppeln). Die KPI-Ziele dafür stehen in `docs/LAUNCH_PLAN.md`; Messwerte gibt es erst mit AppsFlyer-Daten.
+- **Grenzen des Spielstands:** Es gibt keinen Cloud-Spielstand. Deinstallieren löscht ihn. Android-Auto-Backup (`allowBackup=true`) kann ihn auf ein neues Gerät mitnehmen, das ist nicht getestet.
+
+## 6. Bekannte Fehler und Einschränkungen
+
+| Nr. | Punkt | Schwere | Stand |
+|---|---|---|---|
+| Q1 | **Android-Build ab Version 1.5.8 nie gelaufen** (AppsFlyer-Bündelung, Einwilligungsfenster, Plugin-Versionen, Testmarkierung `build.json`, Hochformat-Sperre im Manifest sind nur im Browser mit nachgebauten Plugins und mit einem Mustermanifest geprüft). | hoch | offen, erster Lauf nach Freigabe des Pushs, Fehlerbild im Wochenbericht |
+| Q2 | Kein eigenes Fehlerprotokoll im Spiel (kein Absturzdienst). Nach dem Start liefert Android vitals in der Play Console die Absturz- und ANR-Raten; Einzelheiten zu Fehlern nur über die Stapelspuren dort. | mittel | akzeptiert (spart ein weiteres SDK und eine weitere Datenschutz-Angabe) |
+| Q3 | Echte Werbung, echte Käufe, AppsFlyer-Messung und das echte Einwilligungsfenster sind nie mit echten Konten gelaufen. Konten und Schlüssel fehlen noch. | hoch | wartet auf Konten, Prüfliste in `docs/TECHNIK.md`, Abschnitt 9 |
+| Q4 | Tablets und Faltgeräte: Android 16 ignoriert die Hochformat-Sperre ab 600 dp. Im Querformat bei 1024×600 ist das Brett klein (Felder 26–32 px), das Spiel bleibt bedienbar. | mittel | akzeptiert, bei Bedarf Seitenlayout für Querformat |
+| Q5 | Handy im Querformat: Start-Knopf und Brett wären nicht erreichbar. Behoben: Sperre im Manifest plus Dreh-Hinweis. | – | behoben in v1.5.10, im echten Build ungeprüft |
+| Q6 | Bilder: Böden für Wien, Paris und Rom sind Platzhalter (Wien ist der Berlin-Entwurf), Böden 4 bis 8 fehlen (gebauter Ersatz im Spiel), die zwölf Einzugs-Posen fehlen (Kachel statt Pose). Fünf Teile-Bilder sind am Rand leicht angeschnitten (Donut, Brot, Croissant, Salat, Weizen). | niedrig | offen, braucht neue Bilder des Eigentümers |
+| Q7 | Katze Mocha: Frames teils abgewandelte Kopien, `purr.wav` ist ein Platzhalter; Herkunft und Rechte der Bilder vom Eigentümer zu bestätigen (`docs/ASSETS_LIZENZEN.md`). | niedrig | offen |
+| Q8 | Bedienungshilfen (TalkBack, große Schrift, Farbenblindheit) nicht geprüft. Das Spiel nutzt kaum beschriftete Elemente (7 Stellen mit `aria-label` oder `role`). | mittel | offen, in den Gerätetest aufnehmen |
+| Q9 | Sprachen: Deutsch und Englisch. Bei anderen Gerätesprachen zeigt das Spiel Englisch (so festgelegt, nicht in jeder Sprache geprüft). | niedrig | akzeptiert |
+| Q10 | Belohnungen werden auf dem Gerät gutgeschrieben, ohne Server (siehe `docs/TECHNIK.md`, R5). | niedrig | akzeptiert |
+| Q11 | Ohne vollständige Rechtstexte bleiben Werbung, Käufe und Messung in der App gesperrt (`legalReady`). Das ist gewollt, die Optionen zeigen dann „Testversion“. | – | wartet auf Impressum und Datenschutz |
+| Q12 | Ein unlesbarer oder fremder Spielstand (kaputter Text, andere Versionsnummer, falsche Brettgröße) wird nicht repariert, das Spiel startet neu und überschreibt ihn beim nächsten Speichern. Es gibt keine Sicherungskopie. Relevant erst, wenn eine spätere Version das Format ändert (`v` erhöhen) und jemand zur alten Version zurückkehrt. | niedrig | akzeptiert; bei einer Formatänderung vorher eine Sicherungskopie des alten Textes anlegen |
+
+### Behobene Fehler (Auswahl, mit Version)
+
+- v1.5.0: Tutorial ohne Pärchen (die ersten zwei Spawns sind jetzt immer Stufe 1); Startruckler (schwere Arbeit vor dem ersten Bild).
+- v1.5.1: Ruckeln im Spielfluss (zu viele Endlos-Animationen auf dem Hauptthread, Zieh-Schatten per `left/top`).
+- v1.5.2: **Service Worker lieferte immer die zuerst gespeicherte Seite** (Besucher und Store-Updates blieben auf alten Versionen hängen); Ruckeln bei Fenster-Wechseln (Neuberechnung der ganzen Seite).
+- v1.5.6: Apostroph im App-Namen hätte den Android-Build abgebrochen (Maskierung in `patch-android.js`, doppelt ausführbar).
+- v1.5.9: Werbung, Käufe und Messung liefen in der App auch bei Platzhalter-Rechtstexten; jetzt gesperrt und getestet.
+- v1.5.10: Querformat auf dem Handy (Hochformat-Sperre, Dreh-Hinweis); Schrift „Lilita One“ lag verändert unter dem Originalnamen vor (jetzt unverändert, siehe Lizenzverzeichnis).
+- v1.5.12: Das Diamanten-Fenster nannte „+3 bis +7 pro Level“; ab Level 15 gibt es mehr (Formel 3 + 2 je 5 Level). Der Text ist korrigiert, die Chancen (Geschenk, Stufe 2 beim Erzeugen) stehen jetzt im Spiel.
+- v1.5.11: Die öffentliche Test-APK hätte mit echter AdMob-Kennung echte Anzeigen gezeigt (Kontosperre bei eigenen Klicks möglich); sie nutzt jetzt Googles Test-Anzeigenblock.
+
+## 7. Freigabekriterien
+
+**Vor dem ersten Upload nach `internal`** (Eigentümer entscheidet, Push erst nach Freigabe):
+- [ ] Alle Tests aus Abschnitt 3 grün auf dem Stand, der gebaut wird.
+- [ ] Build grün; Artefakte `noas-bean-trail-test-apk-<Nr>`, `noas-bean-trail-store-aab-<Nr>`, `versionen-<Nr>` vorhanden (`docs/TECHNIK.md`, Abschnitt 9).
+- [ ] Namensfreigabe (`docs/RECHT_UND_NAMEN.md`, 5.3) und vollständige Rechtstexte.
+
+**Vor dem geschlossenen Test mit Testern:**
+- [ ] Gerätetest (Abschnitt 8) auf mindestens drei Geräten ohne Absturz in 20 Minuten Spielzeit.
+- [ ] Kauf mit Lizenztester, Werbung mit Test-Anzeige, Einwilligungsfenster auf einem Gerät im EWR geprüft.
+- [ ] Mindestzahl und Dauer des geschlossenen Tests in der Play Console prüfen (Stand der Recherche vom 24.11.2026: 12 Tester über 14 Tage für neue Privatkonten; die Regel ändert sich, bitte vor Beginn gegenprüfen).
+
+**Vor der Produktion (macht der Eigentümer, nie der Agent):**
+- [ ] Android vitals ohne Warnung: nutzerbemerkte Absturzrate unter 1,09 %, nutzerbemerkte ANR-Rate unter 0,47 % (über alle Geräte) und je Handymodell unter 8 % (Schwellen laut Google, Stand 24.11.2026: https://developer.android.com/google/play/vitals).
+- [ ] Produkt-KPIs aus `docs/LAUNCH_PLAN.md` im Test erreicht (Tutorial ≥ 85 %, D1 ≥ 40 % …) oder bewusst anders entschieden.
+- [ ] Alle offenen Punkte mit Schwere „hoch“ aus Abschnitt 6 erledigt.
+
+## 8. Gerätetest (zu tun, Protokoll)
+
+Mindestens drei Geräte, möglichst: ein Einsteiger-Handy (2 bis 3 GB RAM, Android 8 bis 10), ein Mittelklasse-Handy, ein aktuelles Gerät mit Android 16; zusätzlich, wenn vorhanden, ein Tablet. Jede Zeile mit Gerät, Android-Version und Build-Nummer eintragen.
+
+Ablauf je Gerät (jeweils Test-APK ohne und mit Rechtstexten):
+1. Neu installieren, starten (Zeit bis zum ersten Bild schätzen), Figur wählen, Einzug, Tutorial bis zur ersten Lieferung.
+2. 10 Minuten durchgehend spielen: Merge-Gefühl, Automaten tippen, Lieferungen, Geschenk-Fach, Tagesbonus; Wärme und Akkuverbrauch notieren.
+3. Ton und Musik aus und an, Vibration, Katze streicheln.
+4. Werbung: Test-Anzeige bis zum Ende (Belohnung kommt), Anzeige vorzeitig schließen (keine Belohnung), ohne Netz (keine Anzeige, kein Absturz).
+5. Einwilligung (Gerät im EWR): Fenster erscheint, Ablehnen sperrt Werbung und Messung, „Werbe-Einstellungen“ in den Optionen ändern.
+6. Shop: Preis kommt aus dem Store, Kauf mit Lizenztester, Gutschrift, Kauf abbrechen.
+7. App in den Hintergrund, Anruf, Bildschirm aus und an; Neustart; Spielstand erhalten; Flugmodus-Start.
+8. Systemschrift und Anzeigegröße auf „groß“; Sprache Englisch; Drehen (Handy bleibt hochkant); TalkBack kurz anschalten.
+
+| Gerät / Android | Build | Start | 10 min ohne Absturz | Werbung | Kauf | Einwilligung | Auffälligkeiten |
+|---|---|---|---|---|---|---|---|
+| (offen) | | | | | | | |
+
+Gefundene Fehler kommen mit Nummer in Abschnitt 6; jeder Fehler bekommt, wenn möglich, einen Test in `tests/`.
+
+## Quellen (Stand 24.11.2026)
+- Google, Android vitals und Schwellen für schlechtes Verhalten: https://developer.android.com/google/play/vitals
+- Google, Hintergrund zu den Kennzahlen (2022): https://android-developers.googleblog.com/2022/10/raising-bar-on-technical-quality-on-google-play.html

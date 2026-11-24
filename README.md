@@ -1,13 +1,33 @@
 # Noa's Bean Trail – Build & Release
 
-Casual merge game (genre of top Freecash earners such as *Merge Restaurant*). One code base → Android (Google Play), iOS (App Store), web (itch.io, CrazyGames, Poki, GameDistribution, own PWA).
+Casual merge game with a café theme and a world trip (Hamburg → Star Café). One code base → Android (Google Play) and web (GitHub Pages, own PWA). iOS and other web portals are not set up yet (steps below).
 
 ```
-www/            the game (index.html = complete game, PWA files, icons)
-store/          app icon 512, Play feature graphic, store screenshots
-docs/           LAUNCH_PLAN.md (Almedia), STORE_LISTING.md, EVENTS.md, PRIVACY.md
+www/            the game (index.html = complete game, PWA files, icons, art/)
+store/          app icon 512, feature graphics (de/en), 6 screenshots per language (made by scripts/store_shots.py and scripts/store_promo.py)
+docs/           documents, see the table below
+scripts/        build helpers (inject-config, patch-android, art and cat import, store images)
+tests/          browser tests (Playwright) and store checks, see tests/README.md
+reports/        weekly reports, AppsFlyer KPI downloads
 package.json    Capacitor + SDKs (AppsFlyer, AdMob, RevenueCat)
 ```
+
+## Dokumente (`docs/`)
+
+| Datei | Inhalt |
+|---|---|
+| `RELEASE_UNTERLAGEN.md` | Übersicht der neun Unterlagen vor dem Store-Start: Stand und offene Punkte |
+| `LAUNCH_PLAN.md` | Strategie, Almedia-Event-Leiter, KPI-Ziele |
+| `EVENTS.md` | Event-Katalog (Namen nie ändern) |
+| `STORE_LISTING.md` | Texte, Bilder und Regelcheck für Google Play |
+| `PRIVACY.md` | Datenflüsse, Entwurf für „Datensicherheit“, Pflichten des Eigentümers (die Seite im Spiel ist `www/privacy.html`) |
+| `ALTERSFREIGABE.md` | Zielgruppe, Inhaltseinstufung, Jugendschutz |
+| `MONETARISIERUNG.md` | Münzen, Diamanten, Käufe, Werbung, Zufallsbelohnungen |
+| `ASSETS_LIZENZEN.md` | Herkunft und Lizenzen aller Bilder, Schriften und Bibliotheken |
+| `RECHT_UND_NAMEN.md` | Namensprüfung, Marken, Checkliste, Freigabe |
+| `TECHNIK.md` | Aufbau, Build, Berechtigungen, Risiken, Prüfliste fürs Gerät |
+| `QUALITAET.md` | Testbericht, bekannte Mängel, behobene Fehler |
+| `ART_BRIEF.md` | Auftrag für Bilder (Dateinamen, Maße) |
 
 ## ⚡ Automatisch über GitHub (empfohlen)
 Jeder Push auf `main`:
@@ -35,6 +55,7 @@ cd merge-cafe
 npx http-server www -p 8080 -c-1
 ```
 Open http://localhost:8080 – or just double-click `www\index.html`.
+Automatic tests: see `tests/README.md` (`python3 -I tests/test_gesamt.py 390 844` and the others).
 
 ## 1. Android (priority 1)
 Prerequisites: Node 20+, Android Studio, Google Play Console account (USD 25 one-time).
@@ -75,7 +96,7 @@ All in `www/index.html` → `CONFIG` and in `capacitor.config.json`:
 | AdMob app IDs + rewarded unit IDs | `capacitor.config.json`, `CONFIG.admob` | AdMob (currently Google **test IDs**) |
 | RevenueCat API keys | `CONFIG.revenuecat` | RevenueCat dashboard |
 | In-app products | `starter_pack`, `gems_small`, `gems_large` | create identically in Play Console / App Store Connect + RevenueCat |
-| Privacy policy URL | settings screen (`johnqpowers.github.io/merge-cafe/privacy.html`) | host `docs/PRIVACY.md` |
+| Privacy policy and Impressum | `www/privacy.html`, `www/impressum.html`: replace every `[[…]]`. While any remains, ads, purchases and measurement stay off in the app (`CONFIG.legalReady`). | owner's real details; see `docs/PRIVACY.md` |
 | App ID `io.github.johnqpowers.mergecafe` | `capacitor.config.json` | your own reverse domain |
 
 ## 5. Native plugin notes

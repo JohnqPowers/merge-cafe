@@ -4,10 +4,13 @@ Automatische Tests mit Playwright (Python) und Chrome. Sie laufen ohne Handy; ec
 
 | Datei | Was geprüft wird |
 |---|---|
-| `test_gesamt.py` | Start, Profil, Tutorial bis zur ersten Lieferung, Spiel bis Level 6, Geschenke, Demo-Werbung, Shop, Neustart, keine Konsolenfehler (23 Prüfungen) |
-| `test_plattform.py` | Einwilligung vor Werbung und Messung, Widerruf, Store-Preise, Kauf, Sperre bei unvollständigen Rechtstexten, Browser-Variante (mit nachgebauten Plugins, 46 Prüfungen) |
+| `test_gesamt.py` | Start, Profil, Tutorial bis zur ersten Lieferung, Spiel bis Level 6, Geschenke, Demo-Werbung, Shop, Neustart, keine Konsolenfehler (24 Prüfungen) |
+| `test_plattform.py` | Einwilligung vor Werbung und Messung, Widerruf, Store-Preise, Kauf, Sperre bei unvollständigen Rechtstexten, Debug-Paket mit Test-Anzeigenblock, Browser-Variante (mit nachgebauten Plugins, 54 Prüfungen) |
+| `test_ausrichtung.py` | Dreh-Hinweis im Querformat auf dem Handy, keiner bei Tablets und Hochformat (11 Prüfungen) |
+| `test_spielstand.py` | alte, unvollständige, kaputte und fremde Spielstände laden ohne Absturz (20 Prüfungen) |
 | `test_katze.py` | Katze Mocha: Sprung, Landung, Streicheln, Rückkehr, Sonderfälle |
+| `test_store.py` | Store-Unterlagen ohne Browser: Zeichenlängen und Regeln der Texte in `docs/STORE_LISTING.md`, Zahlen im Text gegen den Code, Alt-Texte, Bildformate in `store/` (91 Prüfungen, braucht nur Pillow) |
 
-Aufruf aus dem Projektordner: `python3 -I tests/test_gesamt.py 390 844` (zweite Größe z. B. `360 640`), `python3 -I tests/test_plattform.py`, `python3 -I tests/test_katze.py`.
+Aufruf aus dem Projektordner: `python3 -I tests/test_gesamt.py 390 844` (zweite Größe z. B. `360 640`), `python3 -I tests/test_plattform.py`, `python3 -I tests/test_ausrichtung.py`, `python3 -I tests/test_spielstand.py`, `python3 -I tests/test_store.py`, `python3 -I tests/test_katze.py` (druckt ein Ablaufprotokoll, keine Zählung).
 Voraussetzung: `pip install playwright` und ein installiertes Chrome (Pfad per Umgebungsvariable `CHROME`, Standard `/usr/bin/google-chrome`).
 `state.json` ist ein Spielstand auf Level 12 (Paris), den die Tests einspielen.

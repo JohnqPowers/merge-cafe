@@ -57,20 +57,22 @@ Grundsatz: Je beschreibender der Name (Vorname plus „Cafe“, „Coffee“, �
 
 Relevant sind Treffer mit „Noa“ plus Cafe/Coffee/Kaffee sowie jeder „Noa“-Treffer in Klasse 9 oder 41. Treffer an den Agenten schicken (Text oder Screenshot), der bewertet sie. Bei klaren Treffern: Namen ändern, **bevor** hochgeladen wird.
 
+Stand 24.11.2026: Die Schritte 1 und 2 hat der Agent im Browser ausgeführt (DPMAregister und TMview, Suchbegriffe wie oben), die Schritte 4 und 5 sind im Web- und Store-Check erledigt. Schritt 3 ist optional, weil TMview und DPMAregister die Madrid-Daten schon enthalten. Hinweis zur Technik: Die Volltextsuche im DPMAregister nach Waren und Dienstleistungen findet Unionsmarken nicht verlässlich, deshalb nach Inhaber und Klassen sichten und die nächsten Treffer einzeln lesen. Einzelheiten und Bewertung gehen als Nachricht an den Eigentümer (Punkt 6 unten). Empfehlung, Entscheidung beim Eigentümer: eigene Wortmarke anmelden (DPMA online 290 € für bis zu drei Klassen) und die kostenlose Überwachung DPMAkurier einrichten.
+
 ### 5.3 Freigabe
 
 | Datum | Name | Ergebnis der Recherche | Freigabe durch |
 |---|---|---|---|
-| 24.11.2026 | Noa's Bean Trail (vom Eigentümer gewählt) | Web- und Store-Check bestanden; Register (DPMA, TMview, WIPO) offen | offen |
+| 24.11.2026 | Noa's Bean Trail (vom Eigentümer gewählt) | Web- und Store-Check bestanden; Registersuche DPMAregister und TMview (u. a. DE, EU, UK, US) durch den Agenten: kein identisches und kein eng ähnliches Zeichen für Spiele, Software oder Café-Leistungen gefunden, Restrisiko gering bis mäßig; WIPO-Einzelabfrage optional | offen |
 
 Ohne ausgefüllte Freigabe kommt der Name nicht in Store-Einträge, Anzeigen oder Almedia-Texte. Web-Version und interne Tests sind davon nicht betroffen.
 
 ## 6. Weitere Abmahn- und Rechtsrisiken (nach Wahrscheinlichkeit)
 
-1. **Impressum und Datenschutz.** Das Web-Spiel hat kein Impressum, `www/privacy.html` und `docs/PRIVACY.md` sind Vorlagen mit Platzhaltern „[Name, Anschrift, E-Mail]“. Sobald Werbung oder Käufe laufen, droht Abmahnung oder Bußgeld (§ 5 DDG). Nötig: Name, ladungsfähige Anschrift (ein Postfach reicht nicht) und eine E-Mail-Adresse für schnelle Kontaktaufnahme. **Daten kommen vom Eigentümer.**
-2. **Einwilligung (AdMob UMP, GDPR-Nachricht):** offener Punkt aus dem Bericht vom 23.11.2026.
+1. **Impressum und Datenschutz.** `www/impressum.html` und `www/privacy.html` sind geschrieben, enthalten aber noch Platzhalter `[[…]]` für die Angaben des Eigentümers. Solange eines davon drin steht, bleiben Werbung, Käufe und Messung in der App aus (`CONFIG.legalReady`). Läuft Werbung ohne vollständiges Impressum, droht Abmahnung oder Bußgeld (§ 5 DDG). Nötig: Name, ladungsfähige Anschrift (ein Postfach reicht nicht) und eine E-Mail-Adresse für schnelle Kontaktaufnahme. **Daten kommen vom Eigentümer.**
+2. **Einwilligung (Google-Einwilligungsfenster, UMP):** im Spiel seit Version 1.5.8 umgesetzt (erst fragen, dann Werbung und Messung). Die Nachricht im AdMob-Konto muss der Eigentümer noch einrichten (`docs/PRIVACY.md`).
 3. **Bilder aus dem KI-Bildtool:** Nutzungsbedingungen zur kommerziellen Nutzung prüfen. Rein KI-erzeugte Bilder sind nach verbreiteter Ansicht kaum urheberrechtlich geschützt, Dritte könnten sie also kopieren. Prompts und Originaldateien aufheben (Beleg der eigenen Entstehung) und Bilder auf zufällige Ähnlichkeit mit bekannten Figuren oder Logos ansehen.
-4. **Schriften:** Fredoka (Copyright 2016 The Fredoka Project Authors) und Lilita One (Copyright 2011 Juan Montoreano) sind als Base64 eingebettet; laut Google Fonts stehen beide unter der SIL Open Font License 1.1. In den Schriftdateien ist weder Lizenztext noch -URL vermerkt, die Lizenz verlangt aber Copyright-Hinweis und Lizenztext bei Weitergabe. **Offen:** Hinweis und Lizenztext in einer Lizenzseite beilegen.
+4. **Schriften:** Fredoka (Copyright 2016 The Fredoka Project Authors) und Lilita One (Copyright 2011 Juan Montoreano) sind als Base64 eingebettet; laut Google Fonts stehen beide unter der SIL Open Font License 1.1. In den Schriftdateien ist weder Lizenztext noch -URL vermerkt, die Lizenz verlangt aber Copyright-Hinweis und Lizenztext bei Weitergabe. **Erledigt seit 1.5.10:** Copyright-Hinweis und Lizenztext liegen in `www/ofl/` und auf `www/licenses.html`; die Seite ist in den Optionen verlinkt.
 5. **Musik und Sounds:** werden zur Laufzeit selbst synthetisiert, unkritisch. **Emojis:** Systemschrift des Geräts, unkritisch.
 6. **Öffentliches Repo:** `JohnqPowers/merge-cafe` ist öffentlich (GitHub Pages). Rechtseinschätzungen zu einzelnen fremden Spielen oder Personen gehören nicht hinein, sondern als Nachricht an den Eigentümer; im Repo bleiben nur allgemeine Regeln und Checklisten wie in diesem Dokument.
 
@@ -85,14 +87,17 @@ Ohne ausgefüllte Freigabe kommt der Name nicht in Store-Einträge, Anzeigen ode
 
 ## 8. Checkliste vor dem ersten Store-Upload
 
-- [ ] Namensrecherche abgeschlossen, Freigabe in 5.3 eingetragen
-- [ ] Icon, Feature-Grafik und Screenshots zeigen den freigegebenen Namen (Stand 24.11.2026: Icon mit „Noa's Bean Trail“ aktuell, Feature-Grafik und Screenshots veraltet)
-- [ ] Impressum und Datenschutz mit echten Angaben, Links im Store-Eintrag
-- [ ] AdMob-Einwilligungsnachricht (UMP) eingerichtet
-- [ ] Bild-Tool: kommerzielle Nutzung geprüft, Prompts und Originaldateien archiviert
-- [ ] Schriftlizenzen (OFL) beigelegt
+- [ ] Namensfreigabe in 5.3 eingetragen (Registersuche DPMAregister und TMview am 24.11.2026 erledigt, ohne identischen Treffer; Freigabe durch den Eigentümer offen)
+- [ ] Icon, Feature-Grafiken und Screenshots zeigen den freigegebenen Namen (Stand 24.11.2026: Icon und beide Feature-Grafiken tragen „Noa's Bean Trail“, die Screenshots zeigen das Spiel in Version 1.5.12; alle neu, siehe `docs/STORE_LISTING.md`; bei anderem Namen Icon und Feature-Grafik neu bauen)
+- [ ] Impressum und Datenschutz mit echten Angaben, Links im Store-Eintrag (Platzhalter `[[…]]` in `www/impressum.html` und `www/privacy.html`; bis dahin bleiben Werbung, Käufe und Messung in der App aus)
+- [ ] AdMob-Einwilligungsnachricht (UMP) eingerichtet (Code fertig; die Nachricht selbst im AdMob-Konto anlegen und mit einem Testgerät prüfen, siehe `docs/PRIVACY.md`)
+- [ ] Bild-Tool: kommerzielle Nutzung geprüft, Prompts und Originaldateien archiviert (Stand der Bilder: `docs/ASSETS_LIZENZEN.md`)
+- [x] Schriftlizenzen (OFL) beigelegt (`www/ofl/`, Seite `www/licenses.html`, Verweis in den Optionen; Stand 1.5.12)
 - [ ] Paket-ID entschieden: `io.github.johnqpowers.mergecafe` ist vor dem ersten Upload noch änderbar, danach nicht mehr; sie erscheint in der Play-Store-Adresse. Eine namensneutrale ID würde jede spätere Umbenennung entkoppeln
+- [ ] Zielgruppe und Inhaltseinstufung (IARC) in der Play Console ausgefüllt (`docs/ALTERSFREIGABE.md`), Datensicherheit nach `docs/PRIVACY.md`
 - [ ] Empfohlen: Erstberatung bei einer IT- oder Markenrechtskanzlei, bevor Werbebudget fließt
+
+Gesamtübersicht aller Unterlagen vor dem Store-Start: `docs/RELEASE_UNTERLAGEN.md`.
 
 ## 9. Falls eine Abmahnung kommt
 
