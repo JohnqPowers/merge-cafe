@@ -1,6 +1,6 @@
 # Test- und Qualitätsbericht – Noa's Bean Trail
 
-Stand: 25.11.2026. Spielversion 1.5.17 (Push auf `main` am 25.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
+Stand: 25.11.2026. Spielversion 1.5.18 (Push auf `main` am 25.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
 
 ## 1. Kurzfazit
 
@@ -23,7 +23,7 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 - Der Spielstand `tests/state.json` (Level 12, Paris) wird für Tests ab Level 12 eingespielt.
 - Konsolenfehler und fehlende Bilder zählen als Testfehler.
 
-## 3. Automatische Tests (Lauf vom 25.11.2026, Version 1.5.17)
+## 3. Automatische Tests (Lauf vom 25.11.2026, Version 1.5.17; zu 1.5.18 nur Icon-Größe, Kurzlauf grün)
 
 | Datei | Ergebnis | Inhalt |
 |---|---|---|
@@ -94,7 +94,7 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 - v1.5.10: Querformat auf dem Handy (Hochformat-Sperre, Dreh-Hinweis); Schrift „Lilita One“ lag verändert unter dem Originalnamen vor (jetzt unverändert, siehe Lizenzverzeichnis).
 - v1.5.12: Das Diamanten-Fenster nannte „+3 bis +7 pro Level“; ab Level 15 gibt es mehr (Formel 3 + 2 je 5 Level). Der Text ist korrigiert, die Chancen (Geschenk, Stufe 2 beim Erzeugen) stehen jetzt im Spiel.
 - v1.5.11: Die öffentliche Test-APK hätte mit echter AdMob-Kennung echte Anzeigen gezeigt (Kontosperre bei eigenen Klicks möglich); sie nutzt jetzt Googles Test-Anzeigenblock.
-- v1.5.17 (Rückmeldung des Eigentümers vom Handy, 24.11.2026): Die Katze blieb nach dem Streicheln auf dem Brett stehen und verdeckte es; Sprung und Streicheln entfernt (außerdem 22 statt 3 Bilder im Arbeitsspeicher). „Verkaufen“ mit Mülltonne war irreführend, jetzt „Take-away“ mit Take-away-Symbol. „Bessere Zutaten“ war nicht spürbar: Jetzt heißt es „Bessere Artikel“, zeigt die Chance in Prozent und meldet einen Glückstreffer („Stufe 2!“); die Chancen selbst sind unverändert. Das App-Icon wirkte auf dem Handy zu klein: Motiv in der Android-Vordergrundebene von 690 auf 810 px vergrößert, Rand bis an die Ecken gefüllt. Auf jedem Teil stand eine Zahl, auch bei Stufe 1; jetzt erst ab Stufe 2. Die gezeichnete Szene oben passt in Paris nicht zu den gemalten Bildern: Platz für ein Vollbild-Hintergrundbild je Welt eingebaut (`b<N>`), Bilder fehlen noch (`docs/ART_BRIEF.md`, Etappe 3).
+- v1.5.17 (Rückmeldung des Eigentümers vom Handy, 24.11.2026): Die Katze blieb nach dem Streicheln auf dem Brett stehen und verdeckte es; Sprung und Streicheln entfernt (außerdem 22 statt 3 Bilder im Arbeitsspeicher). „Verkaufen“ mit Mülltonne war irreführend, jetzt „Take-away“ mit Take-away-Symbol. „Bessere Zutaten“ war nicht spürbar: Jetzt heißt es „Bessere Artikel“, zeigt die Chance in Prozent und meldet einen Glückstreffer („Stufe 2!“); die Chancen selbst sind unverändert. Das App-Icon wirkte auf dem Handy zu klein: Motiv in der Android-Vordergrundebene von 690 auf 810 px vergrößert, Rand bis an die Ecken gefüllt; nach dem Vergleich im Homescreen-Screenshot des Eigentümers in 1.5.18 weiter auf 930 px (91 % der Ebene). Auf jedem Teil stand eine Zahl, auch bei Stufe 1; jetzt erst ab Stufe 2. Die gezeichnete Szene oben passt in Paris nicht zu den gemalten Bildern: Platz für ein Vollbild-Hintergrundbild je Welt eingebaut (`b<N>`), Bilder fehlen noch (`docs/ART_BRIEF.md`, Etappe 3).
 
 ## 7. Freigabekriterien
 

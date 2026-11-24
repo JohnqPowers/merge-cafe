@@ -16,11 +16,13 @@ damit Android, Apple und Google Play die Form selbst zuschneiden können. Daraus
   www/icons/icon-192.png / -512.png         vollflächig (Favicon, Apple-Touch-Icon, Web-Manifest)
   www/icons/icon-maskable-512.png     512  Kunst 84 %, Rand weich fortgesetzt (Sicherheitszone für Masken)
 
-Maße für das adaptive Icon: Ebene 108 dp = 1024 px. Android (AOSP, Pixel, Samsung) zeigt ein Fenster von 72 dp = 683 px; manche
-Oberflächen (Xiaomi HyperOS) zeigen die ganze Ebene, dort wirkte die Kunst mit 690 px zu klein und der Rand war verwaschen (Rückmeldung
-des Eigentümers 24.11.2026). Seit 1.5.17: Kunst 810 px (79 % der Ebene), der Rest der Ebene ein Goldverlauf in den Farben des Rahmens.
-Im 683-px-Fenster werden dafür rund 8 % der Kunst am Rand abgeschnitten (goldener Rahmen und Randdetails), Figuren, Katze, Tasse und
-Schriftzug bleiben ganz; bei der Kreismaske fallen die äußersten Ecken weg.
+Maße für das adaptive Icon: capacitor-assets packt beide Ebenen mit 16,7 % Rand (`<inset>`, gelesen in
+`res/mipmap-anydpi-v26/ic_launcher.xml` des Pakets, Build 19) in die 108-dp-Ebene. Das ganze 1024-px-Bild landet damit im 72-dp-Fenster,
+das die Launcher zeigen; abgeschnitten wird nur an den Ecken durch die Maske. Mit 690 px Kunst (67 %) wirkte das Motiv auf dem Handy des
+Eigentümers (Xiaomi HyperOS) zu klein, und der Rand war verwaschen (Rückmeldung 24.11.2026). 1.5.17: 810 px (79 %), Rest der Ebene ein
+Goldverlauf in den Farben des Rahmens. 1.5.18: 930 px (91 %), gewählt nach einem Vergleich im Homescreen-Screenshot des Eigentümers
+(810, 880, 930, 980 nebeneinander): Gesicht, Katze und Schriftzug sind größer, der goldene Rand der Kunst bleibt sichtbar.
+Bei einer Kreismaske fallen nur die äußersten Ecken weg; Figuren, Katze, Tasse und Schriftzug bleiben ganz.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -31,7 +33,7 @@ from scipy import ndimage as ndi
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'assets' / 'src' / 'app-icon-original.png'
-ADAPTIVE_ART = 810      # px der Kunst auf der 1024-px-Ebene
+ADAPTIVE_ART = 930      # px der Kunst auf der 1024-px-Ebene (690 war zu klein, 810 in 1.5.17 noch zu klein; die Ebene fuellt auf dem Handy die ganze Kachel)
 MASKABLE_ART = 0.84     # Anteil der Kunst auf der maskierbaren Leinwand
 
 
