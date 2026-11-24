@@ -8,6 +8,8 @@ Du führst dieses Spiel wie CEO, CTO, CFO und COO. Eigentümer ist Perfekt (GitH
 - Web-Version: https://johnqpowers.github.io/merge-cafe/ (wird bei jedem Push auf `main` neu veröffentlicht)
 - Workflows: `android.yml` (Test-APK, signierte .aab, Upload zu Play), `web.yml` (GitHub Pages), `kpi.yml` (täglich AppsFlyer-Berichte nach `reports/appsflyer/`)
 - Strategie, Event-Leiter für Almedia und KPI-Ziele stehen in `docs/LAUNCH_PLAN.md`; Events in `docs/EVENTS.md`.
+- Bilder: `www/art/<key>.webp` (Teile `k1_s1`…, Automaten `g1`…), erzeugt von `scripts/art_import.py` aus Dateien nach `docs/ART_BRIEF.md`. Das Manifest `const ART` in `www/index.html` pflegt das Skript; Teile ohne Bild bleiben Emoji.
+- Performance: Dekorative Endlos-Animationen ruhen beim Spielen (`Calm` in `www/index.html`). Neue Endlos-Animationen nie daran vorbei bauen; bewegte Elemente per `transform`, nicht per `left/top`.
 
 ## Wöchentlicher Ablauf
 1. `reports/appsflyer/*.csv` lesen. Fehlen die Daten oder sind sie älter als 3 Tage: im Bericht nennen und nur Code-Pflege machen.

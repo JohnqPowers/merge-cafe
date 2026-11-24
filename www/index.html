@@ -452,10 +452,12 @@ svg.ic.l{width:26px;height:26px}
 .order.ready .bub{background:linear-gradient(#F3FFF0,#D9F7D2);border-color:#35B34D}
 
 /* ---------- Brett: dunkler Rahmen, helle Kacheln ---------- */
-#board{gap:5px;padding:9px;border-radius:24px;background:linear-gradient(var(--fr1),var(--fr2));
-  box-shadow:0 6px 0 rgba(0,0,0,.32),0 16px 24px rgba(10,4,24,.38),inset 0 3px 0 rgba(255,255,255,.38),inset 0 -4px 0 rgba(0,0,0,.2),inset 0 0 0 3px rgba(255,255,255,.12)}
-.cell,.cell:nth-child(odd){background:rgba(0,0,0,.2);border-radius:12px;box-shadow:inset 0 3px 5px rgba(0,0,0,.38),inset 0 -1px 0 rgba(255,255,255,.14)}
-.cell:nth-child(even){background:rgba(0,0,0,.27)}
+#board{position:relative;gap:5px;padding:10px;border-radius:26px;--hole:rgba(0,0,0,.2);--hole2:rgba(0,0,0,.27);--holesh:inset 0 3px 5px rgba(0,0,0,.4),inset 0 -2px 0 rgba(255,255,255,.2);
+  background:radial-gradient(circle at 7px 7px,rgba(255,255,255,.16) 1.4px,rgba(255,255,255,0) 2px) 0 0/16px 16px,linear-gradient(170deg,var(--fr1),var(--fr2));
+  box-shadow:0 7px 0 rgba(0,0,0,.34),0 18px 26px rgba(10,4,24,.42),inset 0 4px 0 rgba(255,255,255,.5),inset 0 -5px 0 rgba(0,0,0,.22),inset 0 0 0 3px rgba(255,255,255,.16)}
+#board::before{content:"";position:absolute;left:7%;right:7%;top:3px;height:15px;border-radius:12px 12px 50% 50%/12px 12px 15px 15px;background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,0));pointer-events:none}
+.cell,.cell:nth-child(odd){background:var(--hole);border-radius:12px;box-shadow:var(--holesh)}
+.cell:nth-child(even){background:var(--hole2)}
 .cell .it{font-size:min(60cqw,38px);text-shadow:0 2px 2px rgba(60,25,5,.35)}
 .cell[data-t]{--t1:#FFFFFF;--t2:#F0E2CC;--tr:#C4A982;background:radial-gradient(120% 105% at 28% 12%,var(--t1),var(--t2));box-shadow:0 3px 0 var(--tr),0 6px 7px rgba(18,6,2,.34),inset 0 2px 0 rgba(255,255,255,.85),inset 0 -3px 5px rgba(0,0,0,.07)}
 .cell[data-t="1"]{--t1:#EBFCE3;--t2:#92DD88;--tr:#4DA854}
@@ -465,6 +467,25 @@ svg.ic.l{width:26px;height:26px}
 .cell[data-t="5"]{--t1:#FFEFCF;--t2:#FFB353;--tr:#E5841A}
 .cell[data-t="6"]{--t1:#FFF8C6;--t2:#FFCE48;--tr:#DD9E0A}
 .cell[data-t="7"]{--t1:#FFFFFF;--t2:#A8F1FF;--tr:#38BDE6}
+/* ---------- Teile mit Bild: stehen frei im Feld, ohne Platte (der Schatten ist im Bild), die Stufe gibt einen weichen Farbschein ---------- */
+img.art{display:block;width:1.15em;height:1.15em;object-fit:contain;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.cell .it img.art{width:100%;height:100%}
+.cell.art .it{display:block;position:relative;z-index:1;width:96%;height:96%}
+.cell.art[data-t]{background:var(--hole);box-shadow:var(--holesh)}
+.cell.art[data-t]:nth-child(even){background:var(--hole2)}
+.cell.art::after{content:"";position:absolute;left:6%;right:6%;top:10%;bottom:4%;border-radius:50%;background:radial-gradient(closest-side,var(--t2),rgba(255,255,255,0));opacity:.45;pointer-events:none}
+.cell.art .tier{z-index:2;left:3px;bottom:2px;min-width:15px;height:15px;border-radius:8px;background:radial-gradient(120% 120% at 30% 15%,var(--t1),var(--t2));color:#4A2A1A;font:700 10px/15px Fredoka,sans-serif;box-shadow:0 0 0 1.5px var(--tr),0 2px 2px rgba(0,0,0,.35)}
+.cell.art.sel{box-shadow:0 0 0 3px #4DB6FF,0 0 12px 3px rgba(77,182,255,.7)}
+.cell.art.hover{box-shadow:0 0 16px 4px rgba(255,226,122,.85)}
+.cell.art.match{box-shadow:0 0 14px 3px rgba(123,227,142,.9)}
+.cell.gen .it img.art{width:92%;height:92%;margin:auto}
+#ghost .gt.art{background:none;box-shadow:none;width:76px;height:76px;filter:drop-shadow(0 8px 6px rgba(10,0,40,.35))}
+.flyitem img.art{width:1.15em;height:1.15em}
+.rq img.art{width:100%;height:100%}
+.oq .oe img.art{width:1.15em;height:1.15em;margin:0 auto}
+.disc-em img.art{width:1em;height:1em;margin:0 auto}
+#discChip .dc-e img.art{width:100%;height:100%}
+.chain span img.art{width:1em;height:1em}
 .cell .tier{left:4px;bottom:3px;min-width:13px;height:13px;padding:0 3px;border-radius:7px;background:rgba(74,42,26,.55);color:#fff;font:700 9px/13px Fredoka,sans-serif;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
 .cell.gen{background:radial-gradient(120% 105% at 28% 12%,#FFF6CF,#FFC24A);box-shadow:0 3px 0 #C9830E,0 6px 9px rgba(18,6,2,.4),inset 0 2px 0 rgba(255,255,255,.9),inset 0 0 0 2px rgba(255,255,255,.5)}
 .cell.gen::after{content:"";right:1px;top:1px;width:15px;height:15px;font-size:0;background:var(--bolt) center/contain no-repeat;filter:drop-shadow(0 1px 0 rgba(150,70,0,.5))}
@@ -479,7 +500,7 @@ svg.ic.l{width:26px;height:26px}
 .cell.dragging .tier,.cell.incoming .tier{opacity:0}
 .cell.pulse{animation:none;outline:3px solid #fff;animation:pulseO 1s infinite}
 @keyframes pulseO{50%{outline-color:#FFE27A;transform:scale(1.07)}}
-#ghost{font-size:46px;transform:translate(-50%,-62%) scale(1.12);filter:none}
+#ghost{left:0;top:0;font-size:46px;transform:translate3d(-200px,-200px,0);will-change:transform;filter:none}
 #ghost .gt{display:grid;place-items:center;width:64px;height:64px;border-radius:16px;background:radial-gradient(120% 105% at 28% 12%,var(--t1),var(--t2));box-shadow:0 5px 0 var(--tr),0 14px 16px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.85)}
 
 /* ---------- Untere Leiste: Candy-Buttons ---------- */
@@ -867,7 +888,7 @@ body.dim #scene *{animation-play-state:paused!important}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.0',
+  version: '1.5.1',
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -1099,7 +1120,14 @@ const fmt = n => n >= 10000 ? (n/1000).toFixed(1).replace('.0','') + 'k' : Strin
 const ic = (n, c = '') => `<svg class="ic ${c}"><use href="#i-${n}"/></svg>`;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const itemName = it => it.g !== undefined ? CHAINS[it.g].genName[LANG] : CHAINS[it.c][LANG][it.t];
-const itemEmoji = it => it.g !== undefined ? CHAINS[it.g].gen : CHAINS[it.c].items[it.t];
+/* Bilder statt Emoji: ART = Teile mit fertigem Bild (Liste pflegt scripts/art_import.py). Alles ohne Bild bleibt Emoji. */
+const ART = new Set(['k1_s1']);
+const artKey = it => it.g !== undefined ? 'g' + (it.g + 1) : 'k' + (it.c + 1) + '_s' + (it.t + 1);
+const hasArt = it => ART.has(artKey(it));
+const artImg = key => `<img class="art" src="art/${key}.webp" alt="" draggable="false" decoding="async">`;
+const itemIcon = (c, t) => { const k = 'k' + (c + 1) + '_s' + (t + 1); return ART.has(k) ? artImg(k) : CHAINS[c].items[t]; };
+const itemEmoji = it => it.g !== undefined ? (ART.has(artKey(it)) ? artImg(artKey(it)) : CHAINS[it.g].gen) : itemIcon(it.c, it.t);
+(window.requestIdleCallback || setTimeout)(() => ART.forEach(k => { const im = new Image(); im.decoding = 'async'; im.src = 'art/' + k + '.webp'; }));
 const maxTier = c => CHAINS[c].items.length - 1;
 const center = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
 const pname = () => (S.profile.name || t('defName'));
@@ -1651,7 +1679,7 @@ function floatText(x, y, text, cls = '') {
 function shake() { const a = $('#app'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake'); setTimeout(() => a.classList.remove('shake'), 420); }
 function bumpEl(sel) { const e = $(sel); if (!e) return; e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
 function flyItem(emoji, from, to, done) {
-  const f = document.createElement('div'); f.className = 'flyitem'; f.textContent = emoji; document.body.appendChild(f);
+  const f = document.createElement('div'); f.className = 'flyitem'; f.innerHTML = emoji; document.body.appendChild(f);
   const mx = (from.x + to.x) / 2, my = Math.min(from.y, to.y) - 55;
   const tr = (x, y, s) => `translate(${x}px,${y}px) translate(-50%,-50%) scale(${s})`;
   const an = f.animate([{ transform: tr(from.x, from.y, .3) }, { transform: tr(mx, my, 1.15), offset: .55 }, { transform: tr(to.x, to.y, 1) }],
@@ -1778,7 +1806,7 @@ function custSVG(look) {
 }
 const SIL = '<svg viewBox="0 0 60 60" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="3.4 3.6"><circle cx="30" cy="28" r="12.5"/><path d="M7 60Q7 47 20 44.5H40Q53 47 53 60"/></g></svg>';
 const EMPTY = `<div class="cus">${SIL}</div><div class="plate"></div>`;
-const seatHTML = o => `<div class="bub">${o.req.map(r => `<span class="rq">${CHAINS[r.c].items[r.t]}</span>`).join('')}</div>`
+const seatHTML = o => `<div class="bub">${o.req.map(r => `<span class="rq">${itemIcon(r.c, r.t)}</span>`).join('')}</div>`
   + `<div class="cus">${custSVG(lookOf(o))}</div><div class="rw"><b>${ic('coin')}${fmt(o.coins)}</b><small>+${o.xp} XP</small></div>`
   + `<div class="plate"><button><span class="bl">${t('deliver')}</span><span class="bc">${ic('coin')}${fmt(o.coins)}</span></button></div>`;
 const seatEls = [];
@@ -1821,7 +1849,7 @@ function renderOrders() {
     }
   });
 }
-const FRAME = [['#2B6A9E', '#1B4068'], ['#9A5A3A', '#5E3220'], ['#7C78B8', '#4B4786'], ['#C2683F', '#85381F'], ['#1F94A0', '#116069'], ['#C25F86', '#86375A'], ['#3C3480', '#1E1850'], ['#12A5A8', '#0A6770'], ['#3B3F9A', '#1A1C5E']];
+const FRAME = [['#1E88E8', '#0B4A92'], ['#D0652B', '#74300F'], ['#8A7FE6', '#4339A8'], ['#F0743A', '#A3330A'], ['#12C4D6', '#066C78'], ['#EC5F96', '#A12559'], ['#5240D6', '#21178A'], ['#10CFC8', '#067A80'], ['#3E48E0', '#161B96']];
 const AWN = [['#2E628C', '#F4F8FC'], ['#9C3B2F', '#FBEFD9'], ['#3F6B5A', '#F6EEDC'], ['#C8553D', '#FFF1DE'], ['#2A8C9A', '#F2FBFA'], ['#D86F95', '#FFF4F8'], ['#F1B82D', '#2B2750'], ['#1EA896', '#FFD54A'], ['#5B4FA8', '#FFE9A8']];
 function catReact(kind, ms = 1400) { const c = $('#cat'); if (!c) return; c.classList.add(kind); clearTimeout(c['_' + kind]); c['_' + kind] = setTimeout(() => c.classList.remove(kind), ms); }
 
@@ -1937,8 +1965,8 @@ function showDiscovery(c, tr) {
     const ov = $('#ov'), ch = CHAINS[c];
     ov.innerHTML = `<div class="rays"></div><div class="ovc"><div class="card">
       <div class="dtitle">${t('masterT')}</div>
-      <div class="disc-em">${ch.items[tr]}</div><div class="dname">${ch[LANG][tr]}</div>
-      <div class="chain">${ch.items.map((e, i) => `<span class="${i > tr && !S.seen[c + ':' + i] ? 'lock' : ''} ${i === tr ? 'cur' : ''}">${e}</span>`).join('')}</div>
+      <div class="disc-em">${itemIcon(c, tr)}</div><div class="dname">${ch[LANG][tr]}</div>
+      <div class="chain">${ch.items.map((e, i) => `<span class="${i > tr && !S.seen[c + ':' + i] ? 'lock' : ''} ${i === tr ? 'cur' : ''}">${itemIcon(c, i)}</span>`).join('')}</div>
       <div class="chips"><span style="--d:.4s">${ic('gem')}+${gem}</span></div>
       <button class="btn g big" id="ovGo">${t('great')}</button></div></div>`;
     ov.hidden = false; Sound.discover(); Sound.levelUp(); const p = center(ov); burst(p.x, p.y - 60, 46, ch.fx.concat(GOLD), 7); rain(40);
@@ -1947,7 +1975,7 @@ function showDiscovery(c, tr) {
 }
 function discoverChip(c, tr, gem) {
   const el = $('#discChip'), ch = CHAINS[c];
-  el.innerHTML = `<span class="dc-e">${ch.items[tr]}</span><span class="dc-t"><small>${t('newItem')}</small><b>${ch[LANG][tr]}</b></span><span class="dc-n">${tr + 1}/${ch.items.length}</span>${gem ? `<span class="dc-g">${ic('gem')}+${gem}</span>` : ''}`;
+  el.innerHTML = `<span class="dc-e">${itemIcon(c, tr)}</span><span class="dc-t"><small>${t('newItem')}</small><b>${ch[LANG][tr]}</b></span><span class="dc-n">${tr + 1}/${ch.items.length}</span>${gem ? `<span class="dc-g">${ic('gem')}+${gem}</span>` : ''}`;
   { const bt = $('#board').getBoundingClientRect().top, ob = $('#orders').getBoundingClientRect().bottom, roomy = bt - ob >= 124, lb = $('#lvBanner');
     let y = roomy ? bt - 118 : Math.max(ob + 4, bt - 62);
     if (!roomy && lb.classList.contains('on')) y = (parseInt(lb.style.top) || y) + 60;
@@ -2156,6 +2184,7 @@ function render(popCells = []) {
     let cls = 'cell';
     if (it && it.g !== undefined) cls += ' gen';
     else if (it && it.t === maxTier(it.c)) cls += ' top';
+    if (it && it.g === undefined && hasArt(it)) cls += ' art';
     if (i === selected) cls += ' sel';
     if (w.has(i)) cls += ' want';
     if (incoming.has(i)) cls += ' incoming';
@@ -2221,10 +2250,29 @@ addEventListener('resize', () => { fxSized = false; updateHand(); layoutScene();
 const ghost = $('#ghost');
 function ghostTile(gi, cell) {
   ghost.innerHTML = `<span class="gt">${itemEmoji(gi)}</span>`; const gt = ghost.firstChild;
-  if (gi.g === undefined) { const cs = getComputedStyle(cell); ['--t1', '--t2', '--tr'].forEach(k => gt.style.setProperty(k, cs.getPropertyValue(k))); }
+  if (gi.g === undefined) { const cs = getComputedStyle(cell); ['--t1', '--t2', '--tr'].forEach(k => gt.style.setProperty(k, cs.getPropertyValue(k))); if (hasArt(gi)) gt.classList.add('art'); }
   else gt.style.cssText = '--t1:#FFF6CF;--t2:#FFC24A;--tr:#C9830E';
 }
 let drag = null, lastAct = Date.now();
+/* Animations-Regler: dekorative Endlos-Animationen (Szene, Gaeste, Katze, Pulse) ruhen, solange gespielt wird.
+   Das gibt dem Ziehen und Mergen auf schwachen Handys das volle Frame-Budget; danach laufen sie von selbst weiter. */
+const Calm = (() => {
+  let held = [], timer = 0;
+  const wake = () => {
+    if (drag) { timer = setTimeout(wake, 500); return; }
+    held.forEach(a => { try { if (a.playState === 'paused') a.play(); } catch (_) {} }); held = [];
+  };
+  const hush = (ms = 1500) => {
+    try {
+      for (const a of document.getAnimations()) {
+        if (a.playState !== 'running' || !a.effect || a.effect.getTiming().iterations !== Infinity) continue;
+        a.pause(); held.push(a);
+      }
+    } catch (_) {}
+    clearTimeout(timer); timer = setTimeout(wake, ms);
+  };
+  return { hush, wake };
+})();
 function targetAt(x, y) {
   const el = document.elementFromPoint(x, y);
   if (!el) return null;
@@ -2238,6 +2286,7 @@ boardEl.addEventListener('pointerdown', e => {
   const c = e.target.closest('.cell'); if (!c) return;
   const i = +c.dataset.i; if (!S.b[i]) { selected = -1; render(); return; }
   drag = { i, x: e.clientX, y: e.clientY, moved: false };
+  Calm.hush(2200);
   try { boardEl.setPointerCapture(e.pointerId); } catch (_) {}
 });
 boardEl.addEventListener('pointermove', e => {
@@ -2247,14 +2296,14 @@ boardEl.addEventListener('pointermove', e => {
     cellEls[drag.i].classList.add('dragging'); Sound.pick(); $('#hand').hidden = true;
   }
   if (drag.moved) {
-    ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+    ghost.style.transform = `translate3d(${e.clientX}px,${e.clientY}px,0) translate(-50%,-62%) scale(1.12)`;
     const tg = targetAt(e.clientX, e.clientY);
     setHover(tg ? (tg.trash ? $('#trash') : cellEls[tg.cell]) : null);
   }
 });
 function endDrag(e) {
   if (!drag) return;
-  const d = drag; drag = null; lastAct = Date.now();
+  const d = drag; drag = null; lastAct = Date.now(); Calm.hush(1500);
   ghost.style.display = 'none'; setHover(null);
   cellEls[d.i].classList.remove('dragging');
   if (!d.moved) {
@@ -2272,7 +2321,7 @@ boardEl.addEventListener('pointerup', endDrag);
 boardEl.addEventListener('pointercancel', endDrag);
 
 $('#orders').addEventListener('click', e => {
-  lastAct = Date.now();
+  lastAct = Date.now(); Calm.hush(1800);
   const card = e.target.closest('.order'); if (!card || card.classList.contains('leaving') || card.classList.contains('empty')) return;
   const idx = S.orders.findIndex(o => o.id === card.dataset.id); if (idx < 0) return;
   if (card.classList.contains('ready')) deliver(idx);
@@ -2338,7 +2387,7 @@ function openOrder(idx) {
   const cells = findCells(o), miss = o.req.filter((r, j) => cells[j] < 0), price = miss.reduce((s, r) => s + wishCost(r.t), 0);
   openModal(`<h2>${ic('wand')}${t('orderT')}</h2>
     <p class="lead">${miss.length ? t('orderP') : t('orderOk')}</p>
-    <div class="oreq">${o.req.map((r, j) => { const ok = cells[j] >= 0; return `<div class="oq ${ok ? 'ok' : ''}"><span class="oe">${CHAINS[r.c].items[r.t]}</span><b>${CHAINS[r.c][LANG][r.t]}</b>
+    <div class="oreq">${o.req.map((r, j) => { const ok = cells[j] >= 0; return `<div class="oq ${ok ? 'ok' : ''}"><span class="oe">${itemIcon(r.c, r.t)}</span><b>${CHAINS[r.c][LANG][r.t]}</b>
       ${ok ? `<small>${t('onBoard')}</small><i class="st">${ic('check')}</i>` : `<em>${ic('gem')} ${wishCost(r.t)}</em>`}</div>`; }).join('')}</div>
     ${miss.length ? `<div class="center"><button class="btn g big" data-act="orderbuy" data-oid="${o.id}" ${S.gems < price ? 'disabled' : ''}>${ic('gem')} ${price} · ${t('buyIng')}</button></div>
     <p class="mini">${t('gemsHave')}: ${ic('gem')} ${S.gems} · <button class="lnk" data-act="gems">${t('gemsHint')}</button></p>` : ''}`, 'order');
@@ -2356,7 +2405,7 @@ function buyIngredients(oid) {
   miss.forEach((r, k) => {
     const p = nearestEmpty(24); if (p < 0) return;
     S.b[p] = { c: r.c, t: r.t }; S.seen[r.c + ':' + r.t] = 1; incoming.add(p);
-    setTimeout(() => { render(); flyItem(CHAINS[r.c].items[r.t], from, center(cellEls[p]), () => { incoming.delete(p); const el = cellEls[p]; el.classList.remove('incoming'); el.classList.add('pop'); setTimeout(() => el.classList.remove('pop'), 420); Sound.plop(); render(); }); }, 120 + k * 160);
+    setTimeout(() => { render(); flyItem(itemIcon(r.c, r.t), from, center(cellEls[p]), () => { incoming.delete(p); const el = cellEls[p]; el.classList.remove('incoming'); el.classList.add('pop'); setTimeout(() => el.classList.remove('pop'), 420); Sound.plop(); render(); }); }, 120 + k * 160);
   });
   Platform.track('spend_gems', { what: 'order_items', amount: price }); once('first_gem_spend');
   Sound.giftOpen(); burst(from.x, from.y, 24, GOLD, 5); save(); render();
