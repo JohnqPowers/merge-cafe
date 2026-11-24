@@ -1,4 +1,4 @@
-"""Plattformtest mit nachgebauten Plugins (AdMob/UMP, AppsFlyer 7, RevenueCat): Einwilligung vor Werbung und Messung, Widerruf, Store-Preise, Kauf, Pro (Entitlement, Paywall, Customer Center, Wiederherstellen, Schlüssel-Regeln), Sperre bei unvollständigen Rechtstexten, Browser-Variante. Aufruf: python3 -I tests/test_plattform.py"""
+"""Plattformtest mit nachgebauten Plugins (AdMob/UMP, AppsFlyer 7, RevenueCat): Einwilligung vor Werbung und Messung, Widerruf, Store-Preise, Kauf, Sperre bei unvollständigen Rechtstexten, Browser-Variante. Aufruf: python3 -I tests/test_plattform.py"""
 import asyncio, json, datetime, sys, os
 from playwright.async_api import async_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -24,10 +24,6 @@ def native_mock(cfg):
     return """
 window.__log=[]; window.__cfg=%s;
 const L=s=>window.__log.push(s); const wait=ms=>new Promise(r=>setTimeout(r,ms));
-window.__rc={pro:!!window.__cfg.proStart,sku:'yearly',cb:null};
-const ci=()=>({entitlements:{active:window.__rc.pro?{noa_s_bean_trail_pro:{identifier:'noa_s_bean_trail_pro',isActive:true,productIdentifier:window.__rc.sku}}:{},all:{}},managementURL:'https://play.google.com/store/account/subscriptions?sku=yearly&package=de.test'});
-window.__rc.push=wrap=>{const x=ci();window.__rc.cb(wrap?{customerInfo:x}:x)};
-const PKG=(id,type,pid,price,ps,title)=>({identifier:id,packageType:type,offeringIdentifier:'default',product:{identifier:pid,price:price,priceString:ps,currencyCode:'EUR',title:title}});
 window.Capacitor={isNativePlatform:()=>true,getPlatform:()=>'android',Plugins:{
  AdMob:{
   requestConsentInfo:async()=>{L('AdMob.requestConsentInfo');return window.__cfg.info},
@@ -38,34 +34,22 @@ window.Capacitor={isNativePlatform:()=>true,getPlatform:()=>'android',Plugins:{
   showRewardVideoAd:async()=>{L('AdMob.showRewardVideoAd');return {type:'coin',amount:1}}
  },
  Purchases:{
-  setLogLevel:async o=>{L('RC.setLogLevel '+JSON.stringify(o))},
-  configure:async o=>{L('RC.configure '+JSON.stringify(o))},
+  configure:async o=>{L('RC.configure '+JSON.stringify(Object.keys(o)))},
   getProducts:async o=>{L('RC.getProducts '+JSON.stringify(o));return {products:window.__cfg.noProducts?[]:[
     {identifier:'starter_pack',price:1.99,priceString:'1,99 €',currencyCode:'EUR'},
     {identifier:'gems_small',price:0.99,priceString:'0,99 €',currencyCode:'EUR'},
     {identifier:'gems_large',price:4.99,priceString:'4,99 €',currencyCode:'EUR'}]}},
-  purchaseStoreProduct:async o=>{L('RC.purchaseStoreProduct '+o.product.identifier);return {}},
-  getCustomerInfo:async()=>{L('RC.getCustomerInfo');if(window.__cfg.ciFail)throw new Error('offline');return {customerInfo:ci()}},
-  getOfferings:async()=>{L('RC.getOfferings');return {all:{},current:window.__cfg.noOffering?null:{identifier:'default',availablePackages:[PKG('$rc_lifetime','LIFETIME','lifetime',49.99,'49,99 €','Lifetime'),PKG('$rc_annual','ANNUAL','yearly',19.99,'19,99 €','Yearly'),PKG('$rc_monthly','MONTHLY','monthly',2.99,'2,99 €','Monthly')]}}},
-  purchasePackage:async o=>{L('RC.purchasePackage '+o.aPackage.identifier);if(window.__cfg.cancelBuy){const e=new Error('Purchase was cancelled.');if(window.__cfg.cancelStyle==='code'){e.code='1'}else{e.userCancelled=true}throw e}if(window.__cfg.failBuy)throw new Error('billing');window.__rc.pro=true;window.__rc.sku=o.aPackage.product.identifier;return {productIdentifier:o.aPackage.product.identifier,customerInfo:ci()}},
-  restorePurchases:async()=>{L('RC.restorePurchases');if(window.__cfg.restorable){window.__rc.pro=true}return {customerInfo:ci()}},
-  addCustomerInfoUpdateListener:async cb=>{L('RC.addCustomerInfoUpdateListener');window.__rc.cb=cb;return 'id1'}
+  purchaseStoreProduct:async o=>{L('RC.purchaseStoreProduct '+o.product.identifier);return {}}
  }}};
-if(!window.__cfg.noUI){window.Capacitor.Plugins.RevenueCatUI={
-  presentPaywallIfNeeded:async o=>{L('UI.presentPaywallIfNeeded '+JSON.stringify(o));if(window.__rc.pro)return {result:'NOT_PRESENTED'};await wait(120);const r=window.__cfg.paywallResult||'PURCHASED';if(r==='PURCHASED'||r==='RESTORED'){window.__rc.pro=true;window.__rc.sku='yearly'}return {result:r}},
-  presentCustomerCenter:async()=>{L('UI.presentCustomerCenter');if(window.__cfg.ccFail)throw new Error('Customer Center nicht verfuegbar')}
-}}
 """ % json.dumps(cfg)
-async def mk(b, cfg=None, native=True, af=True, legal=True, build=None, rckey='goog_testkey1234567890'):
+async def mk(b, cfg=None, native=True, af=True, legal=True, build=None):
     pg = await b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=1, locale='de-DE')
     pg.errs = []
     pg.on('pageerror', lambda e: pg.errs.append('PAGEERR ' + str(e)))
     pg.on('console', lambda m: pg.errs.append(m.text) if m.type == 'error' and 'Failed to load resource' not in m.text else None)
-    if legal or rckey:
+    if legal:
         async def fix(route):
-            r = await route.fetch(); body = await r.text()
-            if legal: body = body.replace('legalReady: false', 'legalReady: true', 1)
-            if rckey: body = body.replace("android: 'YOUR_RC_ANDROID_KEY'", "android: '%s'" % rckey, 1)
+            r = await route.fetch(); body = (await r.text()).replace('legalReady: false', 'legalReady: true', 1)
             await route.fulfill(response=r, body=body)
         await pg.route('**/index.html', fix)
     if build is not None: await pg.route('**/build.json', lambda r: r.fulfill(status=200, content_type='application/json', body=json.dumps(build)))
@@ -181,10 +165,6 @@ async def main():
         ok('S8 Browser: Kauf zeigt App-Hinweis', 'App-Version' in toast, toast)
         await pg.click('[data-act=ad]', force=True); await pg.wait_for_timeout(3600)
         ok('S8 Browser: Demo-Werbung belohnt', await pg.evaluate("MC.state().ads.n") >= 1)
-        await pg.evaluate("MC.close()"); await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(300)
-        ok('S8 Browser: keine Pro-Karte im Shop', not await pg.evaluate("!!document.querySelector('#modalBody .row.pro')"))
-        await pg.evaluate("MC.close()"); await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
-        ok('S8 Browser: keine Pro-/Wiederherstellen-Zeile in den Optionen', not await pg.evaluate("!!document.querySelector('[data-act=pro],[data-act=manage],[data-act=restore]')"))
         ok('S8 keine Fehler', not pg.errs, pg.errs); await pg.close()
         # S9: Rechtstexte unvollständig (legalReady false) -> alles aus
         cfg = {'info': {'status': 'NOT_REQUIRED', 'isConsentFormAvailable': False, 'canRequestAds': True, 'privacyOptionsRequirementStatus': 'NOT_REQUIRED'}}
@@ -217,134 +197,6 @@ async def main():
         await pg.evaluate("MC.close()"); await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
         ok('S11 Store-Paket: kein Test-Hinweis', 'Test-Paket' not in await pg.evaluate("document.getElementById('modalBody').innerText"))
         ok('S11 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        # ---------- Pro (RevenueCat-Entitlement noa_s_bean_trail_pro) ----------
-        NR = {'info': {'status': 'NOT_REQUIRED', 'isConsentFormAvailable': False, 'canRequestAds': True, 'privacyOptionsRequirementStatus': 'NOT_REQUIRED'}}
-        def cf(**kw):
-            c = json.loads(json.dumps(NR)); c.update(kw); return c
-        async def toast_of(pg): return await pg.evaluate("(document.getElementById('toast')||{}).innerText||''")
-        async def evs(pg): return await pg.evaluate("MC.events().map(e=>[e.name,e.params])")
-        async def modal_txt(pg): return await pg.evaluate("document.getElementById('modalBody').innerText.replace(/\\s+/g,' ')")
-        PRO_ROW = "(() => { const r = document.querySelector('#modalBody .row.pro'); return r ? [r.innerText.replace(/\\s+/g,' '), r.querySelector('button').dataset.act] : null })()"
-        # S12: Pro über die RevenueCat-Paywall kaufen, Pro-Bonus ohne Video, Customer Center
-        pg = await mk(b, cf()); lg = await log(pg); print('S12 Log:', [l for l in lg if l.startswith(('RC', 'UI'))])
-        ok('S12 RevenueCat: configure → Kundeninfo, Angebote und Listener', 0 <= idx(lg, 'RC.configure') < idx(lg, 'RC.getCustomerInfo') and idx(lg, 'RC.getOfferings') > 0 and idx(lg, 'RC.addCustomerInfoUpdateListener') > 0, lg)
-        ok('S12 Pro ist ohne Kauf aus', not await pg.evaluate("MC.plat.pro"))
-        await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(500)
-        row = await pg.evaluate(PRO_ROW)
-        ok('S12 Shop: Pro-Karte mit Knopf „Ansehen“', row and row[1] == 'pro' and "Noa's Pro" in row[0] and 'Ansehen' in row[0], row)
-        g0 = await pg.evaluate("MC.state().gems")
-        await pg.click('#modalBody .row.pro button', force=True); await pg.wait_for_timeout(900)
-        lg = await log(pg)
-        ok('S12 Paywall nur bei fehlendem Entitlement (presentPaywallIfNeeded mit noa_s_bean_trail_pro)', 'UI.presentPaywallIfNeeded {"requiredEntitlementIdentifier":"noa_s_bean_trail_pro","displayCloseButton":true}' in lg, [l for l in lg if l.startswith('UI')])
-        g1 = await pg.evaluate("MC.state().gems")
-        ok('S12 nach dem Kauf: Pro aktiv, Tagesgeschenk +5 Diamanten', await pg.evaluate("MC.plat.pro") and g1 == g0 + 5 and await pg.evaluate("MC.state().proDay") == today, (g0, g1))
-        ev = await evs(pg); names = [n for n, _ in ev]
-        ok('S12 Ereignisse: paywall_open, purchase mit Umsatz, first_purchase, pro_start', 'paywall_open' in names and 'first_purchase' in names and 'pro_start' in names and any(n == 'purchase' and p.get('sku') == 'yearly' and p.get('af_revenue') == 19.99 and p.get('af_currency') == 'EUR' for n, p in ev), ev[-6:])
-        tt = await toast_of(pg)
-        ok('S12 Dank-Hinweis mit Tagesgeschenk', 'Willkommen bei Pro' in tt and '+5 Diamanten' in tt, tt)
-        row = await pg.evaluate(PRO_ROW)
-        ok('S12 Shop zeigt jetzt „aktiv“ und „Verwalten“', row and row[1] == 'manage' and 'aktiv' in row[0] and 'Verwalten' in row[0], row)
-        txt = await pg.evaluate("document.querySelector('#modalBody [data-act=ad]').closest('.row').innerText.replace(/\\s+/g,' ')")
-        ok('S12 Pro: Zeile „Pro-Bonus“ statt „Werbung ansehen“', 'Pro-Bonus' in txt and 'Werbung ansehen' not in txt, txt)
-        en0, n0 = await pg.evaluate("MC.state().energy"), await pg.evaluate("MC.state().ads.n")
-        await pg.click('[data-act=ad]', force=True); await pg.wait_for_timeout(500)
-        en1, n1 = await pg.evaluate("MC.state().energy"), await pg.evaluate("MC.state().ads.n")
-        names = [n for n, _ in await evs(pg)]
-        ok('S12 Pro: +25 Energie ohne Video, Tageslimit zählt, kein ad_request/ad_rewarded', idx(await log(pg), 'AdMob.showRewardVideoAd') == -1 and en1 - en0 >= 24 and n1 == n0 + 1 and 'ad_request' not in names and 'ad_rewarded' not in names, (en0, en1, n0, n1))
-        await pg.click('#modalBody .row.pro button', force=True); await pg.wait_for_timeout(400)
-        ok('S12 „Verwalten“ öffnet das Customer Center', idx(await log(pg), 'UI.presentCustomerCenter') >= 0)
-        ok('S12 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        # S13: Pro beim Start schon aktiv, Listener (beide Datenformen), Rückkehr in die App
-        pg = await mk(b, cf(proStart=True)); await pg.wait_for_timeout(800)
-        st = await pg.evaluate("({pro: MC.plat.pro, sku: MC.plat.proSku, gems: MC.state().gems, day: MC.state().proDay})")
-        ok('S13 Pro beim Start aktiv, Tagesgeschenk einmal', st['pro'] and st['sku'] == 'yearly' and st['gems'] == BASE['gems'] + 5 and st['day'] == today, st)
-        await pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); await pg.wait_for_timeout(300)
-        ok('S13 erneutes Öffnen am selben Tag: kein zweites Geschenk', await pg.evaluate("MC.state().gems") == BASE['gems'] + 5)
-        await pg.evaluate("window.__rc.pro=false; window.__rc.push(false)"); await pg.wait_for_timeout(200)
-        ok('S13 Listener (CustomerInfo direkt): Abo abgelaufen → Pro aus', not await pg.evaluate("MC.plat.pro"))
-        await pg.evaluate("window.__rc.pro=true; window.__rc.push(true)"); await pg.wait_for_timeout(200)
-        ok('S13 Listener (mit customerInfo-Umhüllung): Pro wieder an, kein weiteres Geschenk', await pg.evaluate("MC.plat.pro") and await pg.evaluate("MC.state().gems") == BASE['gems'] + 5)
-        ev = await evs(pg)
-        ok('S13 pro_start nur einmal, kein purchase-Ereignis (nur Bestand)', len([1 for n, _ in ev if n == 'pro_start']) == 1 and not any(n == 'purchase' for n, _ in ev), [n for n, _ in ev])
-        await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
-        row = await pg.evaluate("(() => { const b = document.querySelector('#modalBody [data-act=manage]'); return b ? b.closest('.row').innerText.replace(/\\s+/g,' ') : null })()")
-        ok('S13 Optionen: Pro „aktiv“ mit „Verwalten“, Zeile „Käufe wiederherstellen“', row and 'aktiv' in row and 'Käufe wiederherstellen' in await modal_txt(pg), row)
-        ok('S13 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        # S14: ohne RevenueCat-Oberfläche → eigene Paket-Liste (Kauf, Abbruch, Fehler)
-        pg = await mk(b, cf(noUI=True))
-        await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(500)
-        await pg.click('#modalBody .row.pro button', force=True); await pg.wait_for_timeout(500)
-        kind = await pg.evaluate("document.getElementById('modal').dataset.kind")
-        rows = await pg.evaluate("[...document.querySelectorAll('#modalBody [data-pkg]')].map(b=>[b.closest('.row').querySelector('.tx').innerText.replace(/\\s+/g,' '), b.textContent.trim()])")
-        ok('S14 eigene Paket-Liste mit drei Paketen', kind == 'paywall' and len(rows) == 3, (kind, rows))
-        ok('S14 Namen, Laufzeiten und Preise aus dem Angebot', len(rows) == 3 and rows[0][1] == '49,99 €' and 'Lifetime' in rows[0][0] and rows[1][1] == '19,99 €' and 'Jährlich' in rows[1][0] and 'jederzeit kündbar' in rows[1][0] and rows[2][1] == '2,99 €' and 'Monatlich' in rows[2][0], rows)
-        txt = await modal_txt(pg)
-        ok('S14 Abo-Hinweise sichtbar (automatische Verlängerung, Kündigung in Google Play, Wiederherstellen)', 'verlängern sich automatisch' in txt and 'Google Play' in txt and 'Käufe wiederherstellen' in txt, txt[-260:])
-        await pg.evaluate("window.__cfg.cancelBuy=true; document.getElementById('toast').textContent=''"); await pg.click('[data-pkg="1"]', force=True); await pg.wait_for_timeout(400)
-        ok('S14 Abbruch durch den Nutzer: kein Fehlerhinweis, Liste bleibt offen', await toast_of(pg) == '' and not await pg.evaluate("MC.plat.pro") and await pg.evaluate("document.getElementById('modal').dataset.kind") == 'paywall', await toast_of(pg))
-        await pg.evaluate("window.__cfg.cancelStyle='code'; document.getElementById('toast').textContent=''"); await pg.click('[data-pkg="1"]', force=True); await pg.wait_for_timeout(400)
-        ok('S14 Abbruch als Fehlercode 1 (ohne userCancelled): ebenfalls still', await toast_of(pg) == '' and not await pg.evaluate("MC.plat.pro"), await toast_of(pg))
-        await pg.evaluate("window.__cfg.cancelBuy=false; window.__cfg.failBuy=true"); await pg.click('[data-pkg="1"]', force=True); await pg.wait_for_timeout(400)
-        ok('S14 Fehler beim Kauf: Hinweis, kein Pro', 'abgebrochen' in await toast_of(pg) and not await pg.evaluate("MC.plat.pro"), await toast_of(pg))
-        await pg.evaluate("window.__cfg.failBuy=false"); await pg.click('[data-pkg="2"]', force=True); await pg.wait_for_timeout(700)
-        ok('S14 Kauf über purchasePackage mit dem Paket aus dem Angebot', 'RC.purchasePackage $rc_monthly' in await log(pg))
-        ev = await evs(pg)
-        ok('S14 danach Pro aktiv, Liste geschlossen, purchase mit Umsatz', await pg.evaluate("MC.plat.pro") and await pg.evaluate("document.getElementById('modal').hidden") and any(n == 'purchase' and p.get('sku') == 'monthly' and p.get('af_revenue') == 2.99 for n, p in ev), ev[-4:])
-        ok('S14 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        # S15: Käufe wiederherstellen (gefunden / nichts gefunden)
-        pg = await mk(b, cf(restorable=True))
-        await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
-        await pg.click('[data-act=restore]', force=True); await pg.wait_for_timeout(600)
-        ev = await evs(pg)
-        ok('S15 Wiederherstellen: restorePurchases, Pro aktiv, Hinweis, pro_restore statt purchase', 'RC.restorePurchases' in await log(pg) and await pg.evaluate("MC.plat.pro") and 'Pro ist wieder aktiv' in await toast_of(pg) and any(n == 'pro_restore' for n, _ in ev) and not any(n == 'purchase' for n, _ in ev), (await toast_of(pg), [n for n, _ in ev]))
-        ok('S15 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        pg = await mk(b, cf())
-        await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
-        await pg.click('[data-act=restore]', force=True); await pg.wait_for_timeout(500)
-        ok('S15 nichts zu finden: Hinweis, kein Pro', 'Keine Käufe' in await toast_of(pg) and not await pg.evaluate("MC.plat.pro"), await toast_of(pg))
-        ok('S15 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        # S16: Customer Center nicht verfügbar → Hinweis mit Link zur Abo-Verwaltung in Google Play
-        for tag, extra in (('Customer Center wirft Fehler', dict(proStart=True, ccFail=True)), ('Plugin fehlt', dict(proStart=True, noUI=True))):
-            pg = await mk(b, cf(**extra))
-            await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(500)
-            await pg.click('#modalBody .row.pro button', force=True); await pg.wait_for_timeout(500)
-            kind = await pg.evaluate("document.getElementById('modal').dataset.kind")
-            href = await pg.evaluate("(document.querySelector('#modalBody a.btn')||{}).href||''")
-            ok('S16 ' + tag + ': Hinweis „Pro verwalten“ mit Link zu Google Play', kind == 'manage' and href.startswith('https://play.google.com/store/account/subscriptions?sku=yearly'), (kind, href))
-            ok('S16 ' + tag + ': keine Fehler', not pg.errs, pg.errs); await pg.close()
-        # S17: Schlüssel-Regeln (Platzhalter, test_ im Store-Paket, Debug-Paket mit Test-Store-Schlüssel)
-        pg = await mk(b, cf(), rckey=None); lg = await log(pg)
-        await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(600)
-        btn = await pg.evaluate("[...document.querySelectorAll('#modalBody [data-buy]')].map(b=>[b.textContent.trim(),b.disabled])")
-        ok('S17a Platzhalter-Schlüssel (Build ohne Secret): RevenueCat bleibt aus, keine Pro-Karte, Kauf-Knöpfe gesperrt', idx(lg, 'RC.') == -1 and not await pg.evaluate("!!document.querySelector('#modalBody .row.pro')") and btn and all(x == ['–', True] for x in btn), (lg, btn))
-        ok('S17a keine Fehler', not pg.errs, pg.errs); await pg.close()
-        pg = await mk(b, cf(), rckey='test_ABCDEFGHIJKLMNOP'); lg = await log(pg)
-        ok('S17b test_-Schlüssel im Store-Paket: wird nicht benutzt (kein configure, kein Absturz)', idx(lg, 'RC.') == -1 and not pg.errs, (lg, pg.errs)); await pg.close()
-        dbg = {'kind': 'debug', 'admobRewarded': 'ca-app-pub-3940256099942544/5224354917', 'rcTest': 'test_DEBUGKEY1234567'}
-        pg = await mk(b, cf(), build=dbg, rckey=None); lg = await log(pg)
-        ok('S17c Debug-Paket: Test-Store-Schlüssel aus build.json, ausführliche Protokolle', 'RC.configure {"apiKey":"test_DEBUGKEY1234567"}' in lg and 'RC.setLogLevel {"level":"DEBUG"}' in lg, [l for l in lg if l.startswith('RC.')])
-        await pg.click('[data-open="settings"]', force=True); await pg.wait_for_timeout(300)
-        txt = await modal_txt(pg)
-        ok('S17c Debug-Paket: Optionen zeigen RevenueCat-Stand', 'RevenueCat: Test Store · Pakete: 3 · Pro: –' in txt, txt[-140:])
-        ok('S17c keine Fehler', not pg.errs, pg.errs); await pg.close()
-        pg = await mk(b, cf(), build={'kind': 'debug', 'admobRewarded': 'ca-app-pub-3940256099942544/5224354917'}); lg = await log(pg)
-        ok('S17d Debug-Paket ohne Test-Schlüssel: nimmt den Schlüssel aus CONFIG', 'RC.configure {"apiKey":"goog_testkey1234567890"}' in lg, [l for l in lg if l.startswith('RC.')]); await pg.close()
-        pg = await mk(b, cf(), build=dbg); lg = await log(pg)
-        ok('S17e Debug-Paket: Test-Store-Schlüssel hat Vorrang vor dem Produktiv-Schlüssel', 'RC.configure {"apiKey":"test_DEBUGKEY1234567"}' in lg and not any('goog_' in l for l in lg), [l for l in lg if l.startswith('RC.')]); await pg.close()
-        # S18: Randfälle (kein Angebot, Kundeninfo nicht ladbar, Paywall-Ergebnisse)
-        pg = await mk(b, cf(noOffering=True))
-        await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(500)
-        ok('S18 ohne aktuelles Angebot: keine Pro-Karte, Shop sonst normal', not await pg.evaluate("!!document.querySelector('#modalBody .row.pro')") and await pg.evaluate("!!document.querySelector('#modalBody [data-buy]')"))
-        ok('S18 keine Fehler', not pg.errs, pg.errs); await pg.close()
-        pg = await mk(b, cf(ciFail=True)); await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(500)
-        ok('S18 Kundeninfo nicht ladbar: kein Pro, Pro-Karte „Ansehen“, keine Fehler', not await pg.evaluate("MC.plat.pro") and (await pg.evaluate(PRO_ROW) or ['', ''])[1] == 'pro' and not pg.errs, pg.errs); await pg.close()
-        for pw, want in (('CANCELLED', ''), ('ERROR', 'nicht verfügbar'), ('RESTORED', 'wieder aktiv')):
-            pg = await mk(b, cf(paywallResult=pw))
-            await pg.click('[data-open="shop"]', force=True); await pg.wait_for_timeout(500)
-            await pg.evaluate("document.getElementById('toast').textContent=''")
-            await pg.click('#modalBody .row.pro button', force=True); await pg.wait_for_timeout(900)
-            tt = await toast_of(pg); pro = await pg.evaluate("MC.plat.pro")
-            ok('S18 Paywall-Ergebnis ' + pw, (want in tt if want else tt == '') and pro == (pw == 'RESTORED') and not pg.errs, (tt, pro, pg.errs)); await pg.close()
         await b.close()
     print(f'\nERGEBNIS: {sum(res)}/{len(res)} bestanden')
 asyncio.run(main())

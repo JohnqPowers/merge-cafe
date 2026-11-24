@@ -581,8 +581,6 @@ img.art{display:block;width:1.15em;height:1.15em;object-fit:contain;pointer-even
 .row .tx{font:700 15px/1.2 Fredoka,sans-serif;color:var(--ink)}
 .row .tx small{font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
 .row.hl{background:linear-gradient(#F4FFEF,#DDF8D5);box-shadow:0 3px 0 #9BD890,inset 0 2px 0 #fff}
-.row.pro{background:linear-gradient(#FFFBE6,#FFEBA8);box-shadow:0 3px 0 #E0B43E,inset 0 2px 0 #fff}
-.row .tx .tag{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:9px;background:#E8A317;color:#fff;font:700 10.5px/1.2 Fredoka,sans-serif;font-style:normal;vertical-align:1px}
 .days{gap:6px}
 .days div{background:linear-gradient(#fff,#FFF3DC);border-radius:13px;padding:7px 2px 5px;font:700 11px/1.1 Fredoka,sans-serif;color:var(--muted);box-shadow:0 3px 0 #E6C98F}
 .days div b{font:400 18px/1.15 var(--num);color:var(--ink)}
@@ -994,14 +992,14 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.14',
+  version: '1.5.13',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
-  revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro' },   // Pro = dieses Entitlement im RevenueCat-Dashboard
+  revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY' },
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -1115,30 +1113,6 @@ Object.assign(STR.en, {
   newItem:'New discovery', masterT:'Masterpiece!', masterP:'Highest tier reached', lvl:'Level', maxLv:'Tier',
   dailyDbl:'Double the bonus', yourReward:'Your bonus', up:'Level'
 });
-Object.assign(STR.de, {                                                  // Noa's Pro (RevenueCat-Entitlement) – Abo (monatlich, jährlich) und Einmalkauf (Lifetime)
-  proT:"Noa's Pro", proPlan:'Plan wählen', proD:'Belohnungen ohne Video · täglich +{n} Diamanten', proOn:'aktiv', proOff:'nicht aktiv', proView:'Ansehen', proManage:'Verwalten',
-  proBonus:'Pro-Bonus', proIntro:'Mehr Komfort für dein Café. Alles Wichtige im Spiel bleibt für alle gratis.',
-  proPerk1:'Belohnungen ohne Video', proPerk1d:'Energie und Boni sofort abholen – mit denselben Tageslimits.',
-  proPerk2:'Täglich +{n} Diamanten', proPerk2d:'Ein Geschenk für jeden Tag, an dem du spielst.',
-  pkgM:'Monatlich', pkgY:'Jährlich', pkgL:'Lifetime (einmalig)', perM:'Verlängert sich jeden Monat · jederzeit kündbar', perY:'Verlängert sich jedes Jahr · jederzeit kündbar', perL:'Einmal zahlen, für immer behalten',
-  proTerms:'Abos verlängern sich automatisch, bis du sie in Google Play kündigst (Play Store › Profil › Zahlungen &amp; Abos › Abos). Bezahlt wird über dein Google-Konto.',
-  restore:'Käufe wiederherstellen', restoreD:'Pro auf einem neuen Gerät zurückholen', restoreGo:'Prüfen', restoredOk:'Pro ist wieder aktiv.', restoredNone:'Keine Käufe zum Wiederherstellen gefunden.',
-  proThanks:'Willkommen bei Pro – danke!', proGift:'Pro-Geschenk: +{n} Diamanten', proGiftShort:'+{n} Diamanten Tagesgeschenk.', proAlready:'Pro ist schon aktiv.',
-  manageT:'Pro verwalten', manageP:'Öffne Google Play › Profil › Zahlungen &amp; Abos › Abos. Dort kannst du dein Abo ändern oder kündigen.', manageGo:'Abos in Google Play', manageLife:'Lifetime ist ein Einmalkauf: Es läuft nichts aus, es gibt nichts zu kündigen.',
-  rcDbg:'RevenueCat: {s} · Pakete: {n} · Pro: {p}'
-});
-Object.assign(STR.en, {
-  proT:"Noa's Pro", proPlan:'Choose a plan', proD:'Rewards without video · +{n} gems every day', proOn:'active', proOff:'not active', proView:'View', proManage:'Manage',
-  proBonus:'Pro bonus', proIntro:'More comfort for your café. Everything important in the game stays free for everyone.',
-  proPerk1:'Rewards without video', proPerk1d:'Collect energy and bonuses instantly – with the same daily limits.',
-  proPerk2:'+{n} gems every day', proPerk2d:'A gift for every day you play.',
-  pkgM:'Monthly', pkgY:'Yearly', pkgL:'Lifetime (one-time)', perM:'Renews every month · cancel anytime', perY:'Renews every year · cancel anytime', perL:'Pay once, keep it forever',
-  proTerms:'Subscriptions renew automatically until you cancel them in Google Play (Play Store › Profile › Payments &amp; subscriptions › Subscriptions). Payment is charged to your Google account.',
-  restore:'Restore purchases', restoreD:'Get Pro back on a new device', restoreGo:'Check', restoredOk:'Pro is active again.', restoredNone:'No purchases found to restore.',
-  proThanks:'Welcome to Pro – thank you!', proGift:'Pro gift: +{n} gems', proGiftShort:'+{n} gems daily gift.', proAlready:'Pro is already active.',
-  manageT:'Manage Pro', manageP:'Open Google Play › Profile › Payments &amp; subscriptions › Subscriptions. There you can change or cancel your subscription.', manageGo:'Subscriptions in Google Play', manageLife:'Lifetime is a one-time purchase: nothing expires and there is nothing to cancel.',
-  rcDbg:'RevenueCat: {s} · packages: {n} · Pro: {p}'
-});
 const t = (k, v = {}) => String(STR[LANG][k] ?? STR.en[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? '');
 
 const CHAINS = [
@@ -1214,7 +1188,7 @@ const Platform = {
   consentOk: false, privacyForm: false, decided: false, locked: false, build: {},
   adsInit: false, adReady: false, adBusy: false,
   afReady: false, afOn: false, afInit: false, afPending: true, evq: [],
-  rcOk: false, rcP: null, products: {}, pro: false, proSku: '', offering: null, manageUrl: '', rcListen: false, rcT: 0,
+  rcOk: false, products: {},
   async init() {
     if (!isNative()) { this.consentOk = true; this.decided = true; this.dropQueue(); return; }
     if (!CONFIG.legalReady) { this.locked = true; this.decided = true; this.dropQueue(); return; }       // Rechtstexte unvollständig: weder Werbung noch Käufe noch Messung
@@ -1314,123 +1288,12 @@ const Platform = {
     }
     return demoAd();
   },
-  /* Käufe (RevenueCat). Preise kommen aus dem Store (landesrichtig, mit Währung), nie aus dem Spiel.
-     Schlüssel: Das Store-Paket nimmt nur den echten Schlüssel aus CONFIG (vom Build eingesetzt). Nur das Debug-Paket (Test-APK) darf den
-     Test-Store-Schlüssel aus build.json nehmen, denn RevenueCat lässt test_-Schlüssel in Store-Paketen absichtlich abstürzen.
-     Ein Platzhalter (Build ohne Secret) ergibt keinen Schlüssel: Käufe bleiben dann aus, nichts bricht. */
-  rcKey() {
-    const ios = osName() === 'ios', dbg = this.build.kind === 'debug';
-    const k = String((dbg && !ios && this.build.rcTest) || (ios ? CONFIG.revenuecat.ios : CONFIG.revenuecat.android) || '');
-    return /^YOUR_/.test(k) || (/^test_/.test(k) && !dbg) ? '' : k;
-  },
-  initRC() {                                                                                         // nur einmal konfigurieren, auch bei gleichzeitigen Aufrufen
-    if (this.rcOk) return Promise.resolve(true);
-    if (!this.rcP) this.rcP = this.rcSetup().then(ok => { if (!ok) this.rcP = null; return ok; });
-    return this.rcP;
-  },
-  async rcSetup() {
-    const P = Plug(), apiKey = this.rcKey(); if (!P.Purchases || !apiKey) return false;
-    if (this.build.kind === 'debug' && P.Purchases.setLogLevel) { try { await P.Purchases.setLogLevel({ level: 'DEBUG' }); } catch (e) {} }   // Test-APK: ausführliche Meldungen (adb logcat)
-    try { await P.Purchases.configure({ apiKey }); } catch (e) { console.warn('RevenueCat init', e); return false; }
-    this.rcOk = true; this.rcWatch(); this.refreshPro(); this.loadOffering();
-    return true;
-  },
-  /* Pro = Entitlement CONFIG.revenuecat.entitlement. Quelle ist immer RevenueCat, nie der Spielstand: Kundeninfo beim Start, bei jeder Änderung
-     (Listener) und nach der Rückkehr in die App. Offline gilt der Zwischenspeicher des SDK. */
-  rcWatch() {
-    const P = Plug(); if (this.rcListen || !P.Purchases || !P.Purchases.addCustomerInfoUpdateListener) return; this.rcListen = true;
-    try {
-      const r = P.Purchases.addCustomerInfoUpdateListener(o => { if (!this.applyCustomer((o && o.customerInfo) || o)) this.refreshPro(); });
-      if (r && r.catch) r.catch(e => { console.warn('RevenueCat Listener', e); this.rcListen = false; });
-    } catch (e) { console.warn('RevenueCat Listener', e); this.rcListen = false; }
-  },
-  async refreshPro() {
-    const P = Plug(); if (!P.Purchases || !this.rcOk) return this.pro;
-    this.rcT = Date.now();
-    try { const r = await P.Purchases.getCustomerInfo(); this.applyCustomer((r && r.customerInfo) || r); }
-    catch (e) { console.warn('RevenueCat Kundeninfo', e); }
-    return this.pro;
-  },
-  resume() { if (this.rcOk && Date.now() - this.rcT > 5000) this.refreshPro(); },                       // zurück in der App: Paywall, Customer Center oder Abo in Google Play geändert
-  applyCustomer(ci) {
-    if (!ci || !ci.entitlements) return false;
-    const en = (ci.entitlements.active || {})[CONFIG.revenuecat.entitlement], was = this.pro;
-    this.pro = !!en && en.isActive !== false; this.proSku = this.pro ? String(en.productIdentifier || '') : '';
-    if (typeof ci.managementURL === 'string' && /^https:\/\//.test(ci.managementURL)) this.manageUrl = ci.managementURL;
-    if (this.pro !== was) onProChange();
-    return true;
-  },
-  async loadOffering() {
-    const P = Plug(); if (this.locked || !P.Purchases || !(this.rcOk || await this.initRC())) return null;
-    const had = !!this.offering;
-    try {
-      const r = await P.Purchases.getOfferings(), cur = r && r.current;
-      this.offering = cur && Array.isArray(cur.availablePackages) && cur.availablePackages.length ? cur : null;
-    } catch (e) { console.warn('RevenueCat Angebote', e); }
-    if (had !== !!this.offering) refreshSheet();
-    return this.offering;
-  },
-  proUi() { return isNative() && !this.locked && this.rcOk && (this.pro || !!this.offering); },          // Pro-Karte nur, wenn es wirklich etwas anzubieten gibt
-  proPrice(sku) {                                                                                       // Preis des gekauften Pakets (für das purchase-Ereignis)
-    const pk = ((this.offering && this.offering.availablePackages) || []).filter(p => p.product && p.product.identifier), id = String(sku || '');
-    const hit = pk.filter(p => p.product.identifier === id), base = pk.filter(p => p.product.identifier.split(':')[0] === id.split(':')[0]);
-    const p = hit[0] || (base.length === 1 ? base[0] : null);
-    return p ? { price: p.product.price, currency: p.product.currencyCode } : null;
-  },
-  /* Paywall = RevenueCat-Oberfläche (im Dashboard gestaltet), angezeigt nur, wenn das Entitlement fehlt.
-     Rückgabe: null = keine Store-Anbindung (Browser), 'off' = nicht verfügbar, 'own' = Plugin fehlt, das Spiel zeigt seine eigene Liste,
-     'bought' | 'restored' = Pro ist jetzt aktiv, 'pro' = war schon aktiv, 'cancel' = geschlossen, 'error' */
-  async paywall(place) {
-    const P = Plug(); if (!P.Purchases) return null;
-    if (this.locked) return 'off';
-    if (!(this.rcOk || await this.initRC())) return 'off';
-    if (!this.offering) await this.loadOffering();
-    if (!this.offering) return 'off';
-    this.track('paywall_open', { place });
-    const U = P.RevenueCatUI, was = this.pro; let res = '';
-    if (!U || !U.presentPaywallIfNeeded) return 'own';
-    try {
-      const r = await U.presentPaywallIfNeeded({ requiredEntitlementIdentifier: CONFIG.revenuecat.entitlement, displayCloseButton: true });
-      res = String((r && r.result) || '').toUpperCase();
-    } catch (e) { console.warn('Paywall', e); return 'own'; }
-    await this.refreshPro();                                                                           // Ergebnis zählt nach dem Entitlement, nicht nach dem Text des Plugins
-    if (this.pro && !was) return res === 'RESTORED' ? 'restored' : 'bought';
-    if (this.pro) return 'pro';
-    return res === 'ERROR' || res === 'NOT_PRESENTED' ? 'error' : 'cancel';
-  },
-  /* Abo verwalten = RevenueCat Customer Center; 'own' = Plugin fehlt oder Customer Center nicht verfügbar → Hinweis im Spiel */
-  async manage() {
-    const P = Plug(); if (!P.Purchases) return null;
-    if (this.locked) return 'off';
-    const U = P.RevenueCatUI; if (!U || !U.presentCustomerCenter) return 'own';
-    try { await U.presentCustomerCenter(); } catch (e) { console.warn('Customer Center', e); return 'own'; }
-    await this.refreshPro();
-    return 'done';
-  },
-  /* Käufe wiederherstellen: null = Browser, 'off', false = Fehler, 'pro' = Entitlement aktiv, 'none' = nichts gefunden */
-  async restore() {
-    const P = Plug(); if (!P.Purchases) return null;
-    if (this.locked) return 'off';
-    try {
-      if (!(this.rcOk || await this.initRC())) return 'off';
-      const r = await P.Purchases.restorePurchases();
-      this.applyCustomer((r && r.customerInfo) || r);
-      return this.pro ? 'pro' : 'none';
-    } catch (e) { return false; }
-  },
-  /* Abbruch durch den Nutzer: Das Plugin meldet ihn je nach Version als userCancelled, in data.userCancelled oder als Fehlercode 1 (PURCHASE_CANCELLED_ERROR) */
-  isCancel(e) { return !!e && (e.userCancelled === true || (e.data && e.data.userCancelled === true) || String(e.code) === '1' || /cancel/i.test(String(e.readableErrorCode || e.message || ''))); },
-  /* Eigene Paket-Liste (Ausweichlösung ohne RevenueCat-Oberfläche): { sku, price, currency } | 'cancel' | 'off' | false | null */
-  async purchasePackage(pkg) {
-    const P = Plug(); if (!P.Purchases) return null;
-    if (this.locked) return 'off';
-    try {
-      if (!(this.rcOk || await this.initRC())) return 'off';
-      const r = await P.Purchases.purchasePackage({ aPackage: pkg });
-      this.applyCustomer((r && r.customerInfo) || r);
-      const pr = pkg.product || {};
-      return this.pro ? { sku: pr.identifier || this.proSku, price: pr.price, currency: pr.currencyCode } : false;
-    } catch (e) { return this.isCancel(e) ? 'cancel' : false; }
+  /* Käufe (RevenueCat). Preise kommen aus dem Store (landesrichtig, mit Währung), nie aus dem Spiel. */
+  async initRC() {
+    const P = Plug(); if (!P.Purchases || this.rcOk) return this.rcOk;
+    try { await P.Purchases.configure({ apiKey: osName() === 'ios' ? CONFIG.revenuecat.ios : CONFIG.revenuecat.android }); this.rcOk = true; }
+    catch (e) { console.warn('RevenueCat init', e); }
+    return this.rcOk;
   },
   async loadPrices() {
     const P = Plug(); if (this.locked || !P.Purchases || !(this.rcOk || await this.initRC())) return;
@@ -1495,7 +1358,7 @@ function fresh() {
   return { v:1, b, energy:CONFIG.baseEnergy, eTs:Date.now(), coins:0, gems:10, xp:0, level:1, orders:[],
     up:{ gen:0, bat:0, slots:0 }, tut:0, daily:{ last:'', streak:0 }, ads:{ day:'', n:0, d:0 },
     stats:{ merges:0, orders:0, spawns:0, sessions:0 }, seen:{}, sound:true, music:true, vib:true, ev:{}, starter:false,
-    profile:{ name:'', cafe:'', avatar:'a1', done:false }, worldPick:null, gifts:0, proDay:'', created:Date.now() };
+    profile:{ name:'', cafe:'', avatar:'a1', done:false }, worldPick:null, gifts:0, created:Date.now() };
 }
 function load() {
   try {
@@ -3201,7 +3064,6 @@ $('#modalClose').onclick = closeModal;
 $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
 
 const AD_CAP = { n: 6, d: 8 };
-const PRO_GEMS = 5;                                            // Pro: Diamanten als Tagesgeschenk
 function adState() { if (S.ads.day !== today()) S.ads = { day: today(), n: 0, d: 0 }; S.ads.d = S.ads.d | 0; return S.ads; }
 const wishCost = tr => Math.max(2, Math.ceil(Math.pow(2, tr) * .35));
 const GIFT_P = { coins: .40, energy: .35 };                    // Geschenk-Inhalt: Rest (25 %) sind Diamanten; die Chancen-Anzeige in „Was sind Diamanten?“ liest dieselben Werte
@@ -3210,25 +3072,19 @@ const pct = x => Math.round(x * 100);
 const regenTxt = () => { const s = String(Math.round(CONFIG.energyRegenMs / 6000) / 10); return LANG === 'de' ? s.replace('.', ',') : s; };
 const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const adRow = () => {
-  const left = AD_CAP.n - adState().n, pro = Platform.pro;
-  return `<div class="row hl"><div class="mi">${ic(pro ? 'star' : 'tv')}</div><div class="tx">${pro ? t('proBonus') : t('watchAd')}<small>+25 ${ic('bolt')} · ${left} ${t('adsLeft')}</small></div>
+  const left = AD_CAP.n - adState().n;
+  return `<div class="row hl"><div class="mi">${ic('tv')}</div><div class="tx">${t('watchAd')}<small>+25 ${ic('bolt')} · ${left} ${t('adsLeft')}</small></div>
     <button class="btn g" data-act="ad" ${left <= 0 ? 'disabled' : ''}>${left > 0 ? t('free') : t('limitAds')}</button></div>`;
 };
 const refillRow = () => `<div class="row"><div class="mi">${ic('bolt')}</div><div class="tx">${t('refill')}<small>${maxEnergy()} ${ic('bolt')}</small></div><button class="btn" data-act="refill">${ic('gem')} 15</button></div>`;
-const proRow = () => {
-  if (!Platform.proUi()) return '';
-  const on = Platform.pro;
-  return `<div class="row pro"><div class="mi">${ic('star')}</div><div class="tx">${t('proT')}${on ? `<i class="tag">${t('proOn')}</i>` : ''}<small>${t('proD', { n: PRO_GEMS })}</small></div><button class="btn ${on ? 'b' : 'g'}" data-act="${on ? 'manage' : 'pro'}">${on ? t('proManage') : t('proView')}</button></div>`;
-};
 function openShop() {
   const packs = [
     !S.starter && { sku:'starter_pack', ic:'gift', name:t('starter'), d:`${ic('gem')}100 + ${ic('coin')}500 · ${t('oneTime')}`, hl:1 },
     { sku:'gems_small', ic:'gem', name:t('gemsS'), d:`${ic('gem')} 60` },
     { sku:'gems_large', ic:'gem', name:t('gemsM'), d:`${ic('gem')} 400` }
   ].filter(Boolean);
-  const pr = proRow();
-  openModal(`<h2>${ic('bag')}${t('shop')}</h2>${pr}
-    <h3 class="${pr ? '' : 'first'}">${t('shopFree')}</h3>${adRow()}
+  openModal(`<h2>${ic('bag')}${t('shop')}</h2>
+    <h3 class="first">${t('shopFree')}</h3>${adRow()}
     <h3>${t('shopEnergy')}</h3>${refillRow()}
     <h3>${t('gemsT')} <button class="what" data-act="gems" aria-label="${t('gemsHint')}">${ic('info')}</button></h3>
     ${packs.map(p => `<div class="row ${p.hl ? 'hl' : ''}"><div class="mi">${ic(p.ic)}</div><div class="tx">${p.name}<small>${p.d}</small></div><button class="btn g" data-buy="${p.sku}"${isNative() && !Platform.products[p.sku] ? ' disabled' : ''}>${Platform.priceOf(p.sku)}</button></div>`).join('')}
@@ -3302,93 +3158,16 @@ async function buy(sku) {
 async function watchAd(place = 'shop_energy', onReward) {
   const A = adState();
   if (place === 'shop_energy' ? A.n >= AD_CAP.n : A.d >= AD_CAP.d) return false;
-  const pro = Platform.pro;                                      // Pro: Belohnung ohne Video, gleiche Tageslimits; kein ad_request/ad_rewarded (nichts wurde angezeigt)
-  if (!pro && !Platform.adsAllowed()) { toast(t('adOff')); return false; }
-  if (!pro) {
-    Platform.track('ad_request', { placement: place });
-    const ok = await Platform.showRewarded(place);
-    if (!ok) { toast(t('adFail')); return false; }
-  }
+  if (!Platform.adsAllowed()) { toast(t('adOff')); return false; }
+  Platform.track('ad_request', { placement: place });
+  const ok = await Platform.showRewarded(place);
+  if (!ok) { toast(t('adFail')); return false; }
   const B = adState();
   if (place === 'shop_energy') { B.n++; S.energy += 25; } else B.d++;
-  if (!pro) { Platform.track('ad_rewarded', { placement: place, level: S.level }); once('first_ad'); }
-  Sound.giftOpen(); save(); render();
+  Platform.track('ad_rewarded', { placement: place, level: S.level });
+  once('first_ad'); Sound.giftOpen(); save(); render();
   if (onReward) onReward();
   return true;
-}
-/* ---------------- Pro (RevenueCat-Entitlement noa_s_bean_trail_pro) ---------------- */
-let proFlow = false;                                             // true, solange Paywall, Kauf oder Wiederherstellen laufen: verhindert Doppeltipps und doppelte Hinweise
-function refreshSheet() { if (sheet === 'shop') openShop(); else if (sheet === 'settings') openSettings(); }
-function proDaily(quiet) {                                       // Tagesgeschenk: einmal pro Kalendertag, erst nach dem Tutorial
-  if (!Platform.pro || !started || S.tut < 3 || S.proDay === today()) return false;
-  S.proDay = today(); S.gems += PRO_GEMS; save(); render();
-  if (!quiet) { Sound.giftOpen(); toast(t('proGift', { n: PRO_GEMS })); }
-  return true;
-}
-function onProChange() {                                         // Entitlement hat sich geändert (Start, Kauf, Ablauf, Wiederherstellung auf anderem Gerät)
-  if (Platform.pro) { once('pro_start', { sku: Platform.proSku }); if (!proFlow) proDaily(); }
-  render(); if (!proFlow) refreshSheet();
-}
-function proWelcome(kind, info) {
-  const sku = (info && info.sku) || Platform.proSku;
-  if (kind === 'bought') {
-    const pr = info && info.price !== undefined ? info : Platform.proPrice(sku);
-    Platform.track('purchase', pr ? { sku, af_revenue: pr.price, af_currency: pr.currency } : { sku }); once('first_purchase', { sku });
-  } else Platform.track('pro_restore', { sku });
-  once('pro_start', { sku });
-  const g = proDaily(true);
-  Sound.giftOpen(); rain(80); toast(t(kind === 'bought' ? 'proThanks' : 'restoredOk') + (g ? ' ' + t('proGiftShort', { n: PRO_GEMS }) : ''));
-  if (sheet === 'paywall') closeModal(); else refreshSheet();
-  render(); save();
-}
-async function openPro(place) {
-  if (proFlow) return; proFlow = true;
-  let r; try { r = await Platform.paywall(place || 'game'); } finally { proFlow = false; }
-  if (r === null) toast(t('onlyApp'));
-  else if (r === 'off' || r === 'error') toast(t('storeOff'));
-  else if (r === 'own') openPaywall();
-  else if (r === 'bought' || r === 'restored') proWelcome(r);
-  else if (r === 'pro') { toast(t('proAlready')); refreshSheet(); }
-}
-function openPaywall() {                                         // Ausweichlösung, falls die RevenueCat-Oberfläche fehlt: Pakete des aktuellen Angebots
-  const pk = (Platform.offering && Platform.offering.availablePackages) || [];
-  const nm = p => ({ MONTHLY: t('pkgM'), ANNUAL: t('pkgY'), LIFETIME: t('pkgL') })[p.packageType] || (p.product && p.product.title) || p.identifier;
-  const per = p => ({ MONTHLY: t('perM'), ANNUAL: t('perY'), LIFETIME: t('perL') })[p.packageType] || '';
-  const perk = (ico, a, b) => `<div class="row"><div class="mi">${ic(ico)}</div><div class="tx">${a}<small>${b}</small></div></div>`;
-  openModal(`<h2>${ic('star')}${t('proT')}</h2>
-    <div class="hero"><div class="hi">${ic('star')}</div><p>${t('proIntro')}</p></div>
-    ${perk('tv', t('proPerk1'), t('proPerk1d'))}${perk('gem', t('proPerk2', { n: PRO_GEMS }), t('proPerk2d'))}
-    <h3>${t('proPlan')}</h3>
-    ${pk.map((p, i) => `<div class="row ${p.packageType === 'ANNUAL' ? 'pro' : ''}"><div class="mi">${ic(p.packageType === 'LIFETIME' ? 'heart' : 'clock')}</div><div class="tx">${esc(nm(p))}<small>${per(p)}</small></div><button class="btn g" data-pkg="${i}">${esc((p.product && p.product.priceString) || '–')}</button></div>`).join('')}
-    <p class="mini">${t('proTerms')}</p>
-    <div class="center"><button class="lnk" data-act="restore">${t('restore')}</button></div>`, 'paywall');
-}
-async function buyPackage(i) {
-  const pkg = Platform.offering && Platform.offering.availablePackages[i]; if (!pkg || proFlow) return;
-  proFlow = true; let r; try { r = await Platform.purchasePackage(pkg); } finally { proFlow = false; }
-  if (r === 'cancel') return;
-  if (r === null) toast(t('onlyApp')); else if (r === 'off') toast(t('storeOff')); else if (!r) toast(t('purchaseFail'));
-  else proWelcome('bought', r);
-}
-async function restorePro() {
-  if (proFlow) return; proFlow = true;
-  const was = Platform.pro; let r; try { r = await Platform.restore(); } finally { proFlow = false; }
-  if (r === null) toast(t('onlyApp'));
-  else if (r === 'off') toast(t('storeOff'));
-  else if (r === 'pro') { if (was) { toast(t('proAlready')); refreshSheet(); } else proWelcome('restored'); }
-  else if (r === 'none') toast(t('restoredNone'));
-  else toast(t('purchaseFail'));
-}
-async function manageSub() {
-  const r = await Platform.manage();
-  if (r === null) toast(t('onlyApp')); else if (r === 'off') toast(t('storeOff')); else if (r === 'own') openManage();
-}
-function openManage() {                                          // Ausweichlösung, falls das Customer Center fehlt: Weg zur Abo-Verwaltung in Google Play
-  const url = Platform.manageUrl || 'https://play.google.com/store/account/subscriptions';
-  openModal(`<h2>${ic('star')}${t('manageT')}</h2>
-    <div class="hero"><div class="hi">${ic('star')}</div><p>${t('manageP')}</p></div>
-    <div class="center"><a class="btn g" style="text-decoration:none" href="${esc(url)}" target="_blank" rel="noopener">${t('manageGo')}</a></div>
-    <p class="mini">${t('manageLife')}</p>`, 'manage');
 }
 /* Nach einer Lieferung: freiwilliges Angebot „Münzen verdoppeln“ (höchstens alle 2,5 Minuten, nie im Tutorial) */
 let lastDbl = 0, dblT;
@@ -3474,8 +3253,6 @@ function openSettings() {
   openModal(`<h2>${ic('gear')}${t('settings')}</h2>
     <div class="row"><div class="mi av${avArt(S.profile.avatar)}" style="${avStyle(S.profile.avatar)}">${avatarHTML(S.profile.avatar)}</div><div class="tx">${t('profile')}<small>${esc(pname())} · ${esc(S.profile.cafe || t('defCafe'))}</small></div><button class="btn b" data-act="profile">${t('edit')}</button></div>
     ${tgl('sound', 'speaker', t('sfx'), S.sound)}${tgl('music', 'note', t('music'), S.music)}${tgl('vib', 'phone', t('vib'), S.vib)}
-    ${Platform.proUi() ? `<div class="row"><div class="mi">${ic('star')}</div><div class="tx">${t('proT')}<small>${Platform.pro ? t('proOn') : t('proOff')}</small></div><button class="btn ${Platform.pro ? 'b' : 'g'}" data-act="${Platform.pro ? 'manage' : 'pro'}">${Platform.pro ? t('proManage') : t('proView')}</button></div>` : ''}
-    ${isNative() && !Platform.locked && Platform.rcOk ? `<div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('restore')}<small>${t('restoreD')}</small></div><button class="btn b" data-act="restore">${t('restoreGo')}</button></div>` : ''}
     ${Platform.privacyForm ? `<div class="row"><div class="mi">${ic('tv')}</div><div class="tx">${t('adPriv')}<small>${t('adPrivD')}</small></div><button class="btn b" data-act="privopt">${t('open')}</button></div>` : ''}
     <div class="row"><div class="mi">${ic('shield')}</div><div class="tx">${t('privacy')}</div><a class="btn b" style="text-decoration:none" href="privacy.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('user')}</div><div class="tx">${t('legal')}</div><a class="btn b" style="text-decoration:none" href="impressum.html">${ic('info')}</a></div>
@@ -3483,15 +3260,14 @@ function openSettings() {
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
     <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
     ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}
-    ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}<br>${t('rcDbg', { s: Platform.rcOk ? (Platform.build.rcTest ? 'Test Store' : 'live') : 'off', n: ((Platform.offering && Platform.offering.availablePackages) || []).length, p: Platform.pro ? '✓' : '–' })}</p>` : ''}`, 'settings');
+    ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}</p>` : ''}`, 'settings');
 }
 $('#modalBody').addEventListener('click', e => {
   const wc = e.target.closest('[data-world]');
   if (wc) { const i = +wc.dataset.world, cur = CHAPTERS.indexOf(chapterFor(S.level)); if (i > cur) { Sound.bonk(); return; }
     S.worldPick = i === cur ? null : i; save(); closeModal(); setTimeout(() => applyChapter(true), 60); return; }
-  const a = e.target.closest('[data-act],[data-buy],[data-up],[data-pkg]'); if (!a) return;
+  const a = e.target.closest('[data-act],[data-buy],[data-up]'); if (!a) return;
   if (a.dataset.buy) return buy(a.dataset.buy);
-  if (a.dataset.pkg) return buyPackage(+a.dataset.pkg);
   if (a.dataset.up) return buyUp(a.dataset.up);
   const act = a.dataset.act;
   if (act === 'ad') watchAd('shop_energy', () => { if (sheet === 'noenergy') { closeModal(); toast(t('adGot')); } else openShop(); });
@@ -3500,9 +3276,6 @@ $('#modalBody').addEventListener('click', e => {
   else if (act === 'orderbuy') buyIngredients(a.dataset.oid);
   else if (act === 'dailydbl') dailyDouble();
   else if (act === 'refill') refill();
-  else if (act === 'pro') openPro(sheet);
-  else if (act === 'manage') manageSub();
-  else if (act === 'restore') restorePro();
   else if (act === 'claim') claimDaily(a);
   else if (act === 'sound') { S.sound = !S.sound; save(); openSettings(); }
   else if (act === 'music') { S.music = !S.music; S.music ? Sound.musicOn() : Sound.musicOff(); save(); openSettings(); }
@@ -3815,13 +3588,12 @@ function setupSplash() {
     started = true;
     if (!S.profile.done) showOnboarding();
     else if (S.tut >= 3 && S.daily.last !== today()) setTimeout(openDaily, 600);
-    setTimeout(proDaily, 1800);
     render();
   };
 }
 document.addEventListener('pointerdown', () => { if (started) Sound.unlock(); }, { passive: true });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) Sound.pause(); else { if (started) Sound.resume(); render(); Platform.resume(); proDaily(); }
+  if (document.hidden) Sound.pause(); else { if (started) Sound.resume(); render(); }
 });
 setInterval(() => {
   if (!started || oBusy || drag || !$('#modal').hidden || S.tut < 3) return;
@@ -3830,8 +3602,7 @@ setInterval(() => {
 
 window.MC = { ent: (id, o) => playEntrance(id, o), cust: l => custSVG(l), seats: () => seatEls, fill: () => { fillOrders(); render(); }, render: () => render(), close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state(), world: L => { S.level = L; S.worldPick = null; applyChapter(true); render(); }, levelUp: L => { S.level = L - 1; S.xp = 0; addXP(xpNeed(L - 1)); }, scene: (i, vb, still) => Scenes.svg(i, vb, still),
   disc: (c, tr) => showDiscovery(c, tr), gift: () => addGift(), dbl: o => offerDouble(o || { coins: 80 }), shop: () => openShop(), gems: () => openGems(), noEnergy: () => openNoEnergy(),
-  order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx,
-  plat: Platform, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
+  order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx };
 
 /* ---------------- Boot ---------------- */
 S = load();

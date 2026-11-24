@@ -22,7 +22,6 @@ jobs:
       BUILD_NUMBER: ${{ github.run_number }}
       APPSFLYER_DEV_KEY: ${{ secrets.APPSFLYER_DEV_KEY }}
       REVENUECAT_ANDROID_KEY: ${{ secrets.REVENUECAT_ANDROID_KEY }}
-      REVENUECAT_TEST_KEY: ${{ secrets.REVENUECAT_TEST_KEY }}
       ADMOB_APP_ID_ANDROID: ${{ secrets.ADMOB_APP_ID_ANDROID }}
       ADMOB_REWARDED_ANDROID: ${{ secrets.ADMOB_REWARDED_ANDROID }}
     steps:

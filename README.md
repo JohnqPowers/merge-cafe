@@ -44,8 +44,7 @@ Secrets (Settings → Secrets and variables → Actions):
 | `PLAY_SERVICE_ACCOUNT_JSON` | JSON des Google-Cloud-Servicekontos mit Play-Console-Zugriff |
 | `APPSFLYER_DEV_KEY`, `APPSFLYER_API_TOKEN` | AppsFlyer Dev Key und API-Token (für die täglichen Berichte) |
 | `ADMOB_APP_ID_ANDROID`, `ADMOB_REWARDED_ANDROID` | AdMob App-ID und Rewarded-Anzeigenblock |
-| `REVENUECAT_ANDROID_KEY` | RevenueCat Public SDK Key (Android), der **Produktiv**-Schlüssel (`goog_…`) für Store-Pakete |
-| `REVENUECAT_TEST_KEY` | RevenueCat **Test-Store**-Schlüssel (`test_…`). Er landet nur in der Test-APK (Datei `build.json`), nie im Store-Paket und nie im Code. RevenueCat lässt `test_`-Schlüssel in Store-Paketen absichtlich abstürzen. Setzen: `gh secret set REVENUECAT_TEST_KEY --repo JohnqPowers/merge-cafe` (fragt den Wert ab) |
+| `REVENUECAT_ANDROID_KEY` | RevenueCat Public SDK Key (Android) |
 
 Fehlt ein Secret, läuft der jeweilige Schritt mit Test-IDs oder wird übersprungen.
 Hinweis: Die **allererste** .aab muss einmal von Hand in der Play Console hochgeladen werden. Danach übernimmt die Pipeline.
@@ -96,7 +95,6 @@ All in `www/index.html` → `CONFIG` and in `capacitor.config.json`:
 | AppsFlyer Dev Key, iOS App ID | `CONFIG.appsflyer` | AppsFlyer dashboard |
 | AdMob app IDs + rewarded unit IDs | `capacitor.config.json`, `CONFIG.admob` | AdMob (currently Google **test IDs**) |
 | RevenueCat API keys | `CONFIG.revenuecat` | RevenueCat dashboard |
-| RevenueCat Pro | entitlement `noa_s_bean_trail_pro` (`CONFIG.revenuecat.entitlement`), current offering with packages monthly / annual / lifetime, paywall designed in the dashboard | RevenueCat dashboard, see `docs/MONETARISIERUNG.md` |
 | In-app products | `starter_pack`, `gems_small`, `gems_large` | create identically in Play Console / App Store Connect + RevenueCat |
 | Privacy policy and Impressum | `www/privacy.html`, `www/impressum.html`: replace every `[[…]]`. While any remains, ads, purchases and measurement stay off in the app (`CONFIG.legalReady`). | owner's real details; see `docs/PRIVACY.md` |
 | App ID `io.github.johnqpowers.beantrail` | `capacitor.config.json` | your own reverse domain |

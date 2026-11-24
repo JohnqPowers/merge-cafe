@@ -19,7 +19,7 @@ Stand: 24.11.2026, Spielversion 1.5.13 (Push auf `main` vom Eigentümer am 24.11
 ## 2. Werbung und Bezahlfunktion (Stand im Code)
 
 - **Werbung:** nur freiwillige Videos mit Belohnung (Google AdMob), kein Banner, kein Zwangsvideo. Einwilligung zuerst (Google-Einwilligungsfenster), Tageslimits im Code (`AD_CAP`), Inhaltsstufe „ParentalGuidance“.
-- **Käufe:** Diamanten-Pakete und ein einmaliges Startpaket über Google Play, abgewickelt mit RevenueCat; angezeigt wird der Preis aus dem Store. Dazu „Noa's Pro“ als Abo (monatlich, jährlich) oder einmalig (Lifetime): Belohnungen ohne Video und täglich Diamanten.
+- **Käufe:** Diamanten-Pakete und ein einmaliges Startpaket über Google Play, abgewickelt mit RevenueCat; angezeigt wird der Preis aus dem Store.
 - **Sperre (`CONFIG.legalReady`):** Enthält `www/impressum.html` oder `www/privacy.html` einen Platzhalter, bleiben Werbung, Käufe und Messung in der App aus. Seit 24.11.2026 steht in beiden Seiten kein Platzhalter mehr; der Build schaltet die Funktionen damit frei. Echte Werbung und echte Käufe laufen trotzdem erst mit Konten und Schlüsseln (GitHub-Secrets). Die Web-Version hat nie Käufe und nur Demo-Werbung.
 - **Test-APK:** zeigt nur Googles Testanzeigen (Version 1.5.11).
 - **Nicht geprüft:** echte Anzeigen, echte Käufe, echtes Einwilligungsfenster und AppsFlyer mit echten Konten. Die Plugins sind im Test nachgebaut (`docs/QUALITAET.md`, Abschnitt 2). Das lässt sich erst mit Konten und Gerät klären.
@@ -31,7 +31,7 @@ Stand: 24.11.2026, Spielversion 1.5.13 (Push auf `main` vom Eigentümer am 24.11
 2. **Namen freigeben** (`docs/RECHT_UND_NAMEN.md`, Abschnitt 5.3): erledigt am 24.11.2026 für „Noa's Bean Trail“. Bei einem anderen Namen gilt wieder: ohne Freigabe kein Store-Upload und keine Werbetexte (auch nicht für Almedia).
 3. **Push freigeben:** erteilt am 24.11.2026. Die Pipeline baut die Test-APK; die signierte Store-Datei und der Upload (nur nach `internal`) laufen erst, wenn die Secrets für Signierung und Play gesetzt sind.
 4. **Test-APK auf einem Gerät prüfen:** `docs/TECHNIK.md`, Abschnitt 9, und `docs/QUALITAET.md`, Abschnitt 8.
-5. **Konten und Schlüssel** (nur der Eigentümer): Play Console (Produkte `gems_small`, `gems_large`, `starter_pack`; für Pro ein Abo mit Basis-Tarifen monatlich und jährlich sowie ein einmaliges Produkt Lifetime), AdMob (App, Belohnungs-Anzeigenblock, Einwilligungsnachricht), RevenueCat, AppsFlyer, Signierschlüssel und Dienstkonto als GitHub-Secrets (`README.md`, `docs/MONETARISIERUNG.md`, Abschnitt 10).
+5. **Konten und Schlüssel** (nur der Eigentümer): Play Console (Produkte `gems_small`, `gems_large`, `starter_pack`), AdMob (App, Belohnungs-Anzeigenblock, Einwilligungsnachricht), RevenueCat, AppsFlyer, Signierschlüssel und Dienstkonto als GitHub-Secrets (`README.md`, `docs/MONETARISIERUNG.md`, Abschnitt 10).
 6. **Play Console ausfüllen:** Store-Eintrag (`docs/STORE_LISTING.md`), Zielgruppe und Inhaltseinstufung (`docs/ALTERSFREIGABE.md`), Datensicherheit (`docs/PRIVACY.md`, Abschnitt 3), Datenschutz-URL.
 7. **Interner Test** mit Lizenztestern: Testkäufe und Anzeigen mit Testgeräten.
 8. **Produktion** löst nur der Eigentümer aus; der Agent veröffentlicht nie auf `production`.

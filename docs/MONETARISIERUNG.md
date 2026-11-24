@@ -1,15 +1,14 @@
 # Monetarisierungsdokumentation – Noa's Bean Trail
 
-Stand: 24.11.2026, Spielversion 1.5.14 (Noa's Pro neu). Alle Zahlen stammen aus `www/index.html`; die Fundstellen stehen in Klammern. Keine Rechtsberatung. **Die Sperre `CONFIG.legalReady` (Werbung, Käufe und Messung) ist seit 24.11.2026 offen, weil Impressum und Datenschutz keine Platzhalter mehr enthalten. Echte Werbung und echte Käufe laufen erst mit Konten und Schlüsseln (GitHub-Secrets); das Test-Paket zeigt nur Googles Testanzeigen.** Es wurde kein Konto angelegt, kein Preis eingestellt und kein Geld ausgegeben.
+Stand: 24.11.2026, Spielversion 1.5.13 (Push auf `main` freigegeben). Alle Zahlen stammen aus `www/index.html`; die Fundstellen stehen in Klammern. Keine Rechtsberatung. **Die Sperre `CONFIG.legalReady` (Werbung, Käufe und Messung) ist seit 24.11.2026 offen, weil Impressum und Datenschutz keine Platzhalter mehr enthalten. Echte Werbung und echte Käufe laufen erst mit Konten und Schlüsseln (GitHub-Secrets); das Test-Paket zeigt nur Googles Testanzeigen.** Es wurde kein Konto angelegt, kein Preis eingestellt und kein Geld ausgegeben.
 
 ## 1. Modell in Kürze
 
-Kostenlos spielbar, ohne Zwang. Vier Einnahmequellen:
+Kostenlos spielbar, ohne Zwang. Drei Einnahmequellen:
 
 1. **Freiwillige Belohnungs-Videos** (Google AdMob): Spieler tippt auf ein Angebot und bekommt Energie oder eine Verdopplung. Kein Banner, kein Zwangsvideo.
 2. **Diamanten-Pakete** (Echtgeld): 60 oder 400 Diamanten.
 3. **Startpaket** (Echtgeld, einmalig): 100 Diamanten + 500 Münzen.
-4. **Noa's Pro** (Abo monatlich oder jährlich, oder einmalig als Lifetime; RevenueCat-Entitlement `noa_s_bean_trail_pro`): Belohnungen ohne Video und täglich Diamanten. Abschnitt 3.
 
 Diamanten sparen Zeit (Energie sofort voll, fehlende Zutaten kaufen). Alles im Spiel bleibt auch ohne Echtgeld und ohne Diamanten erreichbar (Text im Spiel: „Spielen kannst du alles auch ohne sie“). **Direkt gegen Echtgeld gibt es nichts Zufälliges.**
 
@@ -37,20 +36,6 @@ Diamanten gelten nur in diesem Spiel, lassen sich nicht übertragen und nicht au
 - **Weg zum Kauf:** nur über den Shop. Das „+“ neben der Energie öffnet den Shop; das „+“ neben den Diamanten öffnet zuerst das Info-Fenster „Was sind Diamanten?“ mit dem Knopf „Diamanten kaufen“. Kein Pop-up mit Echtgeld-Angebot, keine Kauf-Aufforderung nach einer Niederlage oder bei leerer Energie (das „Keine Energie“-Fenster nennt zuerst Video, Diamanten und Warten).
 - **Zahlung, Rechnung, Erstattung, Widerruf:** Google Play. Die Gutschrift erfolgt auf dem Gerät, ohne eigenen Server; eine Erstattung bei Google nimmt die Diamanten nicht zurück (kleiner Schaden, akzeptiert).
 - **Messung:** Das Ereignis `purchase` trägt `af_revenue` (Store-Preis) und `af_currency`. Der Umsatz ist brutto (vor Abzug der Store-Gebühr).
-
-### Noa's Pro (Abo und Lifetime, seit v1.5.14)
-
-| Angabe | Wert |
-|---|---|
-| Entitlement (RevenueCat) | `noa_s_bean_trail_pro` (`CONFIG.revenuecat.entitlement`). Pro ist aktiv, wenn dieses Entitlement in der Kundeninfo aktiv ist. Quelle ist immer RevenueCat, nie der Spielstand: Abfrage beim Start, per Listener bei jeder Änderung und nach der Rückkehr in die App. |
-| Produkte | `monthly` (Abo monatlich), `yearly` (Abo jährlich), `lifetime` (einmalig). So heißen sie im RevenueCat **Test Store**. In Google Play: ein Abo mit zwei Basis-Tarifen (monatlich, jährlich) und ein einmaliges Produkt; die Kennungen legt der Eigentümer an. Das Spiel erkennt Pakete nur am Pakettyp (`MONTHLY`, `ANNUAL`, `LIFETIME`), nie an festen Produkt-IDs. |
-| Angebot und Paywall | das **aktuelle Angebot** („Current Offering“) mit den drei Paketen; die Paywall wird im RevenueCat-Dashboard gestaltet und dem Angebot zugewiesen. Das Spiel zeigt sie nur, wenn das Entitlement fehlt (`presentPaywallIfNeeded`). |
-| Vorteile (Entscheidung des Agenten, **vom Eigentümer zu bestätigen**, bevor echte Produkte live gehen) | 1. **Belohnungen ohne Video:** Zeile „Pro-Bonus“ statt „Werbung ansehen“, gleiche Tageslimits (`AD_CAP`), kein `ad_request`/`ad_rewarded`. 2. **Täglich +5 Diamanten** (`PRO_GEMS`, Tag in `S.proDay`), erst nach dem Tutorial, einmal je Kalendertag. Sonst nichts: kein Vorteil auf dem Brett, keine Zusatz-Energie, keine Chancen-Änderung. |
-| Wo im Spiel | Shop (Karte ganz oben) und Optionen (Zeilen „Noa's Pro“ und „Käufe wiederherstellen“). Kein Pop-up, keine Kauf-Aufforderung, keine Zeitgeber. Die Karte erscheint nur, wenn RevenueCat ein Angebot liefert; bis zur Einrichtung ist Pro also nirgends sichtbar. |
-| Technik | `Platform.paywall()` (RevenueCat-Paywall; fehlt das UI-Plugin oder wirft es einen Fehler, zeigt das Spiel die eigene Liste `openPaywall()` mit `purchasePackage`), `Platform.manage()` (Customer Center; sonst Hinweis mit Link zu Google Play), `Platform.restore()`. Test: `tests/test_plattform.py`, S12 bis S18. |
-| Preisvorschlag (nicht gemessen, Entscheidung des Eigentümers) | monatlich 2,99 €, jährlich 19,99 € (≈ 1,67 € je Monat, ≈ 44 % unter 12 × Monatspreis), Lifetime 39,99 € (zwei Jahre Jahres-Abo). Wegen der überschaubaren Vorteile eher niedrig ansetzen. |
-| Test Store | Der **Test-Store-Schlüssel** (`test_…`) steckt nur in der Test-APK (Secret `REVENUECAT_TEST_KEY` → `build.json` im Debug-Paket). Käufe sind dort simuliert (Erfolg, Fehler oder Abbruch wählbar); Test-Abos verlängern sich höchstens 5-mal (monatlich alle 5 Minuten). Im Store-Paket wird ein `test_`-Schlüssel ignoriert, damit die App nicht abstürzt. |
-| Messung | `paywall_open`, `pro_start`, `pro_restore`, beim ersten Kauf `purchase` mit Preis des Pakets und `first_purchase` (`docs/EVENTS.md`). Verlängerungen sieht nur das RevenueCat-Dashboard. |
 
 ## 4. Werbung
 
@@ -105,9 +90,7 @@ Mit Glücksspiel hat das Spiel nichts zu tun: keine Einsätze, keine Gewinne geg
 | Chancen offenlegen bei Zufallsgegenständen aus Käufen | dieselbe Richtlinie | nicht einschlägig, trotzdem im Spiel genannt |
 | Belohnungs-Werbung nur freiwillig, Belohnung vorher erkennbar | AdMob-/Play-Werberichtlinien | erfüllt nach Code; Prüfpunkt: Verdopplungs-Angebot erscheint nach einer Lieferung unten im Bild (Risiko versehentlicher Tipper, Abschnitt 9) |
 | Einwilligung (EWR, Großbritannien, Schweiz) vor Werbung und Messung | Google-Richtlinie zur Einwilligung, DSGVO | umgesetzt (UMP), nur mit nachgebauten Plugins getestet |
-| Keine Kauf-Aufforderungen an Kinder, keine falschen Zeitgeber | `CLAUDE.md` | erfüllt; Zielgruppe 16+ (`docs/ALTERSFREIGABE.md`); Pro erscheint nur als Karte im Shop und Zeile in den Optionen |
-| Abo-Bedingungen vor dem Kauf zeigen (Preis, Laufzeit, automatische Verlängerung, Kündigungsweg) | Google Play, Abo-Richtlinien; EU-Verbraucherrecht | eigene Liste im Spiel: erfüllt (Texte `proTerms`, `perM`, `perY`, `perL`). **RevenueCat-Paywall: Der Eigentümer muss Preis, Laufzeit, automatische Verlängerung und Kündigungshinweis im Paywall-Entwurf im Dashboard zeigen.** Das lässt sich im Spiel nicht prüfen. |
-| Abo kündbar und verwaltbar | dieselben | erfüllt: Customer Center, sonst Hinweis mit Link zu Google Play (Shop und Optionen) |
+| Keine Kauf-Aufforderungen an Kinder, keine falschen Zeitgeber | `CLAUDE.md` | erfüllt; Zielgruppe 16+ (`docs/ALTERSFREIGABE.md`) |
 | **EU-Leitsätze zu Spielwährungen** (CPC-Netzwerk, 21.03.2025, nicht bindend, stützen sich auf geltendes EU-Verbraucherrecht) | siehe Quellen | Tabelle unten |
 
 Die sieben Leitsätze und unser Stand:
@@ -129,7 +112,7 @@ Textvorschlag für eine spätere Seite „Käufe“ (vom Eigentümer fachlich pr
 ## 8. Kennzahlen und Stellschrauben
 
 - **Ziele** (`docs/LAUNCH_PLAN.md`, `CLAUDE.md`): Tutorial ≥ 85 %, D1 ≥ 40 %, D7 ≥ 15 %, Anteil zahlender Nutzer ≥ 2 %, D7-ROAS ≥ 15 %.
-- **Ereignisse für die Auswertung** (`docs/EVENTS.md`, nie umbenennen): `purchase`, `first_purchase`, `ad_request`, `ad_rewarded`, `first_ad`, `spend_gems`, `first_gem_spend`, `gift_open`. Annahmequote der Werbung = `ad_rewarded` ÷ `ad_request` (Pro-Spieler erzeugen beides nicht). Pro: `paywall_open`, `pro_start`, `pro_restore`.
+- **Ereignisse für die Auswertung** (`docs/EVENTS.md`, nie umbenennen): `purchase`, `first_purchase`, `ad_request`, `ad_rewarded`, `first_ad`, `spend_gems`, `first_gem_spend`, `gift_open`. Annahmequote der Werbung = `ad_rewarded` ÷ `ad_request`.
 - **Stellschrauben** (`CLAUDE.md`: **höchstens eine Änderung pro Woche**): `xpNeed()`, `DAILY`, `energyRegenMs`, Energiekosten, Ausbau-Preise, `AD_CAP`, Chancen (`GIFT_P`, `spawnChance`). Bei Änderungen die Anzeige „Chancen im Spiel“ mitprüfen (sie liest dieselben Werte).
 - **Messlücken:** AdMob-Umsatz fehlt in AppsFlyer; die Test-APK sendet nach Einwilligung auch Messdaten (verfälscht die Zahlen); Zahlen pro Nutzer erst mit echten Daten (`reports/appsflyer/` ist bisher leer).
 
@@ -145,16 +128,12 @@ Textvorschlag für eine spätere Seite „Käufe“ (vom Eigentümer fachlich pr
 | M6 | AdMob und Play Console prüfen Konten und Apps (Genehmigung, Auszahlungsgrenze, Steuerangaben). Ablauf und Dauer sind hier nicht bekannt. | Eigentümer legt Konten an; Steuer- und Zahlungsangaben nur er |
 | M7 | AdMob empfiehlt eine `app-ads.txt` auf der Entwickler-Website (Domain-Wurzel). Mit der Seite unter `johnqpowers.github.io/merge-cafe/` geht das nur über ein Repo `johnqpowers.github.io` oder eine eigene Domain. | prüfen, wenn AdMob eine Warnung zeigt |
 | M8 | Echte Käufe und Anzeigen sind auf keinem Gerät gelaufen (der Android-Build 13 vom 24.11.2026 enthält die echten Plugins, ist aber nur im Paket geprüft). | Prüfliste `docs/TECHNIK.md`, Abschnitt 9, und Gerätetest |
-| M9 | **Der Nutzen von Pro ist klein:** Videos sind ohnehin freiwillig, +5 Diamanten täglich sind ein Drittel einer Energiefüllung (15). Niedrige Umwandlung ist wahrscheinlich. | Preis niedrig halten; nach 2 bis 4 Wochen Daten (`paywall_open` → `pro_start`) abwarten und erst dann Vorteile ausbauen. Echte Produkte erst anlegen, wenn der Eigentümer die Vorteile bestätigt hat. |
-| M10 | Der Test-Store-Schlüssel steckt in der **öffentlichen** Test-APK. Er ist ein öffentlicher SDK-Schlüssel ohne Zugriff auf Geld, Käufe sind simuliert; Fremde könnten aber Testkäufe in deinem Test Store auslösen. | akzeptiert; bei Missbrauch im Dashboard einen neuen Schlüssel erzeugen und das Secret ersetzen |
-| M11 | Customer Center ist laut RevenueCat-Dokumentation an einen bezahlten Tarif gebunden (vor dem Einsatz im Dashboard prüfen); der Tarif des Eigentümers ist nicht bekannt. | ohne: Hinweis mit Link zu Google Play (eingebaut) |
 
 ## 10. Einrichtung vor dem Start (Eigentümer; der Agent legt keine Konten an und gibt kein Geld aus)
 
 1. Impressum und Datenschutz: erledigt am 24.11.2026 (keine Platzhalter `[[…]]` mehr in `www/privacy.html` und `www/impressum.html`). Damit schaltet der Build Werbung, Käufe und Messung frei, sobald Schlüssel vorhanden sind.
-2. **Google Play Console:** App anlegen, drei Produkte mit genau diesen IDs und Typ „einmalig, verbrauchbar“: `gems_small`, `gems_large`, `starter_pack`; Preise festlegen (Vorschläge in Abschnitt 3); Lizenztester eintragen. Für Pro kommen ein Abo und ein einmaliges Produkt dazu (Punkt 3a).
+2. **Google Play Console:** App anlegen, drei Produkte mit genau diesen IDs und Typ „einmalig, verbrauchbar“: `gems_small`, `gems_large`, `starter_pack`; Preise festlegen (Vorschläge in Abschnitt 3); Lizenztester eintragen.
 3. **RevenueCat:** Projekt, Android-App mit der Paket-ID, Dienstkonto, die drei Produkte; den öffentlichen Android-Schlüssel als GitHub-Secret `REVENUECAT_ANDROID_KEY` eintragen.
-3a. **RevenueCat für Pro:** die Produkte `monthly`, `yearly`, `lifetime` (Test Store) bzw. die Play-Produkte dem **Entitlement `noa_s_bean_trail_pro`** zuweisen; ein **Angebot** mit den Paketen Monatlich, Jährlich und Lifetime anlegen und als „Current“ setzen; die **Paywall** im Paywall-Editor gestalten und dem Angebot zuweisen (mit Preis, Laufzeit, automatischer Verlängerung und Kündigungshinweis); optional das Customer Center einrichten. Zum Testen genügt der Test Store: Secret `REVENUECAT_TEST_KEY` setzen (`gh secret set REVENUECAT_TEST_KEY --repo JohnqPowers/merge-cafe`, fragt den Wert ab). In Google Play dazu später ein Abo (Basis-Tarife monatlich und jährlich) und ein einmaliges Produkt Lifetime.
 4. **AdMob:** App und Belohnungs-Anzeigenblock anlegen; Secrets `ADMOB_APP_ID_ANDROID` und `ADMOB_REWARDED_ANDROID`; in der Konsole die **EU-Einwilligungsnachricht (UMP)** einrichten und Testgeräte eintragen.
 5. **AppsFlyer:** Dev-Key als Secret `APPSFLYER_DEV_KEY`.
 6. Danach (nach der Push-Freigabe) bauen lassen und die Prüfliste in `docs/TECHNIK.md`, Abschnitt 9, abarbeiten, zuerst mit der Test-APK (Test-Anzeigen), dann mit der Store-Datei in `internal`.
