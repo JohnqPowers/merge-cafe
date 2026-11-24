@@ -1,7 +1,9 @@
 # Store-Eintrag
 
+> **Name gewählt, Freigabe offen:** „Noa's Bean Trail“ (Eigentümer, 24.11.2026) hat den Web- und Store-Check bestanden, die Markenregister (DPMA, TMview, WIPO) sind aber noch nicht durchsucht. Vor dem Upload die Checkliste in `docs/RECHT_UND_NAMEN.md` abarbeiten und die Freigabe dort eintragen.
+
 ## Deutsch
-**App-Name (max. 30):** Merge Café: Verschmelz-Spiel
+**App-Name (max. 30):** Noa's Bean Trail: Merge-Spiel
 **Kurzbeschreibung (max. 80):** Verschmelze Kaffee, Gebäck & Frühstück – erfülle Bestellungen und steig auf!
 
 **Beschreibung:**
@@ -13,15 +15,15 @@ Deine Gäste warten schon mit ihren Bestellungen. Liefere, verdiene Münzen und 
 
 ★ Einfach zu lernen, schwer wegzulegen
 ★ 22 Leckereien in 3 Ketten zum Entdecken
-★ Neue Maschinen und Upgrades für dein Café
+★ Neue Zutaten und Upgrades für dein Café
 ★ Täglicher Bonus mit 7-Tage-Serie
 ★ Offline spielbar – überall, jederzeit
 ★ Entspannt: kein Zeitdruck, kein Stress
 
-Lade Merge Café herunter und werde zur Café-Legende!
+Lade Noa's Bean Trail herunter und werde zur Café-Legende!
 
 ## English
-**App name (max 30):** Merge Café: Merge Puzzle
+**App name (max 30):** Noa's Bean Trail: Merge Puzzle
 **Short description (max 80):** Merge coffee, pastries & breakfast – serve orders and level up your café!
 
 **Description:**
@@ -33,16 +35,17 @@ Your guests are waiting with their orders. Serve them, earn coins and level up.
 
 ★ Easy to learn, hard to put down
 ★ 22 treats in 3 merge chains to discover
-★ New machines and upgrades for your café
+★ New ingredients and upgrades for your café
 ★ Daily bonus with a 7-day streak
 ★ Play offline – anywhere, anytime
 ★ Relaxing: no timers, no stress
 
-Download Merge Café and become a café legend!
+Download Noa's Bean Trail and become a café legend!
 
 ## Metadaten
 - Kategorie: Spiele → Puzzle (Untergenre Casual)
 - Tags: merge, puzzle, café, casual, entspannt
 - Altersfreigabe: IARC-Fragebogen → erwartet „USK 0 / PEGI 3“ (keine Gewalt; In-App-Käufe und Werbung angeben)
 - Datensicherheit (Play): Geräte-IDs (AppsFlyer, AdMob) für Analyse & Werbung, Kaufverlauf (RevenueCat); keine Weitergabe zum Verkauf
-- Grafiken: `store/app-icon-512.png` (Quelle: `assets/icon-only.png`, 1024 px), `store/feature-graphic-1024x500.png`, Screenshots `store/screenshot-*.png`
+- Grafiken: `store/app-icon-512.png` (neues Icon, gebaut mit `python3 -I assets/src/build-icon.py` aus `assets/src/app-icon-original.png`), `store/feature-graphic-1024x500.png`, Screenshots `store/screenshot-*.png`
+- **Noch zu erneuern vor dem Upload:** Feature-Grafik und Screenshots zeigen noch das alte Startbild bzw. den alten Namen (Stand 24.11.2026).

@@ -17,3 +17,13 @@ let g = fs.readFileSync(gradle, 'utf8');
 g = g.replace(/versionCode\s+\d+/, `versionCode ${build}`).replace(/versionName\s+"[^"]*"/, `versionName "1.0.${build}"`);
 fs.writeFileSync(gradle, g);
 console.log(`Version 1.0.${build} (Code ${build})`);
+
+// App-Name mit Apostroph ("Noa's Bean Trail"): In Android-Ressourcen muss er als \' stehen, sonst bricht aapt2 den
+// Build ab ("unescaped apostrophe in string"). Schon maskierte Apostrophe bleiben unverändert (läuft also gefahrlos
+// auch dann, wenn Capacitor selbst maskiert).
+const strings = 'android/app/src/main/res/values/strings.xml';
+if (fs.existsSync(strings)) {
+  const x = fs.readFileSync(strings, 'utf8');
+  const y = x.replace(/(<string\b[^>]*>)([^<]*)(<\/string>)/g, (_, a, body, c) => a + body.replace(/(?<!\\)'/g, "\\'") + c);
+  if (y !== x) { fs.writeFileSync(strings, y); console.log('Apostrophe in strings.xml maskiert'); }
+}

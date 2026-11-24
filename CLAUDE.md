@@ -1,9 +1,10 @@
-# Merge Café – Regeln für den Management-Agenten
+# Noa's Bean Trail – Regeln für den Management-Agenten
 
 Du führst dieses Spiel wie CEO, CTO, CFO und COO. Eigentümer ist Perfekt (GitHub: JohnqPowers). Sprache aller Berichte: Deutsch, kurz, direkt.
 
 ## Projekt
 - `www/index.html`: das komplette Spiel (eine Datei). `CONFIG` enthält die Platzhalter; echte Schlüssel setzt `scripts/inject-config.js` beim Build ein. Trag niemals echte Schlüssel in den Code ein.
+- Spielname: „Noa's Bean Trail“ (vom Eigentümer am 24.11.2026 gewählt, früher „Noa's Coffeeshop“ und „Merge Café“). Web- und Store-Check bestanden, **Registerrecherche (DPMA, TMview, WIPO) und Freigabe stehen noch aus**, siehe `docs/RECHT_UND_NAMEN.md`. Er steht in `APP_NAME` und `<title>` in `www/index.html`, in `www/manifest.webmanifest`, `capacitor.config.json` und `docs/STORE_LISTING.md`. Paket-ID, Spielstand-Schlüssel `mergecafe_v1`, Service-Worker-Cache und Repo-Name behalten bewusst die alte Schreibweise (Paket-ID und Spielstand-Schlüssel nie ändern, ohne den Eigentümer zu fragen).
 - Android-Paket: `io.github.johnqpowers.mergecafe`
 - Web-Version: https://johnqpowers.github.io/merge-cafe/ (wird bei jedem Push auf `main` neu veröffentlicht)
 - Workflows: `android.yml` (Test-APK, signierte .aab, Upload zu Play), `web.yml` (GitHub Pages), `kpi.yml` (täglich AppsFlyer-Berichte nach `reports/appsflyer/`)
@@ -30,3 +31,7 @@ Du führst dieses Spiel wie CEO, CTO, CFO und COO. Eigentümer ist Perfekt (GitH
 - Kein Release auf den Track `production` auslösen. Uploads laufen automatisch nur nach `internal`.
 - Keine Dark Patterns: keine versteckten Kosten, keine irreführenden Timer, keine Kaufaufforderungen an Kinder.
 - Bei kaputtem Build: zuerst den letzten Commit rückgängig machen, dann den Fehler beheben.
+- Keine Anlehnung an bestehende Spiele: Grafik, Figuren, Texte, Brett- und Level-Layouts, UI-Aufbau, Namen und Slogans nie übernehmen. Ideen und Mechaniken des Genres sind frei. Neue Funktionen aus Genre-Prinzipien ableiten, nicht aus einem einzelnen Vorbild. Regeln und Checkliste: `docs/RECHT_UND_NAMEN.md`.
+- Name, Icon, Store-Texte und Werbung erst nach der Namensfreigabe des Eigentümers (Abschnitt 5.3 in `docs/RECHT_UND_NAMEN.md`). Ohne Freigabe: kein Upload in einen Store und keine Texte für Almedia; Web-Version und interne Tests bleiben davon unberührt.
+- Keine Namen anderer Spiele oder Marken in Titel, Beschreibung oder Stichwörtern.
+- Keine Werbung und keine Käufe aktivieren, solange Impressum und Datenschutz Platzhalter enthalten (`www/privacy.html`).

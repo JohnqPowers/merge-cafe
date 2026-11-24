@@ -48,15 +48,15 @@ jobs:
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: merge-cafe-test-apk-${{ github.run_number }}
+          name: noas-bean-trail-test-apk-${{ github.run_number }}
           path: android/app/build/outputs/apk/debug/*.apk
       - name: Test-APK als direkten Download veröffentlichen
         if: github.ref == 'refs/heads/main'
         env: { GH_TOKEN: '${{ github.token }}' }
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk merge-cafe-test.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk noas-bean-trail-test.apk
           gh release delete test-apk -y --cleanup-tag || true
-          gh release create test-apk merge-cafe-test.apk --prerelease \
+          gh release create test-apk noas-bean-trail-test.apk --prerelease \
             --title "Test-APK (Build ${{ github.run_number }})" \
             --notes "Automatisch gebaut. Zum Testen direkt aufs Handy laden und installieren."
 
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: env.HAS_KEYSTORE == 'true'
         with:
-          name: merge-cafe-store-aab-${{ github.run_number }}
+          name: noas-bean-trail-store-aab-${{ github.run_number }}
           path: android/app/build/outputs/bundle/release/*.aab
 
       - name: In Google Play hochladen

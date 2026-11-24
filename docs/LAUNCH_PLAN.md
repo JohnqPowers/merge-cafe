@@ -1,4 +1,4 @@
-# Merge Café – Launch-Plan (CEO · CTO · CFO · COO)
+# Noa's Bean Trail – Launch-Plan (CEO · CTO · CFO · COO)
 
 Stand: 12.11.2026 · Alle Entscheidungen sind getroffen; offene Zahlen sind als **Annahme** markiert und werden nach dem Soft Launch durch echte Daten ersetzt.
 
@@ -11,7 +11,7 @@ Stand: 12.11.2026 · Alle Entscheidungen sind getroffen; offene Zahlen sind als 
 - Rewarded UA bezahlt pro erreichtem Meilenstein (Multi-Reward-CPE). Laut Unity haben die meisten dieser Kampagnen 7–10 Stufen.
 - Nutzer aus Offerwalls bleiben deutlich länger als andere Nutzer (laut MAF D7-Retention +86 %), **wenn** das Spiel tiefe, gleichmäßige Progression hat.
 
-**Entscheidung:** Merge-2-Spiel mit Aufträgen und Leveln („Merge Café“).
+**Entscheidung:** Merge-2-Spiel mit Aufträgen und Leveln („Noa's Bean Trail“).
 - Bewährtes Genre, leicht zu erlernen, endlos skalierbar über Level
 - Energie-System = natürliche Monetarisierung (Werbung + Diamanten)
 - Level sind perfekte Meilensteine für Almedia (Level 3 … Level 30)
@@ -102,6 +102,7 @@ Die Ökonomie ist bewusst so gebaut, dass Offerwall-Spieler ab ~Level 12 an die 
 
 | Woche | Aufgabe | Ergebnis |
 |---|---|---|
+| 0 | Namens- und Markenrecherche (DPMA, TMview, WIPO, App Stores), Impressum und Datenschutz mit echten Angaben füllen; Checkliste in `docs/RECHT_UND_NAMEN.md` | Name freigegeben (vor Play-Upload und vor dem Almedia-Kontakt) |
 | 1 | Konten anlegen (Play Console, AdMob, AppsFlyer, RevenueCat), IDs in `CONFIG` eintragen, `PRIVACY.md` hosten | Release-fähiger Build |
 | 1 | `npm install` → Android-Build (README), interner Test mit 5–10 Leuten | Bugfreie .aab |
 | 2 | Play-Store-Eintrag (Texte in `STORE_LISTING.md`, Grafiken in `store/`), Closed Testing (bei neuen Privatkonten verlangt Google einen geschlossenen Test mit mehreren Testern über mehrere Tage – frühzeitig starten) | Freigabe |
@@ -122,7 +123,7 @@ Die Ökonomie ist bewusst so gebaut, dass Offerwall-Spieler ab ~Level 12 an die 
 | Zahlende Nutzer | ≥ 2 % |
 
 ### Pitch-Text für das Almedia-Formular
-> We are launching **Merge Café**, a casual merge-2 game (DE/EN) on Google Play. Deep level progression designed for multi-reward CPE: tutorial → level 5/7/10/12/15/20/25/30 + first purchase, all tracked via AppsFlyer. Monetization: rewarded video + IAP. We'd like to start a soft-launch test (Android, DACH + US/UK) with ~€3k and scale on D7/D30 ROAS. Could you share your recommended event ladder and payout ranges for casual merge titles?
+> We are launching **Noa's Bean Trail**, a casual merge-2 game (DE/EN) on Google Play. Deep level progression designed for multi-reward CPE: tutorial → level 5/7/10/12/15/20/25/30 + first purchase, all tracked via AppsFlyer. Monetization: rewarded video + IAP. We'd like to start a soft-launch test (Android, DACH + US/UK) with ~€3k and scale on D7/D30 ROAS. Could you share your recommended event ladder and payout ranges for casual merge titles?
 
 ---
 
@@ -131,3 +132,4 @@ Die Ökonomie ist bewusst so gebaut, dass Offerwall-Spieler ab ~Level 12 an die 
 - **Betrug/Low-Quality-Nutzer:** AppsFlyer Protect360 oder Plausibilitätsprüfung (Level-Zeiten); Spielstand ist lokal – für große Budgets in v1.1 serverseitige Validierung der Meilensteine einbauen.
 - **Ökonomie zu streng/zu leicht:** `xpNeed()` und `CONFIG.energyRegenMs` in `index.html` sind die zwei Stellschrauben.
 - **Rechtliches:** Datenschutzerklärung, Impressum (DE), Altersfreigabe IARC im Play-Fragebogen ausfüllen; ich bin kein Anwalt – Datenschutztext vor Veröffentlichung prüfen lassen.
+- **Namens-/Klon-Vorwurf (geprüft 24.11.2026):** Idee und Mechanik des Genres sind frei, Code/Grafik/Name eigen; Restrisiko liegt beim Namen (Marken- und Titelkollision). Vor Upload und Werbung: Registerrecherche und Freigabe laut `docs/RECHT_UND_NAMEN.md`. Keine Nachbildung bestimmter Spiele.

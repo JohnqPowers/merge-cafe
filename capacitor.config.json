@@ -1,6 +1,6 @@
 {
   "appId": "io.github.johnqpowers.mergecafe",
-  "appName": "Merge Café",
+  "appName": "Noa's Bean Trail",
   "webDir": "www",
   "android": { "allowMixedContent": false },
   "ios": { "contentInset": "never" },

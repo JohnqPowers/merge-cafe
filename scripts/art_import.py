@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bild-Import fuer Merge Café.
+"""Bild-Import fuer Noa's Bean Trail.
 
 Nimmt ein ZIP oder einen Ordner mit PNG/WebP-Dateien (Namen wie in docs/ART_BRIEF.md) und erzeugt daraus
 einheitliche Sprites in www/art/<key>.webp. Drei Arten, erkannt am Dateinamen:

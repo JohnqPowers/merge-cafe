@@ -2,7 +2,7 @@
   "name": "merge-cafe",
   "version": "1.0.0",
   "private": true,
-  "description": "Merge Café – casual merge game (Android, iOS, Web)",
+  "description": "Noa's Bean Trail – casual merge game (Android, iOS, Web)",
   "scripts": {
     "serve": "npx http-server www -p 8080 -c-1",
     "sync": "npx cap sync",

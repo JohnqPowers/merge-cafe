@@ -1,7 +1,7 @@
-/* Merge Café – Service Worker (nur Web-Version): Netz zuerst, damit neue Versionen sofort ankommen.
+/* Noa's Bean Trail – Service Worker (nur Web-Version): Netz zuerst, damit neue Versionen sofort ankommen.
    Der Cache dient nur als Offline-Reserve. Ändert sich dieser Name, werden alte Caches beim Aktivieren gelöscht. */
-const C = 'mergecafe-v2';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const C = 'mergecafe-v3';
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(C).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' }))))).catch(() => {}));
   self.skipWaiting();

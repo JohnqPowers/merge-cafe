@@ -1,4 +1,4 @@
-# Merge Café – Build & Release
+# Noa's Bean Trail – Build & Release
 
 Casual merge game (genre of top Freecash earners such as *Merge Restaurant*). One code base → Android (Google Play), iOS (App Store), web (itch.io, CrazyGames, Poki, GameDistribution, own PWA).
 

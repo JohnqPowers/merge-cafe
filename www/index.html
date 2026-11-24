@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#3B2A20">
-<title>Merge Café</title>
+<title>Noa's Bean Trail</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -615,6 +615,8 @@ img.art{display:block;width:1.15em;height:1.15em;object-fit:contain;pointer-even
 .sp-logo{filter:none;will-change:transform}
 .sp-hero .steam-a,.sp-hero .spk-a>*{animation:none}
 .sp-title{font:400 clamp(54px,17vw,72px)/1 var(--num);color:#FFF6D8;-webkit-text-stroke:12px #8E1F4A;paint-order:stroke fill;text-shadow:0 7px 0 #8E1F4A,0 13px 0 rgba(90,10,50,.4);letter-spacing:1px;margin-top:4px}
+.sp-title .ln{display:block;animation:none;text-align:center;white-space:nowrap}
+.sp-title .ln2{font-size:.74em;-webkit-text-stroke-width:9px;margin-top:.02em}
 #spWelcome{font-weight:600;text-shadow:0 2px 0 rgba(90,10,50,.55)}
 #spPlay{font:400 28px/1 var(--num);letter-spacing:.8px;background:linear-gradient(#B5F8A4,#35B34D);box-shadow:0 7px 0 #1B7A32,0 14px 22px rgba(20,60,20,.35),inset 0 3px 0 rgba(255,255,255,.7);text-shadow:0 3px 0 rgba(8,80,30,.65);padding:18px 64px 17px;border-radius:26px;position:relative;overflow:hidden;animation:none}
 #spPlay::before{content:"";position:absolute;top:0;bottom:0;left:0;width:38%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:translateX(-160%) skewX(-18deg);animation:sweep 2.8s ease-in-out infinite;will-change:transform}
@@ -849,7 +851,7 @@ img.fx{object-fit:contain}
 </svg>
 <div id="scene" class="sc"></div>
 <div id="app">
-  <div id="brand"><span class="av" id="bAv">🧑‍🍳</span><b id="bCafe">Merge Café</b><span class="rk" id="bRank"></span><span class="ch" id="bChap"></span></div>
+  <div id="brand"><span class="av" id="bAv">🧑‍🍳</span><b id="bCafe">Noa's Bean Trail</b><span class="rk" id="bRank"></span><span class="ch" id="bChap"></span></div>
   <header id="top">
     <div class="lvl" id="lvlBox"><div class="lvlnum"><svg class="xpring" viewBox="0 0 54 54" aria-hidden="true"><circle class="xo" cx="27" cy="27" r="23"/><circle class="xt" cx="27" cy="27" r="23"/><circle class="xf" id="xpRing" cx="27" cy="27" r="23" pathLength="100"/></svg><svg class="ros"><use href="#i-rosette"/></svg><b id="lvlNum">1</b></div></div>
     <div class="res" id="resEnergy"><span class="rico"><svg><use href="#i-bolt"/></svg></span><span class="rv"><b id="energy">100</b><small id="eTimer"></small></span><i class="plus">+</i></div>
@@ -954,7 +956,7 @@ img.fx{object-fit:contain}
   <circle cx="352" cy="262" r="6" fill="#fff"/><circle cx="748" cy="306" r="5" fill="#fff"/><circle cx="212" cy="470" r="5" fill="#FFF3B0"/>
 </g>
 </svg></div>
-  <h1 class="sp-title" id="spTitle">Merge Café</h1>
+  <h1 class="sp-title" id="spTitle">Noa's Bean Trail</h1>
   <div class="sp-pips" id="spFlags"></div>
   <div id="spWelcome"></div>
   <button id="spPlay"></button>
@@ -963,14 +965,14 @@ img.fx{object-fit:contain}
 
 <script>
 /* =====================================================================
-   Merge Café — v1.2.0
+   Noa's Bean Trail (Version: siehe CONFIG.version)
    Single-file HTML5 game. Runs in browsers (web portals, PWA) and inside
    Capacitor (Android/iOS). Native SDKs (AppsFlyer, AdMob, RevenueCat)
    are used automatically when present; web falls back to demo stubs.
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.4',
+  version: '1.5.6',
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
@@ -996,11 +998,11 @@ const STR = {
     tut2:'Super! Tippe auf den Gast, um den Espresso zu liefern.',
     tutDone:'Tutorial geschafft! Erfülle Aufträge und steig im Level auf.',
     tier:'Stufe', next:'nächste', maxed:'Höchste Stufe!', genTap:'Tippen: erzeugt', cost:'kostet 1 ⚡',
-    sold:'Verkauft für', unlocked:'Neue Maschine', cont:'Weiter',
+    sold:'Verkauft für', unlocked:'Neu:', cont:'Weiter',
     refill:'Energie auffüllen', watchAd:'Werbung ansehen', adsLeft:'heute noch',
     free:'Gratis', onlyApp:'Käufe sind in der App-Version verfügbar.',
     starter:'Starterpaket', gemsS:'Handvoll Diamanten', gemsM:'Truhe Diamanten', oneTime:'einmalig',
-    notEnough:'Nicht genug', upGen:'Bessere Maschinen', upGenD:'Mehr Chance auf Stufe 2 beim Erzeugen',
+    notEnough:'Nicht genug', upGen:'Bessere Zutaten', upGenD:'Mehr Chance auf Stufe 2 beim Erzeugen',
     upBat:'Großer Akku', upBatD:'+20 maximale Energie', upSlots:'Mehr Kundschaft', upSlotsD:'+1 Auftragsplatz',
     max:'MAX', dailyT:'Täglicher Bonus', claim:'Abholen', claimed:'Morgen wieder!', day:'Tag',
     sfx:'Soundeffekte', music:'Musik', vib:'Vibration', on:'An', off:'Aus',
@@ -1025,11 +1027,11 @@ const STR = {
     tut2:'Great! Tap the guest to serve the espresso.',
     tutDone:'Tutorial complete! Fill orders and level up.',
     tier:'Tier', next:'next', maxed:'Max tier!', genTap:'Tap: makes', cost:'costs 1 ⚡',
-    sold:'Sold for', unlocked:'New machine', cont:'Continue',
+    sold:'Sold for', unlocked:'New:', cont:'Continue',
     refill:'Refill energy', watchAd:'Watch an ad', adsLeft:'left today',
     free:'Free', onlyApp:'Purchases are available in the app version.',
     starter:'Starter Pack', gemsS:'Handful of Gems', gemsM:'Chest of Gems', oneTime:'one-time',
-    notEnough:'Not enough', upGen:'Better Machines', upGenD:'Higher chance of tier 2 when producing',
+    notEnough:'Not enough', upGen:'Better Ingredients', upGenD:'Higher chance of tier 2 when producing',
     upBat:'Big Battery', upBatD:'+20 max energy', upSlots:'More Customers', upSlotsD:'+1 order slot',
     max:'MAX', dailyT:'Daily Bonus', claim:'Claim', claimed:'Come back tomorrow!', day:'Day',
     sfx:'Sound effects', music:'Music', vib:'Vibration', on:'On', off:'Off',
@@ -1130,7 +1132,8 @@ const CUSTOMERS = ['👩','👨','🧑','👵','👴','🧕','👩‍🦰','🧔
 const MILESTONES = [2,3,5,7,10,12,15,20,25,30,40,50];
 const DAILY = [{coins:50},{energy:20},{gems:5},{coins:120},{energy:40},{gems:10},{gems:25}];
 const COMBO_WORDS = { de:{3:'Lecker!',5:'Köstlich!',7:'Zuckersüß!',10:'Göttlich!',14:'Unglaublich!'}, en:{3:'Tasty!',5:'Delicious!',7:'Sweet!',10:'Divine!',14:'Unreal!'} };
-const SAVE_KEY = 'mergecafe_v1';
+const SAVE_KEY = 'mergecafe_v1'; // bleibt trotz Umbenennung, sonst verlieren Tester ihren Spielstand
+const APP_NAME = "Noa's Bean Trail"; // Spielname: hier, in <title>, manifest, capacitor.config.json und den Store-Texten (docs/STORE_LISTING.md)
 
 /* ---------------- Platform adapter (native SDKs or web fallback) ---------------- */
 const Cap = () => window.Capacitor;
@@ -2307,7 +2310,7 @@ function onLevelUp(L) {
   queueOverlay(done => {
     const ov = $('#ov');
     const chips = `<div class="chips"><span style="--d:${chap ? 2.4 : .55}s">${ic('gem')}+${gems}</span><span style="--d:${chap ? 2.6 : .8}s">${ic('bolt')}${t('energyFull')}</span>
-        ${newGens.map((i, k) => `<span style="--d:${(chap ? 2.8 : 1.05) + k * .2}s">${CHAINS[i].gen} ${t('unlocked')}</span>`).join('')}</div>`;
+        ${newGens.map((i, k) => `<span style="--d:${(chap ? 2.8 : 1.05) + k * .2}s">${CHAINS[i].gen} ${t('unlocked')} ${esc(CHAINS[i].genName[LANG])}</span>`).join('')}</div>`;
     if (chap) {
       const POT = `<svg class="pot" viewBox="0 0 120 92" width="104"><ellipse cx="60" cy="86" rx="42" ry="5" fill="rgba(0,0,0,.28)"/>
         <path d="M20 44Q10 82 40 86H80Q110 82 100 44Z" fill="#8A4A2E" stroke="#4d2518" stroke-width="3"/><path d="M26 52Q60 64 94 52" stroke="#C9803F" stroke-width="5" fill="none"/>
@@ -2876,7 +2879,7 @@ function refill() {
   if (sheet === 'noenergy' || sheet === 'gems') closeModal(); else openShop();
 }
 const UPS = [
-  { k:'gen', ic:'gear', n:'upGen', d:'upGenD', max:5, cost:l => 80 * Math.pow(2, l) },
+  { k:'gen', ic:'star', n:'upGen', d:'upGenD', max:5, cost:l => 80 * Math.pow(2, l) },
   { k:'bat', ic:'battery', n:'upBat', d:'upBatD', max:5, cost:l => 150 * Math.pow(2, l) },
   { k:'slots', ic:'user', n:'upSlots', d:'upSlotsD', max:2, cost:l => [600, 2500][l] }
 ];
@@ -2937,7 +2940,7 @@ function openSettings() {
     ${tgl('sound', 'speaker', t('sfx'), S.sound)}${tgl('music', 'note', t('music'), S.music)}${tgl('vib', 'phone', t('vib'), S.vib)}
     <div class="row"><div class="mi">${ic('shield')}</div><div class="tx">${t('privacy')}</div><a class="btn b" style="text-decoration:none" href="privacy.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
-    <p class="center" style="color:var(--muted);font-size:12px">Merge Café v${CONFIG.version} · ${osName()}</p>`, 'settings');
+    <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>`, 'settings');
 }
 $('#modalBody').addEventListener('click', e => {
   const wc = e.target.closest('[data-world]');
@@ -3246,7 +3249,10 @@ function showOnboarding() {
 
 /* ---------------- Splash / Start ---------------- */
 function setupSplash() {
-  $('#spTitle').innerHTML = 'Merge Café'.split('').map((c, i) => `<span style="animation-delay:${.3 + i * .06}s,${1.5 + i * .08}s">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+  let k = 0; // laufende Buchstabennummer über beide Zeilen
+  // Zeile 1: erstes Wort ("Noa's"), Zeile 2: der Rest ("Bean Trail"); Leerzeichen bleiben normaler Text zwischen den Buchstaben
+  const [w1, ...rest] = APP_NAME.split(' ');
+  $('#spTitle').innerHTML = [w1, rest.join(' ')].filter(Boolean).map((w, wi) => `<span class="ln${wi ? ' ln2' : ''}">${[...w].map(c => { if (c === ' ') return ' '; const i = k++; return `<span style="animation-delay:${.3 + i * .05}s,${1.5 + i * .07}s">${esc(c)}</span>`; }).join('')}</span>`).join('');
   const pf = S.profile, ch = CHAPTERS[worldIdx()];
   const curCh = CHAPTERS.indexOf(chapterFor(S.level));
   $('#spFlags').innerHTML = CHAPTERS.map((c, i) => `<i class="${i > curCh ? 'off' : i === curCh ? 'cur' : ''}" style="--c:${FRAME[i][0]}"></i>`).join('');

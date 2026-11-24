@@ -1,4 +1,4 @@
-# Kunst-Briefing Merge Café
+# Kunst-Briefing Noa's Bean Trail
 
 **Stand 24.11. (v1.5.4): Alle 49 Bilder (22 Teile, 3 Automaten, 12 Figuren, 12 Gäste) sind im Spiel, dazu Brett-Rahmen und die Böden Hamburg, Wien, Paris, Rom (Wien, Paris, Rom vorläufig aus Entwürfen). Offen: Etappe 2 unten (Böden Istanbul, Kyoto, New York, Rio, Sternecafé, Wien/Paris/Rom im Hamburg-Stil, 12 Einzugs-Posen, Effekte).** Dieses Dokument bleibt die Vorlage für Neues (weitere Gäste und Figuren, Katze, Stadt-Hintergründe, Brett-Rahmen). Die Reihenfolge unten ist damit erledigt.
 

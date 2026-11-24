@@ -1,4 +1,4 @@
-# Datenschutzerklärung – Merge Café (Vorlage)
+# Datenschutzerklärung – Noa's Bean Trail (Vorlage)
 
 *Vorlage – vor Veröffentlichung um Name/Anschrift ergänzen und rechtlich prüfen lassen.*
 
@@ -20,7 +20,7 @@ Stand: November 2026
 
 ---
 
-# Privacy Policy – Merge Café (template)
+# Privacy Policy – Noa's Bean Trail (template)
 
 **Controller:** [name, address, email]
 1. **Game progress** is stored locally on your device only.
