@@ -20,6 +20,14 @@ if (!m.includes('android.permission.VIBRATE')) {
   fs.writeFileSync(manifest, m);
   console.log('VIBRATE-Berechtigung eingetragen');
 }
+// Hochformat sperren: Das Spiel ist fürs Hochformat gebaut; im Querformat wären Start-Knopf und Brett auf Handys nicht erreichbar.
+// (Auf Bildschirmen ab 600 dp ignoriert Android 16 die Sperre; dort bleibt das Spiel spielbar, das Brett wird nur kleiner.
+// In sehr niedrigen Fenstern zeigt das Spiel selbst einen Dreh-Hinweis.)
+if (!/android:screenOrientation=/.test(m)) {
+  const y = m.replace(/<activity\b(?=[^>]*android:name="[^"]*MainActivity")/, '<activity android:screenOrientation="portrait"');
+  if (y !== m) { m = y; fs.writeFileSync(manifest, m); console.log('Hochformat gesperrt'); }
+  else console.warn('WARNUNG: MainActivity im Manifest nicht gefunden, Ausrichtung nicht gesperrt');
+}
 let g = fs.readFileSync(gradle, 'utf8');
 g = g.replace(/versionCode\s+\d+/, `versionCode ${build}`).replace(/versionName\s+"[^"]*"/, `versionName "1.0.${build}"`);
 fs.writeFileSync(gradle, g);
