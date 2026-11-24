@@ -994,14 +994,14 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.15',
+  version: '1.5.16',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
     rewardedAndroid: 'ca-app-pub-3940256099942544/5224354917',
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
-  revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro' },   // Pro = dieses Entitlement im RevenueCat-Dashboard
+  revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro', proEnabled: false },   // Pro = dieses Entitlement im RevenueCat-Dashboard. proEnabled: false = Pro ist AUS (Entscheidung 24.11.2026: kein Abo zum Start, docs/MONETARISIERUNG.md). Die Käufe der Diamanten-Pakete laufen davon unabhängig.
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -1332,28 +1332,30 @@ const Platform = {
     const P = Plug(), apiKey = this.rcKey(); if (!P.Purchases || !apiKey) return false;
     if (this.build.kind === 'debug' && P.Purchases.setLogLevel) { try { await P.Purchases.setLogLevel({ level: 'DEBUG' }); } catch (e) {} }   // Test-APK: ausführliche Meldungen (adb logcat)
     try { await P.Purchases.configure({ apiKey }); } catch (e) { console.warn('RevenueCat init', e); return false; }
-    this.rcOk = true; this.rcWatch(); this.refreshPro(); this.loadOffering();
+    this.rcOk = true;
+    if (this.proOn()) { this.rcWatch(); this.refreshPro(); this.loadOffering(); }                         // Pro aus: weder Kundeninfo noch Angebote abfragen
     return true;
   },
+  proOn() { return CONFIG.revenuecat.proEnabled === true; },                                           // Schalter für Noa's Pro (Abo/Lifetime); aus = nichts davon ist sichtbar oder aktiv
   /* Pro = Entitlement CONFIG.revenuecat.entitlement. Quelle ist immer RevenueCat, nie der Spielstand: Kundeninfo beim Start, bei jeder Änderung
      (Listener) und nach der Rückkehr in die App. Offline gilt der Zwischenspeicher des SDK. */
   rcWatch() {
-    const P = Plug(); if (this.rcListen || !P.Purchases || !P.Purchases.addCustomerInfoUpdateListener) return; this.rcListen = true;
+    const P = Plug(); if (!this.proOn() || this.rcListen || !P.Purchases || !P.Purchases.addCustomerInfoUpdateListener) return; this.rcListen = true;
     try {
       const r = P.Purchases.addCustomerInfoUpdateListener(o => { if (!this.applyCustomer((o && o.customerInfo) || o)) this.refreshPro(); });
       if (r && r.catch) r.catch(e => { console.warn('RevenueCat Listener', e); this.rcListen = false; });
     } catch (e) { console.warn('RevenueCat Listener', e); this.rcListen = false; }
   },
   async refreshPro() {
-    const P = Plug(); if (!P.Purchases || !this.rcOk) return this.pro;
+    const P = Plug(); if (!this.proOn() || !P.Purchases || !this.rcOk) return this.pro;
     this.rcT = Date.now();
     try { const r = await P.Purchases.getCustomerInfo(); this.applyCustomer((r && r.customerInfo) || r); }
     catch (e) { console.warn('RevenueCat Kundeninfo', e); }
     return this.pro;
   },
-  resume() { if (this.rcOk && Date.now() - this.rcT > 5000) this.refreshPro(); },                       // zurück in der App: Paywall, Customer Center oder Abo in Google Play geändert
+  resume() { if (this.proOn() && this.rcOk && Date.now() - this.rcT > 5000) this.refreshPro(); },                       // zurück in der App: Paywall, Customer Center oder Abo in Google Play geändert
   applyCustomer(ci) {
-    if (!ci || !ci.entitlements) return false;
+    if (!this.proOn() || !ci || !ci.entitlements) return false;
     const en = (ci.entitlements.active || {})[CONFIG.revenuecat.entitlement], was = this.pro;
     this.pro = !!en && en.isActive !== false; this.proSku = this.pro ? String(en.productIdentifier || '') : '';
     if (typeof ci.managementURL === 'string' && /^https:\/\//.test(ci.managementURL)) this.manageUrl = ci.managementURL;
@@ -1361,7 +1363,7 @@ const Platform = {
     return true;
   },
   async loadOffering() {
-    const P = Plug(); if (this.locked || !P.Purchases || !(this.rcOk || await this.initRC())) return null;
+    const P = Plug(); if (!this.proOn() || this.locked || !P.Purchases || !(this.rcOk || await this.initRC())) return null;
     const had = !!this.offering;
     try {
       const r = await P.Purchases.getOfferings(), cur = r && r.current;
@@ -1370,7 +1372,7 @@ const Platform = {
     if (had !== !!this.offering) refreshSheet();
     return this.offering;
   },
-  proUi() { return isNative() && !this.locked && this.rcOk && (this.pro || !!this.offering); },          // Pro-Karte nur, wenn es wirklich etwas anzubieten gibt
+  proUi() { return this.proOn() && isNative() && !this.locked && this.rcOk && (this.pro || !!this.offering); },          // Pro-Karte nur, wenn es wirklich etwas anzubieten gibt
   proPrice(sku) {                                                                                       // Preis des gekauften Pakets (für das purchase-Ereignis)
     const pk = ((this.offering && this.offering.availablePackages) || []).filter(p => p.product && p.product.identifier), id = String(sku || '');
     const hit = pk.filter(p => p.product.identifier === id), base = pk.filter(p => p.product.identifier.split(':')[0] === id.split(':')[0]);
@@ -1381,6 +1383,7 @@ const Platform = {
      Rückgabe: null = keine Store-Anbindung (Browser), 'off' = nicht verfügbar, 'own' = Plugin fehlt, das Spiel zeigt seine eigene Liste,
      'bought' | 'restored' = Pro ist jetzt aktiv, 'pro' = war schon aktiv, 'cancel' = geschlossen, 'error' */
   async paywall(place) {
+    if (!this.proOn()) return 'off';
     const P = Plug(); if (!P.Purchases) return null;
     if (this.locked) return 'off';
     if (!(this.rcOk || await this.initRC())) return 'off';
@@ -1400,6 +1403,7 @@ const Platform = {
   },
   /* Abo verwalten = RevenueCat Customer Center; 'own' = Plugin fehlt oder Customer Center nicht verfügbar → Hinweis im Spiel */
   async manage() {
+    if (!this.proOn()) return 'off';
     const P = Plug(); if (!P.Purchases) return null;
     if (this.locked) return 'off';
     const U = P.RevenueCatUI; if (!U || !U.presentCustomerCenter) return 'own';
@@ -1409,6 +1413,7 @@ const Platform = {
   },
   /* Käufe wiederherstellen: null = Browser, 'off', false = Fehler, 'pro' = Entitlement aktiv, 'none' = nichts gefunden */
   async restore() {
+    if (!this.proOn()) return 'off';
     const P = Plug(); if (!P.Purchases) return null;
     if (this.locked) return 'off';
     try {
@@ -1422,6 +1427,7 @@ const Platform = {
   isCancel(e) { return !!e && (e.userCancelled === true || (e.data && e.data.userCancelled === true) || String(e.code) === '1' || /cancel/i.test(String(e.readableErrorCode || e.message || ''))); },
   /* Eigene Paket-Liste (Ausweichlösung ohne RevenueCat-Oberfläche): { sku, price, currency } | 'cancel' | 'off' | false | null */
   async purchasePackage(pkg) {
+    if (!this.proOn()) return 'off';
     const P = Plug(); if (!P.Purchases) return null;
     if (this.locked) return 'off';
     try {
@@ -3475,7 +3481,7 @@ function openSettings() {
     <div class="row"><div class="mi av${avArt(S.profile.avatar)}" style="${avStyle(S.profile.avatar)}">${avatarHTML(S.profile.avatar)}</div><div class="tx">${t('profile')}<small>${esc(pname())} · ${esc(S.profile.cafe || t('defCafe'))}</small></div><button class="btn b" data-act="profile">${t('edit')}</button></div>
     ${tgl('sound', 'speaker', t('sfx'), S.sound)}${tgl('music', 'note', t('music'), S.music)}${tgl('vib', 'phone', t('vib'), S.vib)}
     ${Platform.proUi() ? `<div class="row"><div class="mi">${ic('star')}</div><div class="tx">${t('proT')}<small>${Platform.pro ? t('proOn') : t('proOff')}</small></div><button class="btn ${Platform.pro ? 'b' : 'g'}" data-act="${Platform.pro ? 'manage' : 'pro'}">${Platform.pro ? t('proManage') : t('proView')}</button></div>` : ''}
-    ${isNative() && !Platform.locked && Platform.rcOk ? `<div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('restore')}<small>${t('restoreD')}</small></div><button class="btn b" data-act="restore">${t('restoreGo')}</button></div>` : ''}
+    ${Platform.proOn() && isNative() && !Platform.locked && Platform.rcOk ? `<div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('restore')}<small>${t('restoreD')}</small></div><button class="btn b" data-act="restore">${t('restoreGo')}</button></div>` : ''}
     ${Platform.privacyForm ? `<div class="row"><div class="mi">${ic('tv')}</div><div class="tx">${t('adPriv')}<small>${t('adPrivD')}</small></div><button class="btn b" data-act="privopt">${t('open')}</button></div>` : ''}
     <div class="row"><div class="mi">${ic('shield')}</div><div class="tx">${t('privacy')}</div><a class="btn b" style="text-decoration:none" href="privacy.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('user')}</div><div class="tx">${t('legal')}</div><a class="btn b" style="text-decoration:none" href="impressum.html">${ic('info')}</a></div>
@@ -3483,7 +3489,7 @@ function openSettings() {
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
     <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
     ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}
-    ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}<br>${t('rcDbg', { s: Platform.rcOk ? (Platform.build.rcTest ? 'Test Store' : 'live') : 'off', n: ((Platform.offering && Platform.offering.availablePackages) || []).length, p: Platform.pro ? '✓' : '–' })}</p>` : ''}`, 'settings');
+    ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}<br>${t('rcDbg', { s: Platform.rcOk ? (Platform.build.rcTest ? 'Test Store' : 'live') : 'off', n: ((Platform.offering && Platform.offering.availablePackages) || []).length, p: Platform.proOn() ? (Platform.pro ? '✓' : '–') : 'off' })}</p>` : ''}`, 'settings');
 }
 $('#modalBody').addEventListener('click', e => {
   const wc = e.target.closest('[data-world]');

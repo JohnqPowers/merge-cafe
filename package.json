@@ -18,8 +18,7 @@
     "@capacitor/android": "latest",
     "@capacitor/core": "latest",
     "@capacitor/ios": "latest",
-    "@revenuecat/purchases-capacitor": "latest",
-    "@revenuecat/purchases-capacitor-ui": "latest"
+    "@revenuecat/purchases-capacitor": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
