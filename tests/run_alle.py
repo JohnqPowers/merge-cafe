@@ -5,7 +5,7 @@
 Aufruf aus dem Projektordner:
   python3 -I tests/run_alle.py                                 alle Tests, Tabelle am Ende, Ausgang 1 bei Fehlern
   python3 -I tests/run_alle.py --json nachher.json             zusätzlich als JSON speichern
-  python3 -I tests/run_alle.py --wurzel /tmp/ref --json v.json läuft in einem anderen Arbeitsverzeichnis (z. B. `git worktree add /tmp/ref v1.5.19`)
+  python3 -I tests/run_alle.py --wurzel /tmp/ref --json v.json läuft in einem anderen Arbeitsverzeichnis (z. B. `git worktree add --detach /tmp/ref 0c1bd88`)
   python3 -I tests/run_alle.py --nur test_katze,test_store     nur diese Tests
   python3 -I tests/run_alle.py --vergleich vorher.json nachher.json   Vorher-Nachher-Tabelle (Ausgang 1 bei Rückschritt)
 

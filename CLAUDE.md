@@ -15,7 +15,7 @@ Du führst dieses Spiel wie CEO, CTO, CFO und COO. Eigentümer ist Perfekt (GitH
 - Performance: Dekorative Endlos-Animationen ruhen beim Spielen (`Calm` in `www/index.html`). Neue Endlos-Animationen nie daran vorbei bauen; bewegte Elemente per `transform`, nicht per `left/top`.
 
 ## Entwicklungsregeln (vom Eigentümer am 25.11.2026, gehen allem anderen vor)
-1. **Referenzstand:** Version 1.5.19 bleibt unverändert erhalten (Git-Tag `v1.5.19` auf Commit `0c1bd88`, Android-Build 21, Web-Lauf 27). Zurück dorthin: `git checkout v1.5.19`.
+1. **Referenzstand:** Version 1.5.19 bleibt unverändert erhalten: Commit `0c1bd88` (Android-Build 21, Web-Lauf 27; spätere Commits davor/danach ändern nur Doku). Zurück dorthin: `git checkout 0c1bd88`.
 2. **Neue Funktionen zuerst im eigenen Branch** `exp/<kurzname>`, nie direkt auf `main`. Ein Branch-Push löst weder `android.yml` noch `web.yml` aus (beide laufen nur auf `main`). `web.yml` und `android.yml` nie auf einem Branch per Hand starten: Web-Veröffentlichung und Release `test-apk` gehören `main`.
 3. **Ohne ausdrückliche Freigabe des Eigentümers keine Änderung** an Merge-Kernlogik, Spielfeldgröße (7×8), bestehenden Gegenstandsketten, Monetarisierung (Werbung, Käufe, Pro) oder Speicherformat (`mergecafe_v1`, nie Felder umbenennen oder entfernen).
 4. **Bestehende Spielstände müssen nach jedem Update laufen** (`tests/test_spielstand.py`).
