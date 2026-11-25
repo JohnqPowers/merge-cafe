@@ -14,6 +14,16 @@ Du führst dieses Spiel wie CEO, CTO, CFO und COO. Eigentümer ist Perfekt (GitH
 - Service Worker `www/sw.js` (nur Web-Version): Netz zuerst, Cache nur als Offline-Reserve. Niemals zurück auf Cache-first, sonst bleiben Spieler auf alten Versionen hängen. In der App läuft kein Service Worker.
 - Performance: Dekorative Endlos-Animationen ruhen beim Spielen (`Calm` in `www/index.html`). Neue Endlos-Animationen nie daran vorbei bauen; bewegte Elemente per `transform`, nicht per `left/top`.
 
+## Entwicklungsregeln (vom Eigentümer am 25.11.2026, gehen allem anderen vor)
+1. **Referenzstand:** Version 1.5.19 bleibt unverändert erhalten (Git-Tag `v1.5.19` auf Commit `0c1bd88`, Android-Build 21, Web-Lauf 27). Zurück dorthin: `git checkout v1.5.19`.
+2. **Neue Funktionen zuerst im eigenen Branch** `exp/<kurzname>`, nie direkt auf `main`. Ein Branch-Push löst weder `android.yml` noch `web.yml` aus (beide laufen nur auf `main`). `web.yml` und `android.yml` nie auf einem Branch per Hand starten: Web-Veröffentlichung und Release `test-apk` gehören `main`.
+3. **Ohne ausdrückliche Freigabe des Eigentümers keine Änderung** an Merge-Kernlogik, Spielfeldgröße (7×8), bestehenden Gegenstandsketten, Monetarisierung (Werbung, Käufe, Pro) oder Speicherformat (`mergecafe_v1`, nie Felder umbenennen oder entfernen).
+4. **Bestehende Spielstände müssen nach jedem Update laufen** (`tests/test_spielstand.py`).
+5. **Jede neue Funktion ist einzeln abschaltbar:** Schalter in `CONFIG.features`. Aus heißt: keine Elemente, keine Timer, keine Dateizugriffe.
+6. **Vor dem Zusammenführen alle Tests** auf Referenzstand und Branch laufen lassen und die Vorher-Nachher-Tabelle zeigen (`python3 -I tests/run_alle.py`, Ablauf in `docs/EXPERIMENTE.md`).
+7. **Kein automatischer Merge auf `main`** für Experimente. Zusammengeführt wird nur auf ausdrücklichen Auftrag des Eigentümers.
+Die Regeln gelten zusätzlich zu den „Harten Grenzen“. Der wöchentliche Balancing-Schritt unten bleibt bestehen, solange er Werbung, Käufe und Pro nicht berührt; sonst vorher Freigabe einholen. Übersicht der Experimente: `docs/EXPERIMENTE.md`.
+
 ## Wöchentlicher Ablauf
 1. `reports/appsflyer/*.csv` lesen. Fehlen die Daten oder sind sie älter als 3 Tage: im Bericht nennen und nur Code-Pflege machen.
 2. KPIs gegen die Ziele aus `docs/LAUNCH_PLAN.md` prüfen: Tutorial ≥ 85 %, D1 ≥ 40 %, D7 ≥ 15 %, Anteil zahlender Nutzer ≥ 2 %, D7-ROAS ≥ 15 %.
@@ -22,7 +32,7 @@ Du führst dieses Spiel wie CEO, CTO, CFO und COO. Eigentümer ist Perfekt (GitH
    - D7 schwach → `DAILY`-Belohnungen erhöhen oder `CONFIG.energyRegenMs` senken
    - kaum Werbung/Käufe ab Level 12 → Energiekosten leicht erhöhen oder Regeneration verlangsamen
    - Event-Namen in `docs/EVENTS.md` niemals umbenennen (Almedia rechnet darüber ab)
-4. Jede Änderung: `CONFIG.version` erhöhen, mit Playwright/Chrome kurz testen (Tutorial bis zur ersten Lieferung, keine Konsolenfehler), dann committen und auf `main` pushen. Der Push löst Android-Build und Web-Veröffentlichung aus.
+4. Jede Änderung: `CONFIG.version` erhöhen, mit Playwright/Chrome kurz testen (Tutorial bis zur ersten Lieferung, keine Konsolenfehler), dann committen und auf `main` pushen. Der Push löst Android-Build und Web-Veröffentlichung aus. (Gilt für Balancing und Pflege; neue Funktionen laufen nach den Entwicklungsregeln über einen Branch.)
 5. Bericht als `reports/weekly/JJJJ-MM-TT.md` mit Kennzahlen, Diagnose, Änderung und Empfehlung (skalieren / halten / stoppen). Den Bericht auch dem Eigentümer schicken.
 
 ## Harte Grenzen
