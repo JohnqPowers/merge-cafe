@@ -1,6 +1,6 @@
 # Test- und Qualitätsbericht – Noa's Bean Trail
 
-Stand: 25.11.2026. Spielversion 1.5.18 (Push auf `main` am 25.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
+Stand: 25.11.2026. Spielversion 1.5.19 (Push auf `main` am 25.11.2026). Der Bericht trennt streng zwischen **geprüft** (mit Messwert oder Testprotokoll) und **nicht geprüft**. Wo etwas nicht geprüft ist, steht das da, und im Abschnitt 8 steht, wie es nachgeholt wird.
 
 ## 1. Kurzfazit
 
@@ -23,7 +23,7 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 - Der Spielstand `tests/state.json` (Level 12, Paris) wird für Tests ab Level 12 eingespielt.
 - Konsolenfehler und fehlende Bilder zählen als Testfehler.
 
-## 3. Automatische Tests (Lauf vom 25.11.2026, Version 1.5.17; zu 1.5.18 nur Icon-Größe, Kurzlauf grün)
+## 3. Automatische Tests (Lauf vom 25.11.2026, Version 1.5.19)
 
 | Datei | Ergebnis | Inhalt |
 |---|---|---|
@@ -34,7 +34,7 @@ Empfehlung: Für den internen Test (`internal`) und einen geschlossenen Test rei
 | `tests/test_store.py` | **91/91** | Store-Unterlagen ohne Browser: Titel höchstens 30, Kurzbeschreibung 80, Beschreibung 4000 Zeichen, Alt-Texte höchstens 140; keine Werbewörter, Emojis oder Fremdnamen im Titel; Zahlen im Text (22 Leckereien, 3 Ketten, 9 Welten, 12 Figuren, 7 Bonus-Tage, Automaten, Städte) stimmen mit `www/index.html`; Icon 512×512 mit Alpha, Feature-Grafiken 1024×500 ohne Alpha, 6 Screenshots je Sprache 1080×1920 ohne Alpha, deutsche und englische Fassung verschieden, keine Reste mit altem Namen in `store/`. Mit absichtlich falschem Text geprüft: schlägt dann fehl. |
 | `tests/test_herkunft.py` | **16/16** | Herkunftsnachweise ohne Browser: Manifest der ausgelieferten Dateien (`docs/herkunft/ausgelieferte_dateien.csv`) ist aktuell und stimmt mit den Dateien überein (Pfad, Größe, SHA-256), jedes Spielbild hat eine Quelle, Verzeichnis des Eigentümers und Paketlisten sind stimmig, keine Namen anderer Spiele in den Herkunftsdateien |
 | `tests/test_katze.py` | **11/11** | Katze Mocha (ab 1.5.17 nur Ruhebild): Bild geladen, nur `c01` bis `c03` im Netz, keine Flug-Ebene, Antippen, fehlende Bilder (gezeichnete Katze bleibt), 360×640, 5 Gästeplätze (Katze ausgeblendet), Dateien in `www/art/cat`. |
-| `tests/test_hintergrund.py` | **7/7** | Vollbild-Hintergrund je Welt (`art/b<N>.webp`): mit Bild ersetzt er Szene und Boden, ohne Bild bleibt alles wie zuvor, andere Welten unberührt. |
+| `tests/test_hintergrund.py` | **20/20** | Aufbereitung (9:16 wird 720×1560, Naht ohne Sprung, Bildkörper unverändert, 9:19,5 unverändert, Querformat abgelehnt), Dateien (`b0` bis `b8`, `frame1` bis `frame8`, Größe), alle neun Welten im Browser (richtige Datei, füllt 390×844, keine gezeichnete Szene, richtiger Rahmen), Brett und Bestellleiste an unveränderter Stelle, breites Fenster 1280×800 (520 px mit verwischtem Rand), Rückfall ohne Bild. |
 | `tests/test_wortwahl.py` | **12/12** | Wortwahl und Anzeige ab 1.5.17: „Take-away“ mit Take-away-Symbol statt „Verkaufen“ und Mülltonne, „Bessere Artikel“ mit Chance in Prozent (10 % → 15 % bis 35 %), Hinweis „Stufe 2!“ beim Glückstreffer und keiner ohne, Stufe 1 ohne Zahl auf dem Teil; Deutsch und Englisch, keine Konsolenfehler. |
 
 **Zusatzprüfung zu 1.5.13:** `scripts/inject-config.js` wurde auf einer Kopie von `www/` ausgeführt (Rechtstexte ohne Platzhalter, deshalb `legalReady: true`). Die Seite lädt in Chrome (390×844) ohne Konsolen- oder Seitenfehler, Impressum und Datenschutz zeigen die Anbieterangaben ohne Platzhalter. Das ist die Browser-Schicht des CI-Builds.
@@ -94,6 +94,7 @@ Einordnung: Auf einem Einsteiger-Handy können Merge und Automat tippen noch sp�
 - v1.5.10: Querformat auf dem Handy (Hochformat-Sperre, Dreh-Hinweis); Schrift „Lilita One“ lag verändert unter dem Originalnamen vor (jetzt unverändert, siehe Lizenzverzeichnis).
 - v1.5.12: Das Diamanten-Fenster nannte „+3 bis +7 pro Level“; ab Level 15 gibt es mehr (Formel 3 + 2 je 5 Level). Der Text ist korrigiert, die Chancen (Geschenk, Stufe 2 beim Erzeugen) stehen jetzt im Spiel.
 - v1.5.11: Die öffentliche Test-APK hätte mit echter AdMob-Kennung echte Anzeigen gezeigt (Kontosperre bei eigenen Klicks möglich); sie nutzt jetzt Googles Test-Anzeigenblock.
+- v1.5.19 (Stadtpaket des Eigentümers, 25.11.2026): Die neun Kulissen lagen mit den Wahrzeichen hinter Kopfleiste und Bestellleiste (Paris: kein Eiffelturm zu sehen); der Import setzt oben Himmel an, die Wahrzeichen stehen jetzt im freien Fenster über dem Brett. In der Web-Version am Desktop und Tablet wurde das Hochformat riesig aufgezogen; die Kulisse ist dort auf die Spaltenbreite (520 px) begrenzt, der Rand ist verwischt. **Nicht geprüft:** Aussehen und Arbeitsspeicher auf einem echten Handy; auf sehr kurzen Schirmen (360×640) verdeckt das Brett Teile der Wahrzeichen.
 - v1.5.17 (Rückmeldung des Eigentümers vom Handy, 24.11.2026): Die Katze blieb nach dem Streicheln auf dem Brett stehen und verdeckte es; Sprung und Streicheln entfernt (außerdem 22 statt 3 Bilder im Arbeitsspeicher). „Verkaufen“ mit Mülltonne war irreführend, jetzt „Take-away“ mit Take-away-Symbol. „Bessere Zutaten“ war nicht spürbar: Jetzt heißt es „Bessere Artikel“, zeigt die Chance in Prozent und meldet einen Glückstreffer („Stufe 2!“); die Chancen selbst sind unverändert. Das App-Icon wirkte auf dem Handy zu klein: Motiv in der Android-Vordergrundebene von 690 auf 810 px vergrößert, Rand bis an die Ecken gefüllt; nach dem Vergleich im Homescreen-Screenshot des Eigentümers in 1.5.18 weiter auf 930 px (91 % der Ebene). Auf jedem Teil stand eine Zahl, auch bei Stufe 1; jetzt erst ab Stufe 2. Die gezeichnete Szene oben passt in Paris nicht zu den gemalten Bildern: Platz für ein Vollbild-Hintergrundbild je Welt eingebaut (`b<N>`), Bilder fehlen noch (`docs/ART_BRIEF.md`, Etappe 3).
 
 ## 7. Freigabekriterien

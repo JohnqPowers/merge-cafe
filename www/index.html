@@ -473,7 +473,9 @@ svg.ic.l{width:26px;height:26px}
   box-shadow:inset 0 4px 9px rgba(0,0,0,.45),inset 0 -2px 0 rgba(255,255,255,.14)}
 #board::after{content:"";position:absolute;inset:-1.425% -3% -4.63% -3%;z-index:6;pointer-events:none;background:var(--frimg,url(art/frame.webp)) 0 0/100% 100% no-repeat}
 .sc-floor{position:absolute;display:block;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none}
-.sc-bg{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0;pointer-events:none;-webkit-user-drag:none;user-select:none}
+.sc-bg{position:absolute;top:0;left:0;right:0;margin:0 auto;display:block;width:min(100%,520px);height:100%;object-fit:cover;object-position:50% 0;pointer-events:none;-webkit-user-drag:none;user-select:none}
+/* breite Fenster (Web am Desktop/Tablet): Kulisse bleibt so breit wie die App-Spalte (520 px), der Rest ist eine verwischte Kopie desselben Bildes */
+@media (min-width:521px){.sc-hasbg::before{content:"";position:absolute;inset:-40px;background:var(--bgu) 50% 0/cover;filter:blur(28px);pointer-events:none}}
 .cell,.cell:nth-child(odd){background:var(--hole);border-radius:12px;box-shadow:var(--holesh)}
 .cell:nth-child(even){background:var(--hole2)}
 .cell .it{font-size:min(60cqw,38px);text-shadow:0 2px 2px rgba(60,25,5,.35)}
@@ -987,7 +989,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.18',
+  version: '1.5.19',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
@@ -1471,7 +1473,7 @@ const ic = (n, c = '') => `<svg class="ic ${c}"><use href="#i-${n}"/></svg>`;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const itemName = it => it.g !== undefined ? CHAINS[it.g].genName[LANG] : CHAINS[it.c][LANG][it.t];
 /* Bilder statt Emoji: ART = Teile mit fertigem Bild (Liste pflegt scripts/art_import.py). Alles ohne Bild bleibt Emoji. */
-const ART = new Set(['a1', 'a10', 'a11', 'a12', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'c1', 'c10', 'c11', 'c12', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'f0', 'f1', 'f2', 'f3', 'frame', 'g1', 'g2', 'g3', 'k1_s1', 'k1_s2', 'k1_s3', 'k1_s4', 'k1_s5', 'k1_s6', 'k1_s7', 'k2_s1', 'k2_s2', 'k2_s3', 'k2_s4', 'k2_s5', 'k2_s6', 'k2_s7', 'k2_s8', 'k3_s1', 'k3_s2', 'k3_s3', 'k3_s4', 'k3_s5', 'k3_s6', 'k3_s7']);
+const ART = new Set(['a1', 'a10', 'a11', 'a12', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'c1', 'c10', 'c11', 'c12', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'f0', 'f1', 'f2', 'f3', 'frame', 'frame1', 'frame2', 'frame3', 'frame4', 'frame5', 'frame6', 'frame7', 'frame8', 'g1', 'g2', 'g3', 'k1_s1', 'k1_s2', 'k1_s3', 'k1_s4', 'k1_s5', 'k1_s6', 'k1_s7', 'k2_s1', 'k2_s2', 'k2_s3', 'k2_s4', 'k2_s5', 'k2_s6', 'k2_s7', 'k2_s8', 'k3_s1', 'k3_s2', 'k3_s3', 'k3_s4', 'k3_s5', 'k3_s6', 'k3_s7']);
 const artKey = it => it.g !== undefined ? 'g' + (it.g + 1) : 'k' + (it.c + 1) + '_s' + (it.t + 1);
 const hasArt = it => ART.has(artKey(it));
 const artImg = key => `<img class="art" src="art/${key}.webp" alt="" draggable="false" decoding="async">`;
@@ -2780,7 +2782,8 @@ function setFrameArt(i, now) {
 function buildLayer(i) {
   const l = document.createElement('div'); l.className = 'sc-layer';
   if (ART.has('b' + i)) {            // fertiges Vollbild der Welt (docs/ART_BRIEF.md, Datei b<N>): ersetzt gezeichnete Szene und Boden, eine Quelle für den ganzen Hintergrund
-    const bg = new Image(); bg.className = 'sc-bg'; bg.alt = ''; bg.decoding = 'async'; bg.draggable = false; bg.src = 'art/b' + i + '.webp'; l.appendChild(bg); return l;
+    const bg = new Image(); bg.className = 'sc-bg'; bg.alt = ''; bg.decoding = 'async'; bg.draggable = false; bg.src = 'art/b' + i + '.webp'; l.appendChild(bg);
+    l.classList.add('sc-hasbg'); l.style.setProperty('--bgu', 'url(art/b' + i + '.webp)'); return l;
   }
   l.innerHTML = Scenes.svg(i);
   if (ART.has('f' + i)) { const im = new Image(); im.className = 'sc-floor'; im.alt = ''; im.decoding = 'async'; im.draggable = false; im.src = 'art/f' + i + '.webp'; l.appendChild(im); }   // fertiger Boden (docs/ART_BRIEF.md)

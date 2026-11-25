@@ -28,8 +28,11 @@ SPALTEN = ['pfad', 'gruppe', 'bytes', 'sha256', 'pixel', 'version', 'herkunft', 
            'quelle_status', 'nachweis']
 KATZENPAKET = 'Noas_Bean_Trail_Katze_Claude_Paket.zip'
 KATZE_PRAEFIX = 'Noas_Bean_Trail_Cat_Integration/'
+STADTPAKET = 'Noas_Bean_Trail_Stadtpaket_mit_Animationen_Claude.zip'      # Lieferung vom 25.11.2026: Kulissen b0..b8, Stadtrahmen frame1..frame8
+STADT = ['hamburg', 'wien', 'paris', 'rom', 'istanbul', 'kyoto', 'new_york', 'rio', 'sternecafe']   # Welt 0..8 (Hamburg nutzt den Standardrahmen `frame`)
 
 KI = 'KI-Bild (überwiegend OpenAI-Bildgenerierung nach Briefing; Erklärung des Eigentümers 24.11.2026), im Projekt aufbereitet'
+KI_STADT = 'KI-Bild (OpenAI-Bildgenerierung laut Lieferung vom 25.11.2026; Rechte nicht zugesichert), im Projekt aufbereitet (oben auf 9:19,5 ergänzt, scripts/art_import.py)'
 KATZE = 'KI-Bild (Erklärung des Eigentümers 24.11.2026); Frames im Katzenpaket durch Skalierung, Drehung und Verschiebung abgeleitet, im Projekt aufbereitet'
 ICON = 'KI-Bild des Eigentümers (Icon-Original), im Projekt abgeleitet (assets/src/build-icon.py)'
 GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile gilt
@@ -38,7 +41,7 @@ GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile
     (r'^www/art/a\d+\.webp$', 'Spielerfigur', KI),
     (r'^www/art/c\d+\.webp$', 'Gast', KI),
     (r'^www/art/f\d+\.webp$', 'Boden', KI),
-    (r'^www/art/b\d+\.webp$', 'Hintergrund (Vollbild)', KI),
+    (r'^www/art/b\d+\.webp$', 'Hintergrund (Vollbild)', KI_STADT),
     (r'^www/art/frame\d*\.webp$', 'Brett-Rahmen', KI),
     (r'^www/art/e\d+\.webp$', 'Einzugs-Pose', KI),
     (r'^www/art/fx_[a-z0-9]+\.webp$', 'Effekt', KI),
@@ -61,6 +64,7 @@ BODEN_NACHGESTELLT = re.compile(r'^f[23]$')
 NACH_ART = 'bitgleich nachgestellt 24.11.2026 (scripts/art_import.py)'
 NACH_BODEN = 'bitgleich nachgestellt 24.11.2026 (scripts/floor_prep.py, scripts/art_import.py)'
 NACH_KATZE = 'bitgleich nachgestellt 24.11.2026 (scripts/cat_import.py)'
+NACH_STADT = 'bitgleich nachgestellt 25.11.2026 (scripts/art_import.py aus dem ZIP, Kopie des Repos)'
 NACH_ICON = 'bitgleich nachgestellt 24.11.2026 (assets/src/build-icon.py)'
 NACH_F1 = 'Zuordnung nur nach Dateiname; ausgeliefertes f1.webp nicht bitgleich nachstellbar (vorläufiger Boden)'
 NACH_HASH = 'Prüfsumme gleich Verzeichnis-Eintrag'
@@ -100,6 +104,17 @@ def katzen_zuordnung():
     return out
 
 
+def stadtpaket_zuordnung():
+    """Kulissen und Stadtrahmen der Lieferung vom 25.11.2026: Zieldatei -> Zeile der Paketliste (Quelle im ZIP)."""
+    paket = {r['datei'].split('/', 1)[1]: r for r in lesen_csv(PAK, 'utf-8') if r['paket'] == STADTPAKET}
+    out = {}
+    for i, n in enumerate(STADT):
+        out[f'www/art/b{i}.webp'] = paket.get(f'01_Neue_Stadtkulissen/PNG_Originale/bg_{n}_portrait.png')
+        if i:
+            out[f'www/art/frame{i}.webp'] = paket.get(f'02_Bestehende_Rahmen/frame_{n}.png')
+    return {k: v for k, v in out.items() if v}
+
+
 def pixelmass(p):
     if p.suffix.lower() not in ('.webp', '.png'):
         return ''
@@ -129,6 +144,7 @@ def erzeugen():
                 lib_key.setdefault(m.group(1), r)
     icon_orig = next((r for r in lib if 'icon_original' in r['Pfad']), None)
     katze = katzen_zuordnung()
+    stadt = stadtpaket_zuordnung()
     zeilen = []
     for p in dateien():
         rel = p.relative_to(ROOT).as_posix()
@@ -147,6 +163,11 @@ def erzeugen():
                 quelle = ' + '.join(r['datei'].removeprefix(KATZE_PRAEFIX) for r in qs)
                 qsha = ' + '.join(dict.fromkeys(r['sha256'] for r in qs))
                 paket, qstatus, nachweis = KATZENPAKET, 'Katzenpaket (nicht im Verzeichnis des Eigentümers)', NACH_KATZE
+        elif rel in stadt:
+            r = stadt[rel]
+            quelle, paket, qsha = r['datei'], r['paket'], r['sha256']
+            qstatus = 'Stadtpaket 25.11.2026 (' + ('Prüfsumme im Verzeichnis des Eigentümers' if r['im_verzeichnis'] == 'ja' else 'nicht im Verzeichnis des Eigentümers') + ')'
+            nachweis = NACH_STADT
         elif rel.startswith('www/art/') and stamm in lib_key:
             r = lib_key[stamm]
             quelle, paket, qsha, qstatus = r['Pfad'], r['Quelle'], r['SHA256'], r['Status']

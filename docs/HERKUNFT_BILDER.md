@@ -7,7 +7,7 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
 | Frage | Antwort |
 |---|---|
 | Womit sind die Bilder entstanden? | Überwiegend mit der Bildgenerierung von OpenAI in ChatGPT, nach Briefings des Eigentümers (`docs/ART_BRIEF.md`), teils mit hochgeladenem Referenzmaterial. Danach zugeschnitten, freigestellt, skaliert und als WebP für die App aufbereitet (Skripte im Repo). |
-| Ist die Kette belegt? | **Teilweise.** Von den 83 Bild- und Tondateien in `www/art` und `www/icons` lassen sich 82 aus den gelieferten Paketen mit den Skripten des Repos **bitgleich nachstellen** (geprüft am 24.11.2026). Ausnahme: der vorläufige Boden `f1`. Nicht belegt sind Prompt, Modellversion, Tarif und Tag jeder einzelnen Generierung. |
+| Ist die Kette belegt? | **Teilweise.** Von den 77 Bild- und Tondateien in `www/art` und `www/icons` lassen sich 76 aus den gelieferten Paketen mit den Skripten des Repos **bitgleich nachstellen** (geprüft am 24.11.2026, die 17 Dateien der Lieferung vom 25.11.2026 am 25.11.2026). Ausnahme: der vorläufige Boden `f1`. Nicht belegt sind Prompt, Modellversion, Tarif und Tag jeder einzelnen Generierung. |
 | Wem gehören die Rechte? | Nach den EU-Nutzungsbedingungen von OpenAI stehen dem Nutzer im Verhältnis zu OpenAI die Rechte am Ergebnis zu, soweit rechtlich zulässig; Ergebnisse können denen anderer Nutzer ähneln. Das klärt keine Rechte Dritter (Abschnitt 3). |
 | Was steht noch aus? | Siehe Abschnitt 7: Prompts und Tarif, Rechte am Referenzmaterial, Sichtprüfung gegen bekannte Figuren, ersetzbare Entwürfe, Herkunft des Startbilds. |
 
@@ -46,6 +46,14 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
    - **nicht nachstellbar:** `f1` (vorläufiger Boden, Platzhalter für Wien). Die Quelle `f1_berlin.png` steht im Entwurfspaket und im Verzeichnis, die ausgelieferte Datei entstand aber anders oder aus einer anderen Fassung.
 3. **Grenze dieser Prüfung:** Sie belegt „Paket → Skript → Spieldatei“. Sie belegt nicht, wie die Pakete selbst entstanden sind. Bitgleichheit gilt für die Bibliotheksversionen vom 24.11.2026 (Pillow, OpenCV, NumPy); andere Versionen können abweichende Bytes liefern, ohne dass die Quelle falsch wäre. Nachstellen immer in einer Kopie des Repos: Die Skripte überschreiben `www/art` und das Bildmanifest in `www/index.html`.
 
+4. **Lieferung vom 25.11.2026 („Stadtpaket“, `Noas_Bean_Trail_Stadtpaket_mit_Animationen_Claude.zip`, 78 Dateien, 41 MB):**
+   - **Herkunft laut Begleittext der Lieferung:** Neun Stadtkulissen und eine überarbeitete Pâtisserie-Theke am 25.11.2026 mit der OpenAI-Bildgenerierung erzeugt; die neun Stadtrahmen und 16 Produktgrafiken stammen aus dem früheren Paket. Prompts, Modellversion und Tarif liegen nicht bei. Der Begleittext gibt **keine Zusicherung exklusiver Rechte** und verlangt, Urheber- und Markenrecht sowie Store-Richtlinien vor dem Release gesondert zu prüfen (Abschnitt 7).
+   - **Prüfsummen:** Alle 77 Einträge der Liste des Pakets stimmen mit seinem eigenen Manifest überein. Neun Dateien (die Stadtrahmen) stehen auch im Verzeichnis des Eigentümers; der Rahmen `frame_hamburg.png` ist dieselbe Datei wie der bisherige Standardrahmen `frame.png`.
+   - **Im Spiel seit 1.5.19:** Kulissen `b0` bis `b8` (aus `bg_<stadt>_portrait.png`, 941×1672, oben auf 9:19,5 ergänzt, 720×1560) und Stadtrahmen `frame1` bis `frame8` (Hamburg nutzt weiter `frame`). Die Böden `f0` bis `f3` bleiben als Rückfall in den Dateien.
+   - **Nachstellung (25.11.2026):** In einer Kopie des Repos aus dem ZIP neu erzeugt, alle 17 Dateien **bitgleich**. Die Dateinamen des Pakets passen nicht zum Importmuster, außerdem würden die Kettendateien `g4`, `g5`, `k4_*`, `k5_*` als Spielteile eingelesen. Darum zuerst umbenennen (Welt N: hamburg 0, wien 1, paris 2, rom 3, istanbul 4, kyoto 5, new_york 6, rio 7, sternecafe 8): `bg_<stadt>_portrait.png` → `b<N>_<stadt>.png`, `frame_<stadt>.png` → `frame<N>_<stadt>.png` (ohne Hamburg), alles in einen leeren Ordner, dann `python3 -I scripts/art_import.py <Ordner> --root <Kopie des Repos>`.
+   - **Nicht eingebaut:** die Ketten Schokolade und Pâtisserie (`g4`, `g5`, `k4_s1` bis `k5_s7`; im Spiel gibt es dafür keine Ketten, Balancing und Spielstand-Migration fehlen), die neue Pâtisserie-Theke (Kandidat für das nicht vorhandene `g5`), die Möwe und `city_ambience.*` (Animationen erst nach der Prüfung auf dem Handy) sowie die 768-px-WebPs (die Pipeline erzeugt aus den PNG-Originalen).
+   - **Sichtprüfung durch den Agenten (25.11.2026):** In den neun Kulissen sind keine lesbare Schrift, keine Logos und keine Marken zu sehen. Die Kulissen zeigen reale Bauwerke (Abschnitt 7); das Sternecafé ist erfunden.
+
 ## 6. Regeln für neue Dateien
 
 1. Die Pakete gelten als projektintern erzeugte KI-Bilder. Die Herkunftserklärung ist **keine zusätzliche Lizenz**.
@@ -63,8 +71,9 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
 | Nutzungsbedingungen von OpenAI: Stand des Abrufs sichern (Kopie mit Datum) und fachkundig einordnen lassen | Eigentümer |
 | Rechte am hochgeladenen Referenzmaterial (Screenshots, Referenzbilder) prüfen | Eigentümer |
 | Figuren, Gäste und Teile einmal gegen bekannte Figuren und Logos ansehen (zufällige Ähnlichkeit) | Eigentümer, optional mit fachkundiger Hilfe |
-| Entwürfe ersetzen: Böden `f1` bis `f3` (Verzeichnis: für die finale App einzeln neu erzeugen), Böden 4 bis 8, zwei Stadtrahmen | Eigentümer |
-| Einzugs-Posen und Stadtrahmen liegen im Verzeichnis, aber nicht im Projekt: als ZIP liefern, dann importiert und nachgestellt der Agent | Eigentümer, dann Agent |
+| ~~Entwürfe ersetzen: Böden `f1` bis `f3`, Böden 4 bis 8, Stadtrahmen~~ seit 1.5.19 überholt: Die Vollbild-Kulissen `b0` bis `b8` ersetzen die Böden (die Böden `f0` bis `f3` bleiben als Rückfall), die Stadtrahmen `frame1` bis `frame8` sind geliefert und eingebaut | – |
+| Einzugs-Posen liegen im Verzeichnis, aber nicht im Projekt: als ZIP liefern, dann importiert und nachgestellt der Agent | Eigentümer, dann Agent |
+| Bildrechte an den abgebildeten Bauwerken (Elbphilharmonie, Riesenrad und Stephansdom, Eiffelturm, Kolosseum, Hagia Sophia, Brooklyn Bridge und Freiheitsstatue, Zuckerhut und Christusstatue) und KI-Kennzeichnung im Store vor dem Upload fachkundig einordnen lassen (kein Rechtsrat des Agenten; bekannter Sonderfall: die nächtliche Beleuchtung des Eiffelturms, hier ist es eine Tagesansicht) | Eigentümer |
 | Startbild (`assets/splash*.png`): Herkunft nicht protokolliert und nicht im Verzeichnis; bestätigen oder ersetzen | Eigentümer |
 | ~~Schnurr-Datei ersetzen~~ erledigt: Datei seit 1.5.17 entfernt, kein Ton mehr | – |
 | Transparenzkanten und Darstellung kleiner Spielfiguren auf dem Gerät prüfen | Eigentümer, beim Gerätetest |

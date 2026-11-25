@@ -36,6 +36,8 @@ PO_W, PO_H = 576, 864                                                    # Einzu
 FX_S = 160                                                               # Effekt-Sprites
 FLOOR_W = 1024                                                           # Boeden: Breite (quadratisch)
 BG_W, BG_H_MAX = 720, 1600                                               # Hintergruende: Breite und hoechste Hoehe (Hochformat, 9:19,5 ergibt 720x1560)
+BG_ASPECT = 2340 / 1080                                                  # Zielverhaeltnis Hoehe/Breite (9:19,5); flachere Hochformate bekommen oben Himmel angesetzt
+BG_BLEND = 0.035                                                         # Uebergang vom angesetzten Himmel ins Bild (Anteil der Bildhoehe)
 FR_W, FR_T = 1000, 0.068                                                 # Rahmen: Aussenbreite (Referenz) und Dicke als Anteil der Breite
 FR_H = round(FR_W * (1 - 2 * FR_T) * 8 / 7 + 2 * FR_W * FR_T)            # Fenster 7:8 -> Aussenhoehe (1123); CSS: aspect-ratio 1000/1123
 FR_PAD = (30, 16, 30, 52)                                                # Schattenrand links, oben, rechts, unten (CSS: inset -3% -1.425% -4.63% -3%)
@@ -266,13 +268,37 @@ def floor_asset(im):
     return im.resize((FLOOR_W, round(im.size[1] * k)), Image.LANCZOS) if k < 1 else im
 
 
+def sky_pad(im):
+    """Hochformate flacher als 9:19,5 (z. B. 9:16) bekommen oben weichen Himmel angesetzt: die obersten Bildzeilen werden nach oben gedehnt und
+    waagerecht verwischt (kein neuer Inhalt, Laub und Laternen am Rand werden zu Farbfeldern) und gehen in einem weichen Uebergang ins Bild ueber.
+    Grund: Wahrzeichen sitzen in solchen Bildern im oberen Drittel, im Spiel genau hinter Kopfleiste und Bestellleiste. Mit dem Ansatz rutschen sie in
+    das freie Fenster zwischen Bestellleiste und Brett (Hoehe/Breite = 9:19,5 wie die Telefone)."""
+    a = np.asarray(im, dtype=np.float32)
+    h, w, _ = a.shape
+    pad = round(BG_ASPECT * w - h)
+    if pad <= 0:
+        return im
+    row = a[:max(4, h // 200)].mean(axis=0)                              # oberste Zeilen gemittelt: (w, 3)
+    sig = w * .04
+    row = cv2.GaussianBlur(row[None], (int(sig * 6) | 1, 1), sigmaX=sig)[0]
+    blend = max(2, round(h * BG_BLEND))
+    t = np.linspace(0, 1, blend, dtype=np.float32)[:, None, None]
+    t = t * t * (3 - 2 * t)                                              # smoothstep
+    body = a.copy()
+    body[:blend] = row[None] * (1 - t) + a[:blend] * t
+    out = np.concatenate([np.repeat(row[None], pad, axis=0), body], axis=0)
+    return Image.fromarray(np.clip(out + .5, 0, 255).astype(np.uint8), 'RGB')
+
+
 def bg_asset(im):
-    """Vollbild-Hintergrund einer Welt: Hochformat, deckend (kein Alpha), auf BG_W Breite und hoechstens BG_H_MAX Hoehe verkleinert (nie vergroessert).
-    Das Spiel legt das Bild mit object-fit: cover und Ausrichtung oben auf den ganzen Schirm."""
+    """Vollbild-Hintergrund einer Welt: Hochformat, deckend (kein Alpha), oben bei Bedarf auf 9:19,5 aufgefuellt (sky_pad), auf BG_W Breite und
+    hoechstens BG_H_MAX Hoehe verkleinert (nie vergroessert). Das Spiel legt das Bild mit object-fit: cover und Ausrichtung oben auf den ganzen Schirm."""
     im = im.convert('RGB')
     w, h = im.size
     if h < w * 1.4:
         raise ValueError('Hintergrund muss ein Hochformat sein (mindestens 1:1,4), z. B. 1080x2340')
+    im = sky_pad(im)
+    w, h = im.size
     k = min(1.0, BG_W / w, BG_H_MAX / h)
     return im.resize((round(w * k), round(h * k)), Image.LANCZOS) if k < 1 else im
 
