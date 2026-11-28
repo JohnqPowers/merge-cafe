@@ -42,7 +42,7 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
    - 49 Dateien aus den Paketen für Teile, Automaten, Figuren und Gäste: gleich (`scripts/art_import.py`),
    - Boden Hamburg und Rahmen aus den Einzeldateien: gleich; Böden Paris und Rom: gleich (`scripts/floor_prep.py` mit den dokumentierten Maßen, dann `art_import.py`),
    - Katze, drei Ruhebilder (bis 1.5.16: 22 Frames, 3 Herzen und Schnurr-Datei): gleich (`scripts/cat_import.py`),
-   - Web- und Android-Icons: gleich aus dem Icon-Original (`assets/src/build-icon.py`); das Original im Repo hat dieselbe Prüfsumme wie der Verzeichnis-Eintrag `noas_bean_trail_icon_original_1254.png`,
+   - Web- und Android-Icons: gleich aus dem Icon-Original (`assets/src/build-icon.py`); das Original von damals (heute `assets/src/app-icon-original-2026-11-24.png`) hat dieselbe Prüfsumme wie der Verzeichnis-Eintrag `noas_bean_trail_icon_original_1254.png`,
    - **nicht nachstellbar:** `f1` (vorläufiger Boden, Platzhalter für Wien). Die Quelle `f1_berlin.png` steht im Entwurfspaket und im Verzeichnis, die ausgelieferte Datei entstand aber anders oder aus einer anderen Fassung.
 3. **Grenze dieser Prüfung:** Sie belegt „Paket → Skript → Spieldatei“. Sie belegt nicht, wie die Pakete selbst entstanden sind. Bitgleichheit gilt für die Bibliotheksversionen vom 24.11.2026 (Pillow, OpenCV, NumPy); andere Versionen können abweichende Bytes liefern, ohne dass die Quelle falsch wäre. Nachstellen immer in einer Kopie des Repos: Die Skripte überschreiben `www/art` und das Bildmanifest in `www/index.html`.
 
@@ -60,6 +60,12 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
    - **Nachstellung (25.11.2026):** In einer Kopie des Repos aus dem ZIP neu erzeugt (`python3 -I scripts/gull_import.py <ZIP> --root <Kopie>`), **bitgleich** (SHA-256 `183dafbc…4ea3`). Das Manifest führt eine Zeile mit allen acht Quell-Frames und ihren Prüfsummen.
    - **Sichtprüfung durch den Agenten (25.11.2026):** kein Text, kein Logo, keine Marke; im Spiel (390×844, 360×800, 412×915) keine sichtbaren Säume an den Rändern.
 
+6. **Lieferung vom 28.11.2026 (Icon „Noa blond“, Chat-Anhang, 1254×1254, 2 465 814 Bytes, SHA-256 `dcf986e4…f003`):**
+   - **Herkunft:** vom Eigentümer im Chat geliefert und zum Einbau beauftragt. Werkzeug, Tag und Prompt hat er nicht genannt; die Optik gleicht den KI-Bildern der übrigen Lieferungen. **Rechte nicht zugesichert** (wie Punkt 4).
+   - **Im Repo:** `assets/src/app-icon-original.png` (neu; nicht im Verzeichnis, Zeile „Einzeldatei (Upload)“ in der Paketliste). Das bisherige Original liegt als `assets/src/app-icon-original-2026-11-24.png` (Prüfsumme wie im Verzeichnis). `python3 -I assets/src/build-icon.py` baut daraus `assets/icon-*.png`, `store/app-icon-512.png` und `www/icons/*`.
+   - **Nachstellung (28.11.2026):** In einer Kopie des Repos neu gebaut, alle sieben Dateien **bitgleich**.
+   - **Sichtprüfung durch den Agenten (28.11.2026):** lesbar ist nur der eigene Schriftzug „Noa's Bean Trail“; dazu ein Kaffeebohnen-Zeichen auf Mütze, Tasse, Schürze und Schild und eine Tasse auf dem Café-Schild. Kein Fremdname und kein bekanntes Logo erkannt (Sichtprüfung, keine Markenrecherche). In der runden, der abgerundeten und der maskierbaren Fassung bleiben Gesicht, Katze, Tasse und Schriftzug ganz.
+
 ## 6. Regeln für neue Dateien
 
 1. Die Pakete gelten als projektintern erzeugte KI-Bilder. Die Herkunftserklärung ist **keine zusätzliche Lizenz**.
@@ -74,6 +80,7 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
 | Punkt | Wer |
 |---|---|
 | Tarif, Modellversion, Tag und Prompt je Bild nicht festgehalten; ab jetzt je Lieferung festhalten | Eigentümer, laufend |
+| Icon „Noa blond“ (28.11.2026): Werkzeug, Tag und Prompt festhalten; ob und wie der Store-Eintrag es als KI-Bild kennzeichnet, entscheidet der Eigentümer | Eigentümer |
 | Nutzungsbedingungen von OpenAI: Stand des Abrufs sichern (Kopie mit Datum) und fachkundig einordnen lassen | Eigentümer |
 | Rechte am hochgeladenen Referenzmaterial (Screenshots, Referenzbilder) prüfen | Eigentümer |
 | Figuren, Gäste und Teile einmal gegen bekannte Figuren und Logos ansehen (zufällige Ähnlichkeit) | Eigentümer, optional mit fachkundiger Hilfe |

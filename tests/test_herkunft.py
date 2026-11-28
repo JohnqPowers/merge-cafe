@@ -50,8 +50,11 @@ ok('Paketlisten: Spalten, gültige SHA-256, „im_verzeichnis“ passt zum Verze
    list(pak[0].keys()) == ['paket', 'datei', 'bytes', 'sha256', 'im_verzeichnis', 'eingetragen']
    and all(re.fullmatch(r'[0-9a-f]{64}', z['sha256']) and (z['sha256'] in libh) == (z['im_verzeichnis'] == 'ja') for z in pak), len(pak))
 ok('Paketlisten: Katzenpaket mit 33 Dateien erfasst', sum(1 for z in pak if z['paket'] == 'Noas_Bean_Trail_Katze_Claude_Paket.zip') == 33)
-ok('Icon-Original im Repo hat dieselbe Prüfsumme wie der Verzeichnis-Eintrag',
-   hashlib.sha256(open(os.path.join(ROOT, 'assets', 'src', 'app-icon-original.png'), 'rb').read()).hexdigest() in libh)
+ok('altes Icon-Original (24.11.2026, im Spiel bis 1.5.20) hat dieselbe Prüfsumme wie der Verzeichnis-Eintrag',
+   hashlib.sha256(open(os.path.join(ROOT, 'assets', 'src', 'app-icon-original-2026-11-24.png'), 'rb').read()).hexdigest() in libh)
+icon_neu = hashlib.sha256(open(os.path.join(ROOT, 'assets', 'src', 'app-icon-original.png'), 'rb').read()).hexdigest()
+ok('aktuelles Icon-Original (Lieferung 28.11.2026) steht als Einzeldatei in der Paketliste und ist nicht im Verzeichnis',
+   icon_neu not in libh and any(z['sha256'] == icon_neu and z['paket'] == 'Einzeldatei (Upload)' and z['im_verzeichnis'] == 'nein' for z in pak))
 ok('Erklärung des Eigentümers liegt im Repo', os.path.getsize(os.path.join(HERK, 'Bildherkunft_Erklaerung_2026-11-24.pdf')) > 1000)
 
 # ------------------------------------------------------------ Dokument und öffentliche Dateien

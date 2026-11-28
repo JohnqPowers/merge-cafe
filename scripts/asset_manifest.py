@@ -35,7 +35,9 @@ KI = 'KI-Bild (überwiegend OpenAI-Bildgenerierung nach Briefing; Erklärung des
 KI_STADT = 'KI-Bild (OpenAI-Bildgenerierung laut Lieferung vom 25.11.2026; Rechte nicht zugesichert), im Projekt aufbereitet (oben auf 9:19,5 ergänzt, scripts/art_import.py)'
 KI_MOEWE = 'KI-Bild (OpenAI-Bildgenerierung laut Lieferung vom 25.11.2026; Rechte nicht zugesichert), im Projekt aufbereitet (acht Flug-Frames zu einem Streifen, scripts/gull_import.py)'
 KATZE = 'KI-Bild (Erklärung des Eigentümers 24.11.2026); Frames im Katzenpaket durch Skalierung, Drehung und Verschiebung abgeleitet, im Projekt aufbereitet'
-ICON = 'KI-Bild des Eigentümers (Icon-Original), im Projekt abgeleitet (assets/src/build-icon.py)'
+ICON = 'Bild des Eigentümers (Icon-Original, Chat-Lieferung 28.11.2026), im Projekt abgeleitet (assets/src/build-icon.py)'
+ICON_NEU = 'Bild des Eigentümers (Chat-Lieferung 28.11.2026, Icon mit Noa blond); Erzeugung und Rechte vom Eigentümer noch nicht erklärt (Optik wie die KI-Bilder der übrigen Lieferungen)'
+ICON_ALT = 'KI-Bild des Eigentümers (Verzeichnis: noas_bean_trail_icon_original_1254.png), im Spiel bis 1.5.20, nur noch Archiv'
 GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile gilt
     (r'^www/art/k\d_s\d+\.webp$', 'Teil', KI),
     (r'^www/art/g\d+\.webp$', 'Automat', KI),
@@ -52,7 +54,8 @@ GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile
     (r'^www/art/cat/purr\.wav$', 'Katze (Ton)', 'synthetischer Platzhalter-Ton aus dem Katzenpaket, im Projekt zur Schleife geschnitten'),
     (r'^www/icons/', 'Icon (Web)', ICON),
     (r'^assets/icon-(only|foreground|background)\.png$', 'Icon (Android)', ICON),
-    (r'^assets/src/app-icon-original\.png$', 'Icon-Original', 'KI-Bild des Eigentümers (Verzeichnis: noas_bean_trail_icon_original_1254.png)'),
+    (r'^assets/src/app-icon-original-2026-11-24\.png$', 'Icon-Original (alt)', ICON_ALT),
+    (r'^assets/src/app-icon-original\.png$', 'Icon-Original', ICON_NEU),
     (r'^assets/splash(-dark)?\.png$', 'Startbild', 'Herkunft nicht protokolliert (seit v1.4.0); Eigentümer bestätigt oder ersetzt'),
     (r'^assets/fonts/.*\.ttf$', 'Schrift (Original)', 'SIL OFL 1.1, Quelle: assets/fonts/QUELLE.md'),
     (r'-OFL\.txt$', 'Schrift-Lizenztext', 'SIL OFL 1.1'),
@@ -68,7 +71,8 @@ NACH_BODEN = 'bitgleich nachgestellt 24.11.2026 (scripts/floor_prep.py, scripts/
 NACH_KATZE = 'bitgleich nachgestellt 24.11.2026 (scripts/cat_import.py)'
 NACH_STADT = 'bitgleich nachgestellt 25.11.2026 (scripts/art_import.py aus dem ZIP, Kopie des Repos)'
 NACH_MOEWE = 'bitgleich nachgestellt 25.11.2026 (scripts/gull_import.py aus dem ZIP, Kopie des Repos)'
-NACH_ICON = 'bitgleich nachgestellt 24.11.2026 (assets/src/build-icon.py)'
+NACH_ICON = 'bitgleich nachgestellt 28.11.2026 (assets/src/build-icon.py, Kopie des Repos)'
+NACH_HASH_PAK = 'Prüfsumme gleich Paketliste (Einzeldatei, 28.11.2026)'
 NACH_F1 = 'Zuordnung nur nach Dateiname; ausgeliefertes f1.webp nicht bitgleich nachstellbar (vorläufiger Boden)'
 NACH_HASH = 'Prüfsumme gleich Verzeichnis-Eintrag'
 
@@ -153,6 +157,9 @@ def erzeugen():
             if m:
                 lib_key.setdefault(m.group(1), r)
     icon_orig = next((r for r in lib if 'icon_original' in r['Pfad']), None)
+    p_neu = ROOT / 'assets' / 'src' / 'app-icon-original.png'          # aktuelles Original (Lieferung 28.11.2026): steht in der Paketliste, nicht im Verzeichnis
+    h_neu = hashlib.sha256(p_neu.read_bytes()).hexdigest() if p_neu.exists() else ''
+    icon_neu = next((r for r in lesen_csv(PAK, 'utf-8') if h_neu and r['sha256'] == h_neu), None)
     katze = katzen_zuordnung()
     stadt = stadtpaket_zuordnung()
     moewe = moewe_zuordnung()
@@ -195,9 +202,13 @@ def erzeugen():
                 nachweis = NACH_BODEN
             elif ART_NACHGESTELLT.match(stamm):
                 nachweis = NACH_ART
-        elif gruppe in ('Icon (Web)', 'Icon (Android)', 'Icon-Original') and icon_orig:
+        elif gruppe in ('Icon (Web)', 'Icon (Android)', 'Icon-Original') and icon_neu:
+            quelle, paket, qsha = icon_neu['datei'], icon_neu['paket'], icon_neu['sha256']
+            qstatus = 'Lieferung ' + icon_neu['eingetragen'] + ' (' + ('Prüfsumme im Verzeichnis des Eigentümers' if icon_neu['im_verzeichnis'] == 'ja' else 'nicht im Verzeichnis des Eigentümers') + ')'
+            nachweis = NACH_HASH_PAK if gruppe == 'Icon-Original' else NACH_ICON
+        elif gruppe == 'Icon-Original (alt)' and icon_orig:
             quelle, paket, qsha, qstatus = icon_orig['Pfad'], icon_orig['Quelle'], icon_orig['SHA256'], icon_orig['Status']
-            nachweis = NACH_HASH if (gruppe == 'Icon-Original' and sha == qsha) else (NACH_ICON if gruppe != 'Icon-Original' else '')
+            nachweis = NACH_HASH if sha == qsha else ''
         zeilen.append([rel, gruppe, len(daten), sha, pixelmass(p), version, herkunft, quelle, paket, qsha, qstatus, nachweis])
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator='\n')
