@@ -70,6 +70,7 @@ NACH_ART = 'bitgleich nachgestellt 24.11.2026 (scripts/art_import.py)'
 NACH_BODEN = 'bitgleich nachgestellt 24.11.2026 (scripts/floor_prep.py, scripts/art_import.py)'
 NACH_KATZE = 'bitgleich nachgestellt 24.11.2026 (scripts/cat_import.py)'
 NACH_STADT = 'bitgleich nachgestellt 25.11.2026 (scripts/art_import.py aus dem ZIP, Kopie des Repos)'
+NACH_KULISSE = 'bitgleich nachgestellt 28.11.2026 (scripts/art_import.py mit neuer Aufbereitung: Himmelsansatz, 1220 px, aus dem ZIP, Kopie des Repos)'
 NACH_MOEWE = 'bitgleich nachgestellt 25.11.2026 (scripts/gull_import.py aus dem ZIP, Kopie des Repos)'
 NACH_ICON = 'bitgleich nachgestellt 28.11.2026 (assets/src/build-icon.py, Kopie des Repos)'
 NACH_HASH_PAK = 'Prüfsumme gleich Paketliste (Einzeldatei, 28.11.2026)'
@@ -192,7 +193,7 @@ def erzeugen():
             r = stadt[rel]
             quelle, paket, qsha = r['datei'], r['paket'], r['sha256']
             qstatus = 'Stadtpaket 25.11.2026 (' + ('Prüfsumme im Verzeichnis des Eigentümers' if r['im_verzeichnis'] == 'ja' else 'nicht im Verzeichnis des Eigentümers') + ')'
-            nachweis = NACH_STADT
+            nachweis = NACH_KULISSE if re.match(r'^www/art/b\d+\.webp$', rel) else NACH_STADT
         elif rel.startswith('www/art/') and stamm in lib_key:
             r = lib_key[stamm]
             quelle, paket, qsha, qstatus = r['Pfad'], r['Quelle'], r['SHA256'], r['Status']

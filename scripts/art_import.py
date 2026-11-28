@@ -9,7 +9,7 @@ einheitliche Sprites in www/art/<key>.webp. Drei Arten, erkannt am Dateinamen:
   - Gaeste           c1_kapitaen_hein.png                  -> 240x270, Halbfigur steht unten buendig (Bildausschnitt bleibt wie gezeichnet)
   - Einzugs-Posen    e1_baristina.png                      -> 576x864, Ganzkoerper-Pose fuer den Einzug (ersetzt dort die Kachel)
   - Boden            f0_hamburg.png                        -> 1024x1024, deckend (Boden unter dem Brett, Stadt 0 = Hamburg ... f8)
-  - Hintergrund      b2_paris.png                          -> Vollbild im Hochformat, deckend, Breite 720 (ersetzt gezeichnete Szene und Boden der Welt N = 0 ... 8)
+  - Hintergrund      b2_paris.png                          -> Vollbild im Hochformat, deckend, Breite 1220 (ersetzt gezeichnete Szene und Boden der Welt N = 0 ... 8)
   - Rahmen           frame.png                             -> Magenta (#FF00FF) aussen und im Fenster wird transparent; der Rahmen wird auf
                                                                das Brett-Verhaeltnis umgebaut (Ecken bleiben, Mittelstuecke werden gedehnt) und
                                                                bekommt einen weichen Schatten -> frame.webp. Masse stehen in FR_* und im CSS (#board).
@@ -35,9 +35,10 @@ GU_W, GU_H = 240, 270                                                    # Gaest
 PO_W, PO_H = 576, 864                                                    # Einzugs-Posen (Ganzkoerper, 2:3)
 FX_S = 160                                                               # Effekt-Sprites
 FLOOR_W = 1024                                                           # Boeden: Breite (quadratisch)
-BG_W, BG_H_MAX = 720, 1600                                               # Hintergruende: Breite und hoechste Hoehe (Hochformat, 9:19,5 ergibt 720x1560)
+BG_W, BG_H_MAX = 1220, 2700                                             # Hintergruende: Breite und hoechste Hoehe (Hochformat, 9:19,5 ergibt 1220x2644). Die Lieferungen sind nur 941 breit: auf BG_W hochgerechnet und leicht geschaerft, sonst dehnt das Handy sie selbst und unscharf
 BG_ASPECT = 2340 / 1080                                                  # Zielverhaeltnis Hoehe/Breite (9:19,5); flachere Hochformate bekommen oben Himmel angesetzt
-BG_BLEND = 0.035                                                         # Uebergang vom angesetzten Himmel ins Bild (Anteil der Bildhoehe)
+BG_BLEND = 0.12                                                          # Uebergang der obersten Bildzeilen in den angesetzten Himmel (Anteil der Bildhoehe; liegt hinter Kopfleiste und Bestellleiste)
+BG_SHARP = dict(radius=1.6, percent=70, threshold=2)                      # Schaerfen nach dem Hochrechnen (UnsharpMask)
 FR_W, FR_T = 1000, 0.068                                                 # Rahmen: Aussenbreite (Referenz) und Dicke als Anteil der Breite
 FR_H = round(FR_W * (1 - 2 * FR_T) * 8 / 7 + 2 * FR_W * FR_T)            # Fenster 7:8 -> Aussenhoehe (1123); CSS: aspect-ratio 1000/1123
 FR_PAD = (30, 16, 30, 52)                                                # Schattenrand links, oben, rechts, unten (CSS: inset -3% -1.425% -4.63% -3%)
@@ -268,39 +269,61 @@ def floor_asset(im):
     return im.resize((FLOOR_W, round(im.size[1] * k)), Image.LANCZOS) if k < 1 else im
 
 
+def sky_rgb(a, rows):
+    """Himmelsfarbe aus den obersten Zeilen: Median der blauen bis violetten Bildpunkte (Farbton 185-295 Grad, Saettigung > 0,16, nicht dunkel);
+    gibt es kaum welche, der Median aller Bildpunkte. Laub, Bluete und Markisen am Rand zaehlen so nicht mit."""
+    top = np.clip(a[:rows], 0, 255).astype(np.uint8)
+    hsv = cv2.cvtColor(top, cv2.COLOR_RGB2HSV).reshape(-1, 3).astype(np.float32)
+    rgb = top.reshape(-1, 3).astype(np.float32)
+    hue, sat, val = hsv[:, 0] * 2.0, hsv[:, 1] / 255.0, hsv[:, 2] / 255.0
+    m = (hue >= 185) & (hue <= 295) & (sat > .16) & (val > .22)
+    return np.median(rgb[m] if m.mean() >= .04 else rgb, axis=0)
+
+
 def sky_pad(im):
-    """Hochformate flacher als 9:19,5 (z. B. 9:16) bekommen oben weichen Himmel angesetzt: die obersten Bildzeilen werden nach oben gedehnt und
-    waagerecht verwischt (kein neuer Inhalt, Laub und Laternen am Rand werden zu Farbfeldern) und gehen in einem weichen Uebergang ins Bild ueber.
-    Grund: Wahrzeichen sitzen in solchen Bildern im oberen Drittel, im Spiel genau hinter Kopfleiste und Bestellleiste. Mit dem Ansatz rutschen sie in
-    das freie Fenster zwischen Bestellleiste und Brett (Hoehe/Breite = 9:19,5 wie die Telefone)."""
+    """Hochformate flacher als 9:19,5 (z. B. 9:16) bekommen oben ruhigen Himmel angesetzt: ein senkrechter Verlauf aus der Himmelsfarbe der obersten
+    Zeilen (nach oben etwas tiefer und satter), in den die obersten BG_BLEND des Bildes weich uebergehen. Bis 1.5.21 wurden stattdessen die obersten
+    Zeilen nach oben gedehnt; Laub, Bluete und Markisen am Rand wurden so zu Farbbalken (Hamburg: olivgruen links, blau rechts), sichtbar hinter der
+    Statusleiste. Grund fuer den Ansatz: Wahrzeichen sitzen in solchen Bildern im oberen Drittel, im Spiel genau hinter Kopfleiste und Bestellleiste.
+    Mit dem Ansatz rutschen sie in das freie Fenster zwischen Bestellleiste und Brett (Hoehe/Breite = 9:19,5 wie die Telefone).
+    Ein leichtes Rauschen (feste Zufallszahlen) verhindert Streifen im Verlauf."""
     a = np.asarray(im, dtype=np.float32)
     h, w, _ = a.shape
     pad = round(BG_ASPECT * w - h)
     if pad <= 0:
         return im
-    row = a[:max(4, h // 200)].mean(axis=0)                              # oberste Zeilen gemittelt: (w, 3)
-    sig = w * .04
-    row = cv2.GaussianBlur(row[None], (int(sig * 6) | 1, 1), sigmaX=sig)[0]
+    sky = sky_rgb(a, max(8, h // 16)).astype(np.float32)
+    hsv = cv2.cvtColor((sky / 255.0).reshape(1, 1, 3), cv2.COLOR_RGB2HSV)[0, 0]       # float: H 0-360, S und V 0-1
+    u = np.linspace(1, 0, pad, dtype=np.float32)                                      # oberste Zeile 1, an der Naht 0
+    col = np.stack([np.full(pad, hsv[0], np.float32), np.minimum(1.0, hsv[1] * (1 + .10 * u)), hsv[2] * (1 - .12 * u)], axis=1)[:, None, :]
+    ext = cv2.cvtColor(col.astype(np.float32), cv2.COLOR_HSV2RGB)[:, 0, :] * 255.0
+    ext = np.repeat(ext[:, None, :], w, axis=1)
     blend = max(2, round(h * BG_BLEND))
     t = np.linspace(0, 1, blend, dtype=np.float32)[:, None, None]
-    t = t * t * (3 - 2 * t)                                              # smoothstep
+    t = t * t * (3 - 2 * t)                                                           # smoothstep
     body = a.copy()
-    body[:blend] = row[None] * (1 - t) + a[:blend] * t
-    out = np.concatenate([np.repeat(row[None], pad, axis=0), body], axis=0)
+    body[:blend] = sky[None, None, :] * (1 - t) + a[:blend] * t
+    out = np.concatenate([ext, body], axis=0)
+    out[:pad + blend] += np.random.default_rng(7).normal(0, .7, (pad + blend, w, 1)).astype(np.float32)
     return Image.fromarray(np.clip(out + .5, 0, 255).astype(np.uint8), 'RGB')
 
 
 def bg_asset(im):
-    """Vollbild-Hintergrund einer Welt: Hochformat, deckend (kein Alpha), oben bei Bedarf auf 9:19,5 aufgefuellt (sky_pad), auf BG_W Breite und
-    hoechstens BG_H_MAX Hoehe verkleinert (nie vergroessert). Das Spiel legt das Bild mit object-fit: cover und Ausrichtung oben auf den ganzen Schirm."""
+    """Vollbild-Hintergrund einer Welt: Hochformat, deckend (kein Alpha), oben bei Bedarf auf 9:19,5 aufgefuellt (sky_pad), auf BG_W Breite gerechnet
+    (hoch oder runter, hoechstens BG_H_MAX Hoehe) und beim Hochrechnen leicht geschaerft (BG_SHARP). Das Spiel legt das Bild mit object-fit: cover
+    und Ausrichtung oben auf den ganzen Schirm."""
     im = im.convert('RGB')
     w, h = im.size
     if h < w * 1.4:
         raise ValueError('Hintergrund muss ein Hochformat sein (mindestens 1:1,4), z. B. 1080x2340')
     im = sky_pad(im)
     w, h = im.size
-    k = min(1.0, BG_W / w, BG_H_MAX / h)
-    return im.resize((round(w * k), round(h * k)), Image.LANCZOS) if k < 1 else im
+    k = min(BG_W / w, BG_H_MAX / h)
+    if abs(k - 1) > 1e-3:
+        im = im.resize((round(w * k), round(h * k)), Image.LANCZOS)
+    if k > 1:
+        im = im.filter(ImageFilter.UnsharpMask(**BG_SHARP))
+    return im
 
 
 def sources(path):

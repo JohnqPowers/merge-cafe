@@ -27,23 +27,27 @@ def testbild(w, h):
     return Image.fromarray(a, 'RGB')
 
 def aufbereitung():
-    # 9:16 (wie geliefert 941x1672) -> 720x1560, oben ergänzt; 9:19,5 bleibt unverändert; Querformat wird abgelehnt
+    # 9:16 (wie geliefert 941x1672) -> 1220x2644 (9:19,5), oben ruhiger Himmel angesetzt, auf 1220 px hochgerechnet; 9:19,5 bleibt im Verhältnis; Querformat wird abgelehnt
     im = testbild(941, 1672)
     out = art_import.bg_asset(im)
-    ok('Aufbereitung: 941x1672 (9:16) wird 720x1560 (9:19,5)', out.size == (720, 1560), out.size)
+    ok('Aufbereitung: 941x1672 (9:16) wird 1220x2644 (9:19,5)', out.size == (1220, 2644), out.size)
     pad = round(art_import.BG_ASPECT * 941 - 1672)
-    k = 720 / 941
+    k = 1220 / 941
     a = np.asarray(out, dtype=np.float32)
     n = round(pad * k)
     sprung = float(np.abs(a[n - 1] - a[n + 1]).mean())
     ok('Aufbereitung: kein sichtbarer Sprung an der Naht (mittlerer Unterschied < 6)', sprung < 6, round(sprung, 2))
-    unten = np.asarray(im.resize((720, round(1672 * k)), Image.LANCZOS), dtype=np.float32)
-    ok('Aufbereitung: der Bildkörper unterhalb des Übergangs bleibt unverändert (Abweichung < 3)', float(np.abs(a[-300:] - unten[-300:]).mean()) < 3,
+    unten = np.asarray(im.resize((1220, round(1672 * k)), Image.LANCZOS), dtype=np.float32)
+    ok('Aufbereitung: der Bildkörper unterhalb des Übergangs bleibt im Ton unverändert (Abweichung < 4, nur Schärfen)', float(np.abs(a[-300:] - unten[-300:]).mean()) < 4,
        round(float(np.abs(a[-300:] - unten[-300:]).mean()), 2))
-    spalte_oben = a[2, :, 1].mean(); spalte_links = a[2, : 720 // 7, 1].mean(); spalte_rechts = a[2, -720 // 7:, 1].mean()
-    ok('Aufbereitung: der angesetzte Rand übernimmt die Farben der obersten Zeilen (linker Streifen bleibt heller)', spalte_links > spalte_rechts + 20, (round(spalte_links), round(spalte_rechts)))
+    # neu seit 28.11.2026: der Ansatz ist ein ruhiger Himmelsverlauf, keine Farbbalken vom Bildrand (bis 1.5.21: gedehnte oberste Zeilen)
+    zeile = a[40]                                                        # eine Zeile mitten im Ansatz
+    streu = float(zeile.std(axis=0).max())
+    ok('Aufbereitung: der angesetzte Himmel ist über die Breite gleichmäßig (keine Farbbalken vom Rand, Streuung < 3)', streu < 3, round(streu, 2))
+    himmel = a[2].mean(axis=0); naht = a[n].mean(axis=0)
+    ok('Aufbereitung: der Himmel wird nach oben etwas dunkler als an der Naht', himmel.sum() < naht.sum() - 6, (himmel.round().tolist(), naht.round().tolist()))
     hoch = art_import.bg_asset(testbild(1080, 2340))
-    ok('Aufbereitung: 1080x2340 (schon 9:19,5) wird nur verkleinert, nichts angesetzt', hoch.size == (720, 1560), hoch.size)
+    ok('Aufbereitung: 1080x2340 (schon 9:19,5) wird nur auf 1220 Breite hochgerechnet, nichts angesetzt', hoch.size[0] == 1220 and abs(hoch.size[1] - 1220 * 2340 / 1080) <= 1, hoch.size)
     try:
         art_import.bg_asset(testbild(1600, 1000)); querformat = False
     except ValueError:
@@ -59,11 +63,11 @@ def dateien():
         if f'b{i}' not in art or not f.exists(): fehlt.append(f'b{i}'); continue
         maße.add(Image.open(f).size)
     ok('Dateien: b0 bis b8 liegen vor und stehen im Manifest ART', not fehlt, fehlt)
-    ok('Dateien: alle neun Hintergründe sind 720x1560', maße == {(720, 1560)}, maße)
+    ok('Dateien: alle neun Hintergründe sind 1220x2644', maße == {(1220, 2644)}, maße)
     rahmen = [i for i in range(1, 9) if f'frame{i}' in art and (HIER.parent / 'www' / 'art' / f'frame{i}.webp').exists()]
     ok('Dateien: Stadtrahmen frame1 bis frame8 liegen vor, Hamburg nutzt den Standardrahmen (kein frame0)', rahmen == list(range(1, 9)) and 'frame0' not in art, rahmen)
     gesamt = sum((HIER.parent / 'www' / 'art' / f'b{i}.webp').stat().st_size for i in range(9))
-    ok('Dateien: die neun Hintergründe wiegen zusammen unter 2,2 MB', gesamt < 2.2 * 1024 * 1024, f'{gesamt // 1024} KB')
+    ok('Dateien: die neun Hintergründe wiegen zusammen unter 5 MB', gesamt < 5 * 1024 * 1024, f'{gesamt // 1024} KB')
 
 async def mk(b, w=390, h=844, ohne_b2=False):
     pg = await b.new_page(viewport={'width': w, 'height': h}, device_scale_factor=2, locale='de-DE')
@@ -95,13 +99,13 @@ async def main():
         for i, L in enumerate(LEVELS):
             await pg.evaluate(f"MC.world({L})"); await pg.wait_for_timeout(2300)
             r = await pg.evaluate(f"(()=>{{const l={LAYER},im=l.querySelector('img.sc-bg');if(!im)return null;const b=im.getBoundingClientRect();return [im.getAttribute('src'),im.naturalWidth,im.naturalHeight,Math.round(b.left),Math.round(b.width),Math.round(b.height),getComputedStyle(im).objectFit,!!l.querySelector('svg'),!!l.querySelector('.sc-floor')]}})()")
-            gut = r and r[0] == f'art/b{i}.webp' and r[1:3] == [720, 1560] and r[3:6] == [0, 390, 844] and r[6] == 'cover' and not r[7] and not r[8]
+            gut = r and r[0] == f'art/b{i}.webp' and r[1:3] == [1220, 2644] and r[3:6] == [0, 390, 844] and r[6] == 'cover' and not r[7] and not r[8]
             if not gut: falsch.append((i, r))
             fr = await pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--frimg').trim()")
             if i == 0: gut_fr = fr in ('', 'url(art/frame.webp)')
             else: gut_fr = fr == f'url(art/frame{i}.webp)'
             if not gut_fr: rahmen_falsch.append((i, fr))
-        ok('Alle neun Welten: Vollbild-Ebene mit der richtigen Datei (720x1560, füllt 390x844, cover), keine gezeichnete Szene, kein Boden', not falsch, falsch)
+        ok('Alle neun Welten: Vollbild-Ebene mit der richtigen Datei (1220x2644, füllt 390x844, cover), keine gezeichnete Szene, kein Boden', not falsch, falsch)
         ok('Alle neun Welten: Rahmen der Welt (Hamburg Standard, sonst frame1 bis frame8)', not rahmen_falsch, rahmen_falsch)
         # Kulisse und Brett: das Brett bleibt, wo es war (Geometrie unverändert), Kulisse liegt dahinter
         g = await pg.evaluate("(()=>{const q=s=>{const r=document.querySelector(s).getBoundingClientRect();return [Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height)]};return {board:q('#board'),orders:q('#orders'),z:getComputedStyle(document.querySelector('#scene')).zIndex}})()")
