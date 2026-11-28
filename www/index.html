@@ -1038,7 +1038,7 @@ const CONFIG = {
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
   revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro', proEnabled: false },   // Pro = dieses Entitlement im RevenueCat-Dashboard. proEnabled: false = Pro ist AUS (Entscheidung 24.11.2026: kein Abo zum Start, docs/MONETARISIERUNG.md). Die Käufe der Diamanten-Pakete laufen davon unabhängig.
-  features: { gull: true, startImg: true, devMenu: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg), startImg = neues Startbild (Branch exp/startbild), devMenu = Entwickler-Vorschau (Branch exp/entwickler, nur Test-Paket und Web mit ?dev=1); im Web-Test ?gull=0 / ?gull=1, ?startimg=0 / ?startimg=1 und ?dev=0 / ?dev=1
+  features: { gull: true, startImg: true, devMenu: true, mix: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg), startImg = neues Startbild (Branch exp/startbild), devMenu = Entwickler-Vorschau (Branch exp/entwickler, nur Test-Paket und Web mit ?dev=1), mix = Klang-Mischung Musik/Effekte (Branch exp/klangmix); im Web-Test ?gull=0 / ?gull=1, ?startimg=0 / ?startimg=1, ?dev=0 / ?dev=1 und ?mix=0 / ?mix=1
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -1927,8 +1927,13 @@ const PC_VB = '0 40 400 300';
 /* =====================================================================
    SOUND — eigene Synthese: Glöckchen, Pops, Münzen, Fanfaren + Café-Musik
    ===================================================================== */
+/* Klang-Mischung (Experiment exp/klangmix, Schalter CONFIG.features.mix, im Web-Test ?mix=0|1).
+   Gemessen (Chrome, Pegel hinter dem Verdichter): Musik lag ueber einen Handy-Lautsprecher (ab 300 Hz) rund 20 dB unter den Effekten, weil der tiefe Bass sie dominiert und das Handy ihn kaum spielt.
+   An: Musik +10 dB, Bass-Stimme zusaetzlich -7 dB, Effekte -3 dB. Aus (= Stand 1.5.21): die alten Pegel, kein zusaetzlicher Knoten. */
+const MIX_ON = (() => { const P = new URLSearchParams(location.search).get('mix'); return P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.mix); })();
+const MIX = MIX_ON ? { sfx: .6, mus: .5, duck: .156, bass: .45 } : { sfx: .85, mus: .16, duck: .05, bass: 1 };
 const Sound = (() => {
-  let ctx = null, master, sfxBus, musBus, delay, noiseBuf, musicTimer = null, nextT = 0, step = 0, mel = 3, ducked = false;
+  let ctx = null, master, sfxBus, musBus, bassDest, delay, noiseBuf, musicTimer = null, nextT = 0, step = 0, mel = 3, ducked = false;
   const PENTA = [72,74,76,79,81,84,86,88,91,93,96,98,100];
   const mf = m => 440 * Math.pow(2, (m - 69) / 12);
   function init() {
@@ -1937,8 +1942,9 @@ const Sound = (() => {
       ctx = new AC();
       const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
       master = ctx.createGain(); master.gain.value = .9; master.connect(comp); comp.connect(ctx.destination);
-      sfxBus = ctx.createGain(); sfxBus.gain.value = .85; sfxBus.connect(master);
+      sfxBus = ctx.createGain(); sfxBus.gain.value = MIX.sfx; sfxBus.connect(master);
       musBus = ctx.createGain(); musBus.gain.value = .0; musBus.connect(master);
+      bassDest = musBus; if (MIX_ON) { bassDest = ctx.createGain(); bassDest.gain.value = MIX.bass; bassDest.connect(musBus); }   /* Bass-Stimme einzeln absenkbar; Schalter aus: kein zusaetzlicher Knoten */
       delay = ctx.createDelay(); delay.delayTime.value = .13;
       const fb = ctx.createGain(); fb.gain.value = .28; const wet = ctx.createGain(); wet.gain.value = .2;
       delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master); sfxBus.connect(delay);
@@ -2050,7 +2056,7 @@ const Sound = (() => {
     if (nextT < ctx.currentTime) nextT = ctx.currentTime + .05;
     while (nextT < ctx.currentTime + .4) {
       const n8 = sty.len || 8, bar = Math.floor(step / n8) % 4, s8 = step % n8, ch = sty.ch[bar], MEL = sty.mel;
-      if ((sty.bass || [0, 5]).includes(s8)) osc('sine', mf(ch[0]), nextT, e * 2.2, .3, musBus, { att: .01 });
+      if ((sty.bass || [0, 5]).includes(s8)) osc('sine', mf(ch[0]), nextT, e * 2.2, .3, bassDest, { att: .01 });
       if ((sty.comp || [2, 6]).includes(s8)) ch.slice(1).forEach(m => osc('triangle', mf(m + 12), nextT, e * (sty.pluck ? .7 : 1.4), .055, musBus, { att: .01 }));
       noise(nextT, .03, s8 % 2 ? .035 : .018, 7000, musBus);
       if (s8 === 0) ambient(nextT);
@@ -2066,11 +2072,11 @@ const Sound = (() => {
   function musicOn() {
     if (!ctx || musicTimer) return;
     nextT = ctx.currentTime + .1; musBus.gain.cancelScheduledValues(ctx.currentTime);
-    musBus.gain.setTargetAtTime(ducked ? .05 : .16, ctx.currentTime, .6);
+    musBus.gain.setTargetAtTime(ducked ? MIX.duck : MIX.mus, ctx.currentTime, .6);
     musicTimer = setInterval(schedule, 120); schedule();
   }
   function musicOff() { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } if (ctx) musBus.gain.setTargetAtTime(0, ctx.currentTime, .2); }
-  function duck(d) { ducked = d; if (ctx && musicTimer) musBus.gain.setTargetAtTime(d ? .05 : .16, ctx.currentTime, .3); }
+  function duck(d) { ducked = d; if (ctx && musicTimer) musBus.gain.setTargetAtTime(d ? MIX.duck : MIX.mus, ctx.currentTime, .3); }
   function pause() { if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {}); }
   function resume() { if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); }
   function state() { return ctx ? ctx.state : 'none'; }
@@ -3991,7 +3997,7 @@ const Dev = (() => {
 window.MC = { ent: (id, o) => playEntrance(id, o), cust: l => custSVG(l), seats: () => seatEls, fill: () => { fillOrders(); render(); }, render: () => render(), close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state(), world: L => { S.level = L; S.worldPick = null; applyChapter(true); render(); }, levelUp: L => { S.level = L - 1; S.xp = 0; addXP(xpNeed(L - 1)); }, scene: (i, vb, still) => Scenes.svg(i, vb, still),
   disc: (c, tr) => showDiscovery(c, tr), gift: () => addGift(), dbl: o => offerDouble(o || { coins: 80 }), shop: () => openShop(), gems: () => openGems(), noEnergy: () => openNoEnergy(),
   order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx,
-  plat: Platform, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
+  plat: Platform, snd: Sound, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
 window.MC.gull = Gull.api;
 window.MC.dev = Dev.api; Dev.init();
 
