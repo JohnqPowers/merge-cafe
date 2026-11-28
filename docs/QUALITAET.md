@@ -45,6 +45,9 @@ Frühere Einzelprüfungen, die **nicht** im Repo liegen (Wegwerf-Skripte, damals
 
 Aufruf: siehe `tests/README.md`.
 
+**Experiment `exp/moewe-hamburg` (Version 1.5.20, nur im Branch, nicht auf `main`), Lauf vom 28.11.2026:** Alle zehn bisherigen Läufe sind auf dem Referenzstand (Commit `0c1bd88`) und im Branch gleich grün, dazu der neue `tests/test_moewe.py` mit **86/86**: Lage nur im freien Fenster zwischen Bestellungen und Brett (390×844, 360×800, 412×915; Pixelvergleich mit und ohne Möwenband, außerhalb des Bands ändert sich kein Pixel), Pause bei Fingerdruck und beim Ziehen eines Teils, Ende nach 5 s Dauerstörung, „Bewegung reduzieren“ am Start und mitten im Flug, Leistungswächter (dauerhaft langsame Bilder schalten ab, drei kurze Ruckler nicht), nur Hamburg und nur nach dem Tutorial, Schalter aus in drei Arten (Adressparameter, `CONFIG` false, Eintrag fehlt: kein Element, kein Flug, keine Datei), fehlende Bilddatei, nichts gespeichert, Quelltext ohne Speicher-, Netz-, Geräte- und Tonzugriffe, acht Flüge ohne Reste, Bildstreifen. `www/index.html` unterscheidet sich vom Referenzstand um +129 / −1 Zeilen (ersetzt ist nur die Versionszeile); `package.json`, `capacitor.config.json`, `android`, `assets`, Workflows, Service Worker, Manifest und Datenschutzseite sind unverändert.
+**Leistung der Möwe (Chrome headless, 390×844, je 3 × 5 s im Flug und ohne Flug):** CPU 4×: mittlere Bildzeit 16,7 ms ohne und 16,8 ms mit Möwe, kein Bild über 50 ms. CPU 8×: 24,5 ms ohne und 29,3 ms mit Möwe (Messrauschen ca. ±30 %, der Wächter hat nicht ausgelöst). **Nicht geprüft:** echtes Handy (Akku, Bildrate, Android-WebView).
+
 ## 4. Leistung (Messwerte, Chrome mit gedrosselter CPU)
 
 | Messung | Ergebnis | Quelle |

@@ -3117,7 +3117,7 @@ const Gull = (() => {
   function tick(ts) {
     const r = run; if (!r) return; r.id = 0;
     try {
-      if (off || !band.isConnected || worldIdx() !== 0) return end();
+      if (off || !band.isConnected || worldIdx() !== 0 || reduce()) return end();    // auch „Bewegung reduzieren“ mitten im Flug: sofort weg (kein Ereignis nötig, Chrome meldet es nicht zuverlässig, wenn matches vorher gelesen wurde)
       if (hold()) {                                                   // Spielzug, Fenster, Hintergrund, reduzierte Bewegung: stehen bleiben, nur alle 150 ms nachsehen
         if (!r.hold0) r.hold0 = now(); else if (now() - r.hold0 > HOLD_MAX) return end();     // zu lange gestört: wegfliegen lassen
         r.last = null; r.poll = setTimeout(() => { r.poll = 0; if (run === r) tick(now()); }, 150); return;
@@ -3160,18 +3160,15 @@ const Gull = (() => {
     document.addEventListener('pointerdown', dn, { capture: true, passive: true });
     document.addEventListener('pointerup', up, { capture: true, passive: true });
     document.addEventListener('pointercancel', up, { capture: true, passive: true });
-    try {
-      mq = matchMedia('(prefers-reduced-motion: reduce)');
-      const chg = () => { if (mq.matches && run) end(); };
-      if (mq.addEventListener) mq.addEventListener('change', chg); else if (mq.addListener) mq.addListener(chg);
-    } catch (e) {}
+    try { mq = matchMedia('(prefers-reduced-motion: reduce)'); } catch (e) {}        // gelesen wird bei jedem Bild und vor jedem Start (kein Ereignis-Hörer nötig)
     plan(9000 + Math.random() * 5000);
   }
-  /* Prüf- und Vorführschnittstelle (MC.gull): fly() startet sofort einen Flug, wenn die Bedingungen stimmen (Schalter an, Hamburg, nach dem Tutorial, Band groß genug) */
+  /* Prüf- und Vorführschnittstelle (MC.gull): fly() startet sofort einen Flug, wenn dieselben Bedingungen stimmen wie beim zufälligen Start
+     (Schalter an, Hamburg, nach dem Tutorial, Band groß genug, kein Spielzug, keine reduzierte Bewegung); sonst false und es wird nichts geladen */
   const api = {
     state: () => ({ flag: FLAG, off, planned: !!timer, flying: !!run, paused: !!(run && run.hold0), hold: !off && hold(), t: run ? +run.t.toFixed(2) : 0, frame: run ? run.f : -1,
                     ltr: run ? run.ltr : null, size: run ? [run.W, run.H] : null, band: run ? run.g : (off ? null : where()), watch: { n, slow, strikes } }),
-    fly: () => off ? Promise.resolve(false) : load().then(ok => !!ok && !off && !run && can() && start()),
+    fly: () => (off || hold() || !can()) ? Promise.resolve(false) : load().then(ok => !!ok && !off && !run && !hold() && can() && start()),
     stop: () => { if (run) end(); },
     giveUp
   };
