@@ -642,6 +642,25 @@ img.art{display:block;width:1.15em;height:1.15em;object-fit:contain;pointer-even
 .sp-pips i.off{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);box-shadow:none}
 .sp-pips i.cur{width:19px;height:19px;border-width:4px;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 4px 0 rgba(90,10,50,.35)}
 
+/* ---------- Entwickler-Vorschau (Experiment exp/entwickler, CONFIG.features.devMenu): schmale Leiste unten, unter den Fenstern (z-index kleiner als #modal) ---------- */
+#devPanel{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);max-width:520px;margin:0 auto;z-index:39;background:rgba(24,16,36,.93);color:#fff;border:2px solid #FFC94D;border-radius:16px;padding:8px 8px 10px;font:600 13px/1.25 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+#devPanel.min{left:auto;right:8px;width:auto;padding:4px 8px}
+#devPanel.min>*:not(.dv-top){display:none}
+#devPanel.min .dv-top span{display:none}
+#devPanel .dv-top{display:flex;align-items:center;gap:8px}
+#devPanel .dv-top b{color:#FFC94D;letter-spacing:.5px}
+#devPanel .dv-top span{opacity:.75;flex:1;font-weight:500;font-size:12px}
+#devPanel button{font:inherit;color:#fff;background:rgba(255,255,255,.16);border:0;border-radius:10px;padding:6px 10px;min-height:34px;cursor:pointer}
+#devPanel button.on{background:#FFC94D;color:#3b2200}
+#devPanel .dv-name{margin:6px 0 0;opacity:.9}
+#devPanel .dv-w{display:flex;gap:3px;margin:6px 0}
+#devPanel .dv-w button{flex:1;padding:4px 0;font-size:18px;min-width:0}
+#devPanel .dv-lv{display:flex;align-items:center;gap:8px}
+#devPanel .dv-lv input{flex:1;min-width:0}
+#devPanel .dv-lv output{min-width:64px;text-align:right}
+#devPanel .dv-btn{display:flex;gap:6px;margin-top:6px}
+#devPanel .dv-info{margin-top:6px;opacity:.85;font-weight:500;font-size:11.5px}
+
 /* ---------- Bewegung reduzieren ---------- */
 @media (prefers-reduced-motion:reduce){.cell.top::before,#spPlay::before,#splash .bk i,#dailyBtn svg,.res.low .plus{animation:none!important}}
 /* Querformat auf dem Handy (oder ein sehr niedriges Fenster): Das Spiel ist fürs Hochformat gebaut, Start-Knopf und Brett wären nicht erreichbar. Statisch, ohne Animation. */
@@ -1001,7 +1020,7 @@ const CONFIG = {
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
   revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro', proEnabled: false },   // Pro = dieses Entitlement im RevenueCat-Dashboard. proEnabled: false = Pro ist AUS (Entscheidung 24.11.2026: kein Abo zum Start, docs/MONETARISIERUNG.md). Die Käufe der Diamanten-Pakete laufen davon unabhängig.
-  features: { gull: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg); im Web-Test ?gull=0 / ?gull=1
+  features: { gull: true, devMenu: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg), devMenu = Entwickler-Vorschau (Branch exp/entwickler, nur Test-Paket und Web mit ?dev=1); im Web-Test ?gull=0 / ?gull=1
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -1510,8 +1529,8 @@ function load() {
   } catch (e) {}
   return fresh();
 }
-let saveT;
-function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }, 150); }
+let saveT, devFrozen = false;          // devFrozen: nur in der Entwickler-Vorschau (Dev), dann schreibt save() nichts
+function save() { if (devFrozen) return; clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }, 150); }
 
 const maxEnergy = () => CONFIG.baseEnergy + 20 * S.up.bat;
 const slots = () => 3 + S.up.slots;
@@ -3165,7 +3184,20 @@ const Gull = (() => {
   }
   /* Prüf- und Vorführschnittstelle (MC.gull): fly() startet sofort einen Flug, wenn dieselben Bedingungen stimmen wie beim zufälligen Start
      (Schalter an, Hamburg, nach dem Tutorial, Band groß genug, kein Spielzug, keine reduzierte Bewegung); sonst false und es wird nichts geladen */
+  /* Warum fliegt sie gerade nicht? Kurzer deutscher Grund für die Entwickler-Vorschau (Dev) */
+  const why = () => {
+    if (off) return ({ flag: 'Schalter aus', asset: 'Bilddatei fehlt', perf: 'zu langsam (Wächter)', error: 'Ladefehler' })[off] || off;
+    if (!started) return 'Spiel noch nicht gestartet';
+    if (S.tut < 3) return 'Tutorial läuft';
+    if (worldIdx() !== 0) return 'nur in Hamburg';
+    if (!document.querySelector('#scene .sc-hasbg')) return 'Hintergrundbild noch nicht da';
+    if (!where()) return 'freies Fenster zu schmal (unter ' + MIN_BAND + ' px)';
+    if (run) return 'fliegt';
+    if (hold()) return 'wartet (Spielzug, Pause oder reduzierte Bewegung)';
+    return 'bereit';
+  };
   const api = {
+    why,
     state: () => ({ flag: FLAG, off, planned: !!timer, flying: !!run, paused: !!(run && run.hold0), hold: !off && hold(), t: run ? +run.t.toFixed(2) : 0, frame: run ? run.f : -1,
                     ltr: run ? run.ltr : null, size: run ? [run.W, run.H] : null, band: run ? run.g : (off ? null : where()), watch: { n, slow, strikes } }),
     fly: () => (off || hold() || !can()) ? Promise.resolve(false) : load().then(ok => !!ok && !off && !run && !hold() && can() && start()),
@@ -3465,7 +3497,7 @@ function openSettings() {
     <div class="row"><div class="mi">${ic('user')}</div><div class="tx">${t('legal')}</div><a class="btn b" style="text-decoration:none" href="impressum.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('note')}</div><div class="tx">${t('licenses')}</div><a class="btn b" style="text-decoration:none" href="licenses.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
-    <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
+    <p class="center" data-ver style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
     ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}
     ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}<br>${t('rcDbg', { s: Platform.rcOk ? (Platform.build.rcTest ? 'Test Store' : 'live') : 'off', n: ((Platform.offering && Platform.offering.availablePackages) || []).length, p: Platform.proOn() ? (Platform.pro ? '✓' : '–') : 'off' })}</p>` : ''}`, 'settings');
 }
@@ -3812,11 +3844,94 @@ setInterval(() => {
   if (Date.now() - lastAct > 7000) { lastAct = Date.now(); showMergeHint(); }
 }, 1000);
 
+/* ---------------- Entwickler-Vorschau (Experiment exp/entwickler, Schalter CONFIG.features.devMenu) ----------------
+   Zweck: Welten und Level durchblättern, ohne sie durchzuspielen. Öffnen: in den Optionen siebenmal innerhalb von 4 s auf die Versionszeile tippen.
+   Erlaubt nur im Test-Paket (Debug-APK) und im Web mit ?dev=1; in Release-Paketen (Play) bleibt die Geste ohne Wirkung. Reine VORSCHAU: Beim ersten Sprung wird der
+   Spielstand als Kopie gesichert und eingefroren: save() schreibt nichts (devFrozen), Platform.track() meldet nichts nach außen (die Ereignisse stehen nur mit dev:true
+   in MC.events()). „Beenden“ stellt die Kopie wieder her; schließt die App mitten in der Vorschau, liegt der echte Stand unverändert im Speicher.
+   Schalter: CONFIG.features.devMenu (Master), im Web ?dev=0 (aus) / ?dev=1 (an). Aus heißt: kein Element, kein Timer, keine Datei; die Geste wird nicht abgehört. */
+const Dev = (() => {
+  const P = new URLSearchParams(location.search).get('dev');
+  const FLAG = P === '0' ? false : !!(CONFIG.features && CONFIG.features.devMenu);
+  const MAXL = 60;
+  const allowed = () => FLAG && (isNative() ? Platform.build.kind === 'debug' : P === '1');
+  let snap = null, origTrack = null, panel = null, taps = [];
+  function begin() {                                                   // Kopie des echten Stands sichern, dann einfrieren
+    if (snap) return;
+    snap = JSON.stringify(S);
+    try { localStorage.setItem(SAVE_KEY, snap); } catch (e) {}         // der echte Stand liegt damit sicher im Speicher (ein wartendes save() ist erledigt)
+    clearTimeout(saveT); devFrozen = true;
+    origTrack = Platform.track;
+    Platform.track = function (name, params) { (window.__events = window.__events || []).push({ name, params: params || {}, ts: Date.now(), dev: true }); };
+  }
+  function end() {                                                     // Kopie zurückspielen, Messung wieder frei
+    if (!snap) return;
+    const back = JSON.parse(snap); snap = null; devFrozen = false;
+    Platform.track = origTrack; origTrack = null;
+    S = back; Object.assign(shown, { coins: S.coins, gems: S.gems, energy: S.energy });
+    lastChapter = null; applyChapter(true, false); fillOrders(); render();
+  }
+  function setLevel(L) {
+    L = Math.max(1, Math.min(MAXL, Math.round(+L) || 1));
+    begin();
+    S.level = L; S.worldPick = null; S.tut = Math.max(S.tut, 3);
+    applyChapter(true, false);
+    S.orders = []; fillOrders(); render(); refresh();
+  }
+  const ch = () => CHAPTERS[worldIdx()];
+  function refresh() {
+    if (!panel) return;
+    const w = worldIdx(), L = S.level;
+    panel.querySelectorAll('.dv-w button').forEach((b, i) => b.classList.toggle('on', i === w));
+    const r = panel.querySelector('input'); r.value = L;
+    panel.querySelector('output').textContent = `Level ${L}`;
+    panel.querySelector('.dv-name').textContent = `Welt ${w + 1}/${CHAPTERS.length} · ${CHAPTERS[w].de}`;
+    const ro = $('#orders').getBoundingClientRect(), rb = $('#board').getBoundingClientRect();
+    panel.querySelector('.dv-info').textContent = `Fenster ${innerWidth}×${innerHeight} px · Dichte ${devicePixelRatio} · freier Streifen ${Math.floor(rb.top) - 6 - (Math.ceil(ro.bottom) + 2)} px · Möwe: ${Gull.api.why()}`;
+    panel.querySelector('.dv-top span').textContent = snap ? 'Vorschau – wird nicht gespeichert' : 'Spielstand unverändert';
+  }
+  function open() {
+    if (panel) return true;
+    closeModal();
+    panel = document.createElement('div'); panel.id = 'devPanel'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Entwickler-Vorschau');
+    panel.innerHTML = `<div class="dv-top"><b>DEV</b><span></span><button data-dv="min" aria-label="Verkleinern">▾</button><button data-dv="end">Beenden</button></div>
+      <div class="dv-name"></div>
+      <div class="dv-w">${CHAPTERS.map((c, i) => `<button data-dv="w${i}" aria-label="${esc(c.de)}">${c.ic}</button>`).join('')}</div>
+      <div class="dv-lv"><button data-dv="lm" aria-label="Level zurück">−</button><input type="range" min="1" max="${MAXL}" step="1" aria-label="Level"><button data-dv="lp" aria-label="Level weiter">+</button><output></output></div>
+      <div class="dv-btn"><button data-dv="gull">Möwe zeigen</button><button data-dv="banner">Welt-Banner</button></div>
+      <div class="dv-info"></div>`;
+    const rg = panel.querySelector('input');
+    rg.addEventListener('input', () => { panel.querySelector('output').textContent = `Level ${rg.value}`; });
+    rg.addEventListener('change', () => setLevel(rg.value));
+    panel.addEventListener('click', e => {
+      const b = e.target.closest('[data-dv]'); if (!b) return; const a = b.dataset.dv;
+      if (a === 'end') close();
+      else if (a === 'min') { panel.classList.toggle('min'); b.textContent = panel.classList.contains('min') ? '▴' : '▾'; }
+      else if (a === 'lm') setLevel(S.level - 1);
+      else if (a === 'lp') setLevel(S.level + 1);
+      else if (a === 'banner') worldBanner(ch());
+      else if (a === 'gull') { panel.querySelector('.dv-info').textContent = 'Möwe: Start in 2 s (sie wartet nach jeder Berührung kurz) …'; setTimeout(() => Gull.api.fly().then(refresh, refresh), 1800); }
+      else if (/^w\d$/.test(a)) setLevel(CHAPTERS[+a.slice(1)].lv);
+    });
+    document.body.appendChild(panel); refresh(); return true;
+  }
+  function close() { end(); if (panel) { panel.remove(); panel = null; } }
+  const tap = () => {
+    if (!allowed()) return;
+    const t0 = performance.now(); taps = taps.filter(x => t0 - x < 4000); taps.push(t0);
+    if (taps.length >= 7) { taps = []; open(); }
+  };
+  const init = () => { if (FLAG) $('#modalBody').addEventListener('click', e => { if (e.target.closest('[data-ver]')) tap(); }); };
+  const api = { state: () => ({ flag: FLAG, allowed: allowed(), open: !!panel, frozen: !!snap, level: S.level }), open: () => allowed() ? open() : false, close, setLevel: L => allowed() ? setLevel(L) : false };
+  return { init, api };
+})();
+
 window.MC = { ent: (id, o) => playEntrance(id, o), cust: l => custSVG(l), seats: () => seatEls, fill: () => { fillOrders(); render(); }, render: () => render(), close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state(), world: L => { S.level = L; S.worldPick = null; applyChapter(true); render(); }, levelUp: L => { S.level = L - 1; S.xp = 0; addXP(xpNeed(L - 1)); }, scene: (i, vb, still) => Scenes.svg(i, vb, still),
   disc: (c, tr) => showDiscovery(c, tr), gift: () => addGift(), dbl: o => offerDouble(o || { coins: 80 }), shop: () => openShop(), gems: () => openGems(), noEnergy: () => openNoEnergy(),
   order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx,
   plat: Platform, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
 window.MC.gull = Gull.api;
+window.MC.dev = Dev.api; Dev.init();
 
 /* ---------------- Boot ---------------- */
 S = load();
