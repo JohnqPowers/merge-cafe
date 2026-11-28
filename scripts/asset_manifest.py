@@ -33,6 +33,7 @@ STADT = ['hamburg', 'wien', 'paris', 'rom', 'istanbul', 'kyoto', 'new_york', 'ri
 
 KI = 'KI-Bild (überwiegend OpenAI-Bildgenerierung nach Briefing; Erklärung des Eigentümers 24.11.2026), im Projekt aufbereitet'
 KI_STADT = 'KI-Bild (OpenAI-Bildgenerierung laut Lieferung vom 25.11.2026; Rechte nicht zugesichert), im Projekt aufbereitet (oben auf 9:19,5 ergänzt, scripts/art_import.py)'
+KI_MOEWE = 'KI-Bild (OpenAI-Bildgenerierung laut Lieferung vom 25.11.2026; Rechte nicht zugesichert), im Projekt aufbereitet (acht Flug-Frames zu einem Streifen, scripts/gull_import.py)'
 KATZE = 'KI-Bild (Erklärung des Eigentümers 24.11.2026); Frames im Katzenpaket durch Skalierung, Drehung und Verschiebung abgeleitet, im Projekt aufbereitet'
 ICON = 'KI-Bild des Eigentümers (Icon-Original), im Projekt abgeleitet (assets/src/build-icon.py)'
 GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile gilt
@@ -45,6 +46,7 @@ GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile
     (r'^www/art/frame\d*\.webp$', 'Brett-Rahmen', KI),
     (r'^www/art/e\d+\.webp$', 'Einzugs-Pose', KI),
     (r'^www/art/fx_[a-z0-9]+\.webp$', 'Effekt', KI),
+    (r'^www/art/anim/moewe_[a-z0-9_]+\.webp$', 'Animation (Möwe)', KI_MOEWE),
     (r'^www/art/cat/c\d+\.webp$', 'Katze (Frame)', KATZE),
     (r'^www/art/cat/h\d+\.webp$', 'Katze (Herz)', KATZE),
     (r'^www/art/cat/purr\.wav$', 'Katze (Ton)', 'synthetischer Platzhalter-Ton aus dem Katzenpaket, im Projekt zur Schleife geschnitten'),
@@ -65,6 +67,7 @@ NACH_ART = 'bitgleich nachgestellt 24.11.2026 (scripts/art_import.py)'
 NACH_BODEN = 'bitgleich nachgestellt 24.11.2026 (scripts/floor_prep.py, scripts/art_import.py)'
 NACH_KATZE = 'bitgleich nachgestellt 24.11.2026 (scripts/cat_import.py)'
 NACH_STADT = 'bitgleich nachgestellt 25.11.2026 (scripts/art_import.py aus dem ZIP, Kopie des Repos)'
+NACH_MOEWE = 'bitgleich nachgestellt 25.11.2026 (scripts/gull_import.py aus dem ZIP, Kopie des Repos)'
 NACH_ICON = 'bitgleich nachgestellt 24.11.2026 (assets/src/build-icon.py)'
 NACH_F1 = 'Zuordnung nur nach Dateiname; ausgeliefertes f1.webp nicht bitgleich nachstellbar (vorläufiger Boden)'
 NACH_HASH = 'Prüfsumme gleich Verzeichnis-Eintrag'
@@ -115,6 +118,13 @@ def stadtpaket_zuordnung():
     return {k: v for k, v in out.items() if v}
 
 
+def moewe_zuordnung():
+    """Möwen-Flugstreifen (Experiment exp/moewe-hamburg): Zieldatei -> die acht Flug-Frames der Lieferung vom 25.11.2026 (Zeilen der Paketliste)."""
+    paket = [r for r in lesen_csv(PAK, 'utf-8') if r['paket'] == STADTPAKET]
+    frames = sorted((r for r in paket if re.search(r'/07_Animationen_Optional/moewe/moewe_flug_\d\d\.png$', r['datei'])), key=lambda r: r['datei'])
+    return {'www/art/anim/moewe_hamburg.webp': frames} if len(frames) == 8 else {}
+
+
 def pixelmass(p):
     if p.suffix.lower() not in ('.webp', '.png'):
         return ''
@@ -145,6 +155,7 @@ def erzeugen():
     icon_orig = next((r for r in lib if 'icon_original' in r['Pfad']), None)
     katze = katzen_zuordnung()
     stadt = stadtpaket_zuordnung()
+    moewe = moewe_zuordnung()
     zeilen = []
     for p in dateien():
         rel = p.relative_to(ROOT).as_posix()
@@ -163,6 +174,13 @@ def erzeugen():
                 quelle = ' + '.join(r['datei'].removeprefix(KATZE_PRAEFIX) for r in qs)
                 qsha = ' + '.join(dict.fromkeys(r['sha256'] for r in qs))
                 paket, qstatus, nachweis = KATZENPAKET, 'Katzenpaket (nicht im Verzeichnis des Eigentümers)', NACH_KATZE
+        elif rel in moewe:
+            qs = moewe[rel]
+            quelle = ' + '.join(r['datei'].split('/', 1)[1] for r in qs)
+            qsha = ' + '.join(dict.fromkeys(r['sha256'] for r in qs))
+            paket = STADTPAKET
+            qstatus = 'Stadtpaket 25.11.2026 (' + ('Prüfsummen im Verzeichnis des Eigentümers' if all(r['im_verzeichnis'] == 'ja' for r in qs) else 'nicht im Verzeichnis des Eigentümers') + ')'
+            nachweis = NACH_MOEWE
         elif rel in stadt:
             r = stadt[rel]
             quelle, paket, qsha = r['datei'], r['paket'], r['sha256']
