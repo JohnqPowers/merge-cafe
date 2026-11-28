@@ -3057,7 +3057,7 @@ setInterval(() => { const c = $('#cat'); if (c) c.classList.toggle('sleep', star
 /* ---------------- Möwe über Hamburg (Experiment exp/moewe-hamburg) ----------------
    Ab und zu fliegt eine Möwe durch das freie Fenster zwischen Bestellleiste und Brett (nur Welt 1 Hamburg, erst nach dem Tutorial).
    Gezeichnet wird sie nur in einem Band, das genau zwischen Unterkante der Bestellungen und Oberkante des Bretts liegt und alles
-   Überstehende abschneidet: über Brett und Bestellungen kann sie nicht gelangen. Sie ruht bei jedem Spielzug (Calm.quiet, Finger auf dem
+   Überstehende abschneidet: über Brett und Bestellungen kann sie nicht gelangen. Das Band ist ab 28 px hoch nutzbar, die Möwe wird der Höhe angepasst. Sie ruht bei jedem Spielzug (Calm.quiet, Finger auf dem
    Schirm, 1,5 s danach), unter Fenstern, bei verstecktem Fenster und bei „Bewegung reduzieren“; ein Wächter schaltet sie für die Sitzung
    ab, wenn die Bilder zu langsam kommen. Kein Speicher, keine Berechtigung, kein Ton; bewegt wird nur per transform.
    Schalter: CONFIG.features.gull, im Web ?gull=0 / ?gull=1. Aus heißt: kein Element, kein Timer, keine Datei wird geladen.
@@ -3066,7 +3066,7 @@ const GULL = /*GULL_DATA*/{"v":1,"file":"art/anim/moewe_hamburg.webp","n":8,"w":
 const Gull = (() => {
   const P = new URLSearchParams(location.search).get('gull');
   const FLAG = P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.gull);
-  const FPS = 11, GRACE = 1500, HOLD_MAX = 5000, MIN_BAND = 64, WIN = 30, SLOW_MS = 50, SLOW_N = 8, STRIKES = 2;
+  const FPS = 11, GRACE = 1500, HOLD_MAX = 5000, MIN_BAND = 28, WIN = 30, SLOW_MS = 50, SLOW_N = 8, STRIKES = 2;
   let off = !FLAG ? 'flag' : (GULL && GULL.file ? '' : 'asset');     // '' = bereit; sonst der Grund: flag | asset | perf | error
   let inited = false, timer = 0, band = null, win = null, strip = null, ready = null, run = null, mq = null;
   let downs = 0, lastIn = -1e9, n = 0, slow = 0, strikes = 0;
@@ -3101,7 +3101,8 @@ const Gull = (() => {
   }
   function start() {
     const g = where(); if (!g || run || off || !strip) return false;
-    const W = Math.max(40, Math.min(Math.round(g.w * .16), Math.floor(g.h * .55 * GULL.w / GULL.h))), H = Math.round(W * GULL.h / GULL.w);
+    /* Größe folgt dem Fenster: fast die ganze Bandhöhe (94 %), höchstens 16 % der Breite. Auf hohen Handys ist das Fenster nur 30 bis 60 px hoch (Bildgäste, große Schrift); bis 1.5.21 verlangte der Code 64 px und die Möwe blieb dort ganz aus */
+    const H = Math.min(Math.round(g.h * .94), Math.round(Math.round(g.w * .16) * GULL.h / GULL.w)), W = Math.round(H * GULL.w / GULL.h);
     const ltr = Math.random() < .5, free = g.h - H, A1 = Math.min(6, free * .12);
     if (!band) { band = document.createElement('div'); band.className = 'gull-band'; band.setAttribute('aria-hidden', 'true'); win = document.createElement('div'); win.className = 'gull'; band.appendChild(win); win.appendChild(strip); }
     band.style.cssText = `top:${g.top}px;left:${g.left}px;width:${g.w}px;height:${g.h}px`;
