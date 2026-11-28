@@ -72,6 +72,12 @@ Stand: 24.11.2026, Spielversion 1.5.13. Grundlage: die Herkunftserklärung des E
    - **Nachstellung (28.11.2026):** In einer Kopie des Repos aus dem ZIP neu erzeugt (Umbenennen wie in Punkt 4), alle neun Dateien **bitgleich** zu den ausgelieferten. Gewicht: 4,3 MB statt 1,9 MB für alle neun.
    - **Sichtprüfung durch den Agenten (28.11.2026):** Himmelsansatz in allen neun Welten ohne Balken und ohne Naht; in Hamburg bei 407×904 mit Statusleiste geprüft (Vorher/Nachher). Keine neuen Inhalte hinzugefügt: der Ansatz ist ein reiner Farbverlauf mit leichtem Rauschen.
 
+8. **Lieferung vom 28.11.2026 (Startbild, erste Seite, Chat-Anhang, 941×1672, 2 171 301 Bytes, SHA-256 `afca2c50…99c9`):**
+   - **Herkunft:** vom Eigentümer im Chat geliefert und als neue erste Seite beauftragt. Werkzeug, Tag und Prompt hat er nicht genannt; die Optik gleicht den KI-Bildern der übrigen Lieferungen. **Rechte nicht zugesichert** (wie Punkt 4 und 6).
+   - **Im Repo:** `assets/src/start-original.png` (nicht im Verzeichnis, Zeile „Einzeldatei (Upload)“ in der Paketliste). `python3 -I scripts/start_import.py` baut daraus `www/art/start.webp` (1220×2388) und die Tabelle `START` in `www/index.html`: die eingebrannte Versionsnummer wird mit dem Verlauf der Umgebung getilgt (die echte Nummer setzt das Spiel als Text darüber), das Bild unten um 170 Zeilen verlängert (gespiegelt und zunehmend verwischt, damit der Satz „Dein eigenes Café wartet auf dich!“ an sehr hohen Handys nicht am Rand abgeschnitten wird), auf 1220 px Breite vergrößert und leicht nachgeschärft. Das Spiel zeigt das Bild nur bei deutscher Sprache (der Text im Bild ist deutsch) und nur bei eingeschaltetem `CONFIG.features.startImg`.
+   - **Nachstellung (28.11.2026):** In einer Kopie des Repos neu gebaut, **bitgleich** (`tests/test_startbild.py`, Abschnitt H).
+   - **Sichtprüfung durch den Agenten (28.11.2026):** lesbar sind „Noa's Bean Trail“, „Dein eigenes Café wartet auf dich!“, „Spielen“ und die Versionsnummer (im Spiel getilgt und durch echten Text ersetzt). Kein Fremdname und kein bekanntes Logo erkannt (Sichtprüfung, keine Markenrecherche). Die acht Bohnen im Bild sind reine Dekoration.
+
 ## 6. Regeln für neue Dateien
 
 1. Die Pakete gelten als projektintern erzeugte KI-Bilder. Die Herkunftserklärung ist **keine zusätzliche Lizenz**.
