@@ -642,6 +642,43 @@ img.art{display:block;width:1.15em;height:1.15em;object-fit:contain;pointer-even
 .sp-pips i.off{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);box-shadow:none}
 .sp-pips i.cur{width:19px;height:19px;border-width:4px;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 4px 0 rgba(90,10,50,.35)}
 
+/* ---------- Startbild (Experiment exp/startbild, CONFIG.features.startImg): Vollbild, links/rechts beschnitten; der Knopf ist eine unsichtbare Fläche über dem Bild ---------- */
+#splash.sp-pre>*:not(#spPlay){visibility:hidden}
+#splash.sp-pre #spPlay{opacity:0}
+#splash.sp-img{display:block}
+#splash.sp-img>.sp-stage{position:absolute;left:0;top:0;opacity:0;transition:opacity .25s ease-out;z-index:1}
+#splash.sp-img>.sp-stage.rdy{opacity:1}
+.sp-stage>img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.sp-ov{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.sp-ov text{font-family:var(--num);text-anchor:middle;fill:#FFF1CF;letter-spacing:.5px}
+.sp-ov .sp-sh{fill:rgba(130,25,60,.42)}
+.sp-ov .sp-w{font-family:var(--num);fill:#FFF6DE;stroke:#B02E58;stroke-width:5px;paint-order:stroke;stroke-linejoin:round}
+.sp-stage #spPlay{position:absolute;padding:0;border:0;border-radius:999px;background:transparent;box-shadow:none;text-shadow:none;color:transparent;font-size:0;animation:none;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;z-index:2}
+.sp-stage #spPlay::before{opacity:.55}
+.sp-stage #spPlay:active{transform:none;background:rgba(10,70,20,.18);box-shadow:none}
+.sp-stage #spPlay:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#splash.sp-img::before{display:none}
+@media (min-aspect-ratio:564/1000){#splash.sp-img::before{display:block;background:var(--spbg) 50% 50%/cover no-repeat;filter:blur(34px);transform:scale(1.15)}}
+@media (prefers-reduced-motion:reduce){.sp-stage{transition:none!important}}
+/* ---------- Entwickler-Vorschau (Experiment exp/entwickler, CONFIG.features.devMenu): schmale Leiste unten, unter den Fenstern (z-index kleiner als #modal) ---------- */
+#devPanel{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);max-width:520px;margin:0 auto;z-index:39;background:rgba(24,16,36,.93);color:#fff;border:2px solid #FFC94D;border-radius:16px;padding:8px 8px 10px;font:600 13px/1.25 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+#devPanel.min{left:auto;right:8px;width:auto;padding:4px 8px}
+#devPanel.min>*:not(.dv-top){display:none}
+#devPanel.min .dv-top span{display:none}
+#devPanel .dv-top{display:flex;align-items:center;gap:8px}
+#devPanel .dv-top b{color:#FFC94D;letter-spacing:.5px}
+#devPanel .dv-top span{opacity:.75;flex:1;font-weight:500;font-size:12px}
+#devPanel button{font:inherit;color:#fff;background:rgba(255,255,255,.16);border:0;border-radius:10px;padding:6px 10px;min-height:34px;cursor:pointer}
+#devPanel button.on{background:#FFC94D;color:#3b2200}
+#devPanel .dv-name{margin:6px 0 0;opacity:.9}
+#devPanel .dv-w{display:flex;gap:3px;margin:6px 0}
+#devPanel .dv-w button{flex:1;padding:4px 0;font-size:18px;min-width:0}
+#devPanel .dv-lv{display:flex;align-items:center;gap:8px}
+#devPanel .dv-lv input{flex:1;min-width:0}
+#devPanel .dv-lv output{min-width:64px;text-align:right}
+#devPanel .dv-btn{display:flex;gap:6px;margin-top:6px}
+#devPanel .dv-info{margin-top:6px;opacity:.85;font-weight:500;font-size:11.5px}
+
 /* ---------- Bewegung reduzieren ---------- */
 @media (prefers-reduced-motion:reduce){.cell.top::before,#spPlay::before,#splash .bk i,#dailyBtn svg,.res.low .plus{animation:none!important}}
 /* Querformat auf dem Handy (oder ein sehr niedriges Fenster): Das Spiel ist fürs Hochformat gebaut, Start-Knopf und Brett wären nicht erreichbar. Statisch, ohne Animation. */
@@ -993,7 +1030,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.21',
+  version: '1.5.22',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
@@ -1001,7 +1038,7 @@ const CONFIG = {
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
   revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro', proEnabled: false },   // Pro = dieses Entitlement im RevenueCat-Dashboard. proEnabled: false = Pro ist AUS (Entscheidung 24.11.2026: kein Abo zum Start, docs/MONETARISIERUNG.md). Die Käufe der Diamanten-Pakete laufen davon unabhängig.
-  features: { gull: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg); im Web-Test ?gull=0 / ?gull=1
+  features: { gull: true, startImg: true, devMenu: true, mix: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg), startImg = neues Startbild (Branch exp/startbild), devMenu = Entwickler-Vorschau (Branch exp/entwickler, nur Test-Paket und Web mit ?dev=1), mix = Klang-Mischung Musik/Effekte (Branch exp/klangmix); im Web-Test ?gull=0 / ?gull=1, ?startimg=0 / ?startimg=1, ?dev=0 / ?dev=1 und ?mix=0 / ?mix=1
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -1010,6 +1047,17 @@ const CONFIG = {
 'use strict';
 const COLS = 7, ROWS = 8, N = COLS * ROWS;
 const LANG = (navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
+/* Startbild (Experiment exp/startbild, Schalter CONFIG.features.startImg, im Web ?startimg=0 / ?startimg=1): Das Bild des Eigentümers ersetzt den gebauten
+   Startbildschirm (Vollbild; an hohen Handys links und rechts etwas beschnitten, an breiten Fenstern mit verwischtem Rand). Darüber liegen nur der
+   „Spielen“-Knopf als echte, unsichtbare Fläche (Lage laut START.btn), die echte Versionsnummer und für wiederkehrende Spieler eine Willkommenszeile.
+   Das Bild trägt deutschen Text; in anderen Sprachen bleibt das alte Startbild, ebenso wenn die Datei fehlt oder nicht lesbar ist.
+   Aus heißt: kein Element, kein Timer, keine Datei wird geladen. Bild und Tabelle START erzeugt scripts/start_import.py. */
+const START = /*START_DATA*/{"v":2,"file":"art/start.webp","w":1220,"h":2388,"art":2167.6,"btn":[14.878,69.87,69.819,10.803],"ver":[610.0,2066.5,31.1],"wel":[610.0,1996.5,36.3,726.0]}/*END_START_DATA*/;
+const START_ON = (() => {
+  const P = new URLSearchParams(location.search).get('startimg');
+  return (P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.startImg)) && LANG === 'de' && !!START.file;
+})();
+if (START_ON) document.getElementById('splash').classList.add('sp-pre');          // alte Inhalte sofort verbergen, damit nichts aufblitzt
 
 const STR = {
   de: {
@@ -1510,8 +1558,8 @@ function load() {
   } catch (e) {}
   return fresh();
 }
-let saveT;
-function save() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }, 150); }
+let saveT, devFrozen = false;          // devFrozen: nur in der Entwickler-Vorschau (Dev), dann schreibt save() nichts
+function save() { if (devFrozen) return; clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }, 150); }
 
 const maxEnergy = () => CONFIG.baseEnergy + 20 * S.up.bat;
 const slots = () => 3 + S.up.slots;
@@ -1879,8 +1927,13 @@ const PC_VB = '0 40 400 300';
 /* =====================================================================
    SOUND — eigene Synthese: Glöckchen, Pops, Münzen, Fanfaren + Café-Musik
    ===================================================================== */
+/* Klang-Mischung (Experiment exp/klangmix, Schalter CONFIG.features.mix, im Web-Test ?mix=0|1).
+   Gemessen (Chrome, Pegel hinter dem Verdichter): Musik lag ueber einen Handy-Lautsprecher (ab 300 Hz) rund 20 dB unter den Effekten, weil der tiefe Bass sie dominiert und das Handy ihn kaum spielt.
+   An: Musik +10 dB, Bass-Stimme zusaetzlich -7 dB, Effekte -3 dB. Aus (= Stand 1.5.21): die alten Pegel, kein zusaetzlicher Knoten. */
+const MIX_ON = (() => { const P = new URLSearchParams(location.search).get('mix'); return P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.mix); })();
+const MIX = MIX_ON ? { sfx: .6, mus: .5, duck: .156, bass: .45 } : { sfx: .85, mus: .16, duck: .05, bass: 1 };
 const Sound = (() => {
-  let ctx = null, master, sfxBus, musBus, delay, noiseBuf, musicTimer = null, nextT = 0, step = 0, mel = 3, ducked = false;
+  let ctx = null, master, sfxBus, musBus, bassDest, delay, noiseBuf, musicTimer = null, nextT = 0, step = 0, mel = 3, ducked = false;
   const PENTA = [72,74,76,79,81,84,86,88,91,93,96,98,100];
   const mf = m => 440 * Math.pow(2, (m - 69) / 12);
   function init() {
@@ -1889,8 +1942,9 @@ const Sound = (() => {
       ctx = new AC();
       const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
       master = ctx.createGain(); master.gain.value = .9; master.connect(comp); comp.connect(ctx.destination);
-      sfxBus = ctx.createGain(); sfxBus.gain.value = .85; sfxBus.connect(master);
+      sfxBus = ctx.createGain(); sfxBus.gain.value = MIX.sfx; sfxBus.connect(master);
       musBus = ctx.createGain(); musBus.gain.value = .0; musBus.connect(master);
+      bassDest = musBus; if (MIX_ON) { bassDest = ctx.createGain(); bassDest.gain.value = MIX.bass; bassDest.connect(musBus); }   /* Bass-Stimme einzeln absenkbar; Schalter aus: kein zusaetzlicher Knoten */
       delay = ctx.createDelay(); delay.delayTime.value = .13;
       const fb = ctx.createGain(); fb.gain.value = .28; const wet = ctx.createGain(); wet.gain.value = .2;
       delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master); sfxBus.connect(delay);
@@ -2002,7 +2056,7 @@ const Sound = (() => {
     if (nextT < ctx.currentTime) nextT = ctx.currentTime + .05;
     while (nextT < ctx.currentTime + .4) {
       const n8 = sty.len || 8, bar = Math.floor(step / n8) % 4, s8 = step % n8, ch = sty.ch[bar], MEL = sty.mel;
-      if ((sty.bass || [0, 5]).includes(s8)) osc('sine', mf(ch[0]), nextT, e * 2.2, .3, musBus, { att: .01 });
+      if ((sty.bass || [0, 5]).includes(s8)) osc('sine', mf(ch[0]), nextT, e * 2.2, .3, bassDest, { att: .01 });
       if ((sty.comp || [2, 6]).includes(s8)) ch.slice(1).forEach(m => osc('triangle', mf(m + 12), nextT, e * (sty.pluck ? .7 : 1.4), .055, musBus, { att: .01 }));
       noise(nextT, .03, s8 % 2 ? .035 : .018, 7000, musBus);
       if (s8 === 0) ambient(nextT);
@@ -2018,11 +2072,11 @@ const Sound = (() => {
   function musicOn() {
     if (!ctx || musicTimer) return;
     nextT = ctx.currentTime + .1; musBus.gain.cancelScheduledValues(ctx.currentTime);
-    musBus.gain.setTargetAtTime(ducked ? .05 : .16, ctx.currentTime, .6);
+    musBus.gain.setTargetAtTime(ducked ? MIX.duck : MIX.mus, ctx.currentTime, .6);
     musicTimer = setInterval(schedule, 120); schedule();
   }
   function musicOff() { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } if (ctx) musBus.gain.setTargetAtTime(0, ctx.currentTime, .2); }
-  function duck(d) { ducked = d; if (ctx && musicTimer) musBus.gain.setTargetAtTime(d ? .05 : .16, ctx.currentTime, .3); }
+  function duck(d) { ducked = d; if (ctx && musicTimer) musBus.gain.setTargetAtTime(d ? MIX.duck : MIX.mus, ctx.currentTime, .3); }
   function pause() { if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {}); }
   function resume() { if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); }
   function state() { return ctx ? ctx.state : 'none'; }
@@ -3057,7 +3111,7 @@ setInterval(() => { const c = $('#cat'); if (c) c.classList.toggle('sleep', star
 /* ---------------- Möwe über Hamburg (Experiment exp/moewe-hamburg) ----------------
    Ab und zu fliegt eine Möwe durch das freie Fenster zwischen Bestellleiste und Brett (nur Welt 1 Hamburg, erst nach dem Tutorial).
    Gezeichnet wird sie nur in einem Band, das genau zwischen Unterkante der Bestellungen und Oberkante des Bretts liegt und alles
-   Überstehende abschneidet: über Brett und Bestellungen kann sie nicht gelangen. Sie ruht bei jedem Spielzug (Calm.quiet, Finger auf dem
+   Überstehende abschneidet: über Brett und Bestellungen kann sie nicht gelangen. Das Band ist ab 28 px hoch nutzbar, die Möwe wird der Höhe angepasst. Sie ruht bei jedem Spielzug (Calm.quiet, Finger auf dem
    Schirm, 1,5 s danach), unter Fenstern, bei verstecktem Fenster und bei „Bewegung reduzieren“; ein Wächter schaltet sie für die Sitzung
    ab, wenn die Bilder zu langsam kommen. Kein Speicher, keine Berechtigung, kein Ton; bewegt wird nur per transform.
    Schalter: CONFIG.features.gull, im Web ?gull=0 / ?gull=1. Aus heißt: kein Element, kein Timer, keine Datei wird geladen.
@@ -3066,7 +3120,7 @@ const GULL = /*GULL_DATA*/{"v":1,"file":"art/anim/moewe_hamburg.webp","n":8,"w":
 const Gull = (() => {
   const P = new URLSearchParams(location.search).get('gull');
   const FLAG = P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.gull);
-  const FPS = 11, GRACE = 1500, HOLD_MAX = 5000, MIN_BAND = 64, WIN = 30, SLOW_MS = 50, SLOW_N = 8, STRIKES = 2;
+  const FPS = 11, GRACE = 1500, HOLD_MAX = 5000, MIN_BAND = 28, WIN = 30, SLOW_MS = 50, SLOW_N = 8, STRIKES = 2;
   let off = !FLAG ? 'flag' : (GULL && GULL.file ? '' : 'asset');     // '' = bereit; sonst der Grund: flag | asset | perf | error
   let inited = false, timer = 0, band = null, win = null, strip = null, ready = null, run = null, mq = null;
   let downs = 0, lastIn = -1e9, n = 0, slow = 0, strikes = 0;
@@ -3101,7 +3155,8 @@ const Gull = (() => {
   }
   function start() {
     const g = where(); if (!g || run || off || !strip) return false;
-    const W = Math.max(40, Math.min(Math.round(g.w * .16), Math.floor(g.h * .55 * GULL.w / GULL.h))), H = Math.round(W * GULL.h / GULL.w);
+    /* Größe folgt dem Fenster: fast die ganze Bandhöhe (94 %), höchstens 16 % der Breite. Auf hohen Handys ist das Fenster nur 30 bis 60 px hoch (Bildgäste, große Schrift); bis 1.5.21 verlangte der Code 64 px und die Möwe blieb dort ganz aus */
+    const H = Math.min(Math.round(g.h * .94), Math.round(Math.round(g.w * .16) * GULL.h / GULL.w)), W = Math.round(H * GULL.w / GULL.h);
     const ltr = Math.random() < .5, free = g.h - H, A1 = Math.min(6, free * .12);
     if (!band) { band = document.createElement('div'); band.className = 'gull-band'; band.setAttribute('aria-hidden', 'true'); win = document.createElement('div'); win.className = 'gull'; band.appendChild(win); win.appendChild(strip); }
     band.style.cssText = `top:${g.top}px;left:${g.left}px;width:${g.w}px;height:${g.h}px`;
@@ -3165,7 +3220,20 @@ const Gull = (() => {
   }
   /* Prüf- und Vorführschnittstelle (MC.gull): fly() startet sofort einen Flug, wenn dieselben Bedingungen stimmen wie beim zufälligen Start
      (Schalter an, Hamburg, nach dem Tutorial, Band groß genug, kein Spielzug, keine reduzierte Bewegung); sonst false und es wird nichts geladen */
+  /* Warum fliegt sie gerade nicht? Kurzer deutscher Grund für die Entwickler-Vorschau (Dev) */
+  const why = () => {
+    if (off) return ({ flag: 'Schalter aus', asset: 'Bilddatei fehlt', perf: 'zu langsam (Wächter)', error: 'Ladefehler' })[off] || off;
+    if (!started) return 'Spiel noch nicht gestartet';
+    if (S.tut < 3) return 'Tutorial läuft';
+    if (worldIdx() !== 0) return 'nur in Hamburg';
+    if (!document.querySelector('#scene .sc-hasbg')) return 'Hintergrundbild noch nicht da';
+    if (!where()) return 'freies Fenster zu schmal (unter ' + MIN_BAND + ' px)';
+    if (run) return 'fliegt';
+    if (hold()) return 'wartet (Spielzug, Pause oder reduzierte Bewegung)';
+    return 'bereit';
+  };
   const api = {
+    why,
     state: () => ({ flag: FLAG, off, planned: !!timer, flying: !!run, paused: !!(run && run.hold0), hold: !off && hold(), t: run ? +run.t.toFixed(2) : 0, frame: run ? run.f : -1,
                     ltr: run ? run.ltr : null, size: run ? [run.W, run.H] : null, band: run ? run.g : (off ? null : where()), watch: { n, slow, strikes } }),
     fly: () => (off || hold() || !can()) ? Promise.resolve(false) : load().then(ok => !!ok && !off && !run && !hold() && can() && start()),
@@ -3465,7 +3533,7 @@ function openSettings() {
     <div class="row"><div class="mi">${ic('user')}</div><div class="tx">${t('legal')}</div><a class="btn b" style="text-decoration:none" href="impressum.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('note')}</div><div class="tx">${t('licenses')}</div><a class="btn b" style="text-decoration:none" href="licenses.html">${ic('info')}</a></div>
     <div class="row"><div class="mi">${ic('refresh')}</div><div class="tx">${t('reset')}</div><button class="btn" data-act="reset">${t('reset')}</button></div>
-    <p class="center" style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
+    <p class="center" data-ver style="color:var(--muted);font-size:12px">${esc(APP_NAME)} v${CONFIG.version} · ${osName()}</p>
     ${Platform.locked ? `<p class="center" style="color:var(--muted);font-size:12px">${t('testBuild')}</p>` : ''}
     ${Platform.build.kind === 'debug' ? `<p class="center" style="color:var(--muted);font-size:12px">${t('dbgBuild')}<br>${t('rcDbg', { s: Platform.rcOk ? (Platform.build.rcTest ? 'Test Store' : 'live') : 'off', n: ((Platform.offering && Platform.offering.availablePackages) || []).length, p: Platform.proOn() ? (Platform.pro ? '✓' : '–') : 'off' })}</p>` : ''}`, 'settings');
 }
@@ -3780,6 +3848,37 @@ function showOnboarding() {
 }
 
 /* ---------------- Splash / Start ---------------- */
+/* Startbild-Einbau (Schalter START_ON): Bild laden und entschlüsseln, erst dann die alten Inhalte entfernen und die Bühne einsetzen. Misslingt das, bleibt das alte Startbild. */
+function startImgBuild() {
+  const sp = $('#splash'), play = $('#spPlay'), { btn: b, ver: v, wel: wl, w: W, h: H, art: A } = START;
+  const img = new Image(); img.alt = ''; img.decoding = 'async'; img.draggable = false; img.src = START.file;
+  const fail = () => sp.classList.remove('sp-pre');
+  (img.decode ? img.decode() : new Promise((ok, no) => { img.onload = ok; img.onerror = no; })).then(() => {
+    if (!sp.isConnected || sp.classList.contains('out')) return;                    // der Spieler war schneller (sehr früher Fingerdruck)
+    const stage = document.createElement('div'); stage.className = 'sp-stage';
+    [...sp.children].forEach(c => { if (c !== play) c.remove(); });
+    const ver = 'v' + CONFIG.version, fs = (v[2] / .7).toFixed(1);
+    let svg = `<svg class="sp-ov" viewBox="0 0 ${W} ${H}" aria-hidden="true"><text class="sp-sh" x="${v[0]}" y="${(v[1] + v[2] * .09).toFixed(1)}" font-size="${fs}">${ver}</text><text id="spVer" x="${v[0]}" y="${v[1]}" font-size="${fs}">${ver}</text>`;
+    if (S.profile.done) svg += `<text class="sp-w" x="${wl[0]}" y="${wl[1]}" font-size="${wl[2]}">${esc(t('welcomeBack', { n: pname() }))}</text>`;     // wiederkehrende Spieler: eine Zeile unter dem Knopf
+    stage.append(img); stage.insertAdjacentHTML('beforeend', svg + '</svg>'); stage.append(play);
+    play.style.cssText = `left:${b[0]}%;top:${b[1]}%;width:${b[2]}%;height:${b[3]}%`; play.setAttribute('aria-label', t('play'));
+    /* Größe: Fenster höchstens so breit wie das Bild (9:16 und höher): das ganze Bild deckt das Fenster, oben ausgerichtet, links/rechts mittig beschnitten;
+       breiter: das eigentliche Bild (ohne Verlängerung unten) füllt die Höhe, an den Seiten bleibt der verwischte Rand. */
+    const fit = () => {
+      const w = sp.clientWidth, h = sp.clientHeight;
+      if (!sp.isConnected) return removeEventListener('resize', fit);
+      if (!w || !h) return;
+      const k = w / h <= W / A ? Math.max(w / W, h / H) : h / A;
+      stage.style.cssText = `width:${W * k}px;height:${H * k}px;left:${(w - W * k) / 2}px`;
+    };
+    sp.append(stage); sp.classList.add('sp-img'); sp.classList.remove('sp-pre'); sp.style.setProperty('--spbg', `url("${START.file}")`);
+    fit(); addEventListener('resize', fit);
+    const wt = stage.querySelector('.sp-w');                                         // zu lange Namen werden auf die erlaubte Breite gestaucht (gemessen, auch nach dem Laden der Schrift)
+    const chk = () => { if (!wt) return; wt.removeAttribute('textLength'); if (wt.getBBox().width > wl[3]) { wt.setAttribute('textLength', wl[3]); wt.setAttribute('lengthAdjust', 'spacingAndGlyphs'); } };
+    chk(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(chk);
+    requestAnimationFrame(() => stage.classList.add('rdy'));
+  }, fail);
+}
 function setupSplash() {
   let k = 0; // laufende Buchstabennummer über beide Zeilen
   // Zeile 1: erstes Wort ("Noa's"), Zeile 2: der Rest ("Bean Trail"); Leerzeichen bleiben normaler Text zwischen den Buchstaben
@@ -3802,6 +3901,7 @@ function setupSplash() {
     setTimeout(proDaily, 1800);
     render();
   };
+  if (START_ON) startImgBuild();
 }
 document.addEventListener('pointerdown', () => { if (started) Sound.unlock(); }, { passive: true });
 document.addEventListener('visibilitychange', () => {
@@ -3812,11 +3912,94 @@ setInterval(() => {
   if (Date.now() - lastAct > 7000) { lastAct = Date.now(); showMergeHint(); }
 }, 1000);
 
+/* ---------------- Entwickler-Vorschau (Experiment exp/entwickler, Schalter CONFIG.features.devMenu) ----------------
+   Zweck: Welten und Level durchblättern, ohne sie durchzuspielen. Öffnen: in den Optionen siebenmal innerhalb von 4 s auf die Versionszeile tippen.
+   Erlaubt nur im Test-Paket (Debug-APK) und im Web mit ?dev=1; in Release-Paketen (Play) bleibt die Geste ohne Wirkung. Reine VORSCHAU: Beim ersten Sprung wird der
+   Spielstand als Kopie gesichert und eingefroren: save() schreibt nichts (devFrozen), Platform.track() meldet nichts nach außen (die Ereignisse stehen nur mit dev:true
+   in MC.events()). „Beenden“ stellt die Kopie wieder her; schließt die App mitten in der Vorschau, liegt der echte Stand unverändert im Speicher.
+   Schalter: CONFIG.features.devMenu (Master), im Web ?dev=0 (aus) / ?dev=1 (an). Aus heißt: kein Element, kein Timer, keine Datei; die Geste wird nicht abgehört. */
+const Dev = (() => {
+  const P = new URLSearchParams(location.search).get('dev');
+  const FLAG = P === '0' ? false : !!(CONFIG.features && CONFIG.features.devMenu);
+  const MAXL = 60;
+  const allowed = () => FLAG && (isNative() ? Platform.build.kind === 'debug' : P === '1');
+  let snap = null, origTrack = null, panel = null, taps = [];
+  function begin() {                                                   // Kopie des echten Stands sichern, dann einfrieren
+    if (snap) return;
+    snap = JSON.stringify(S);
+    try { localStorage.setItem(SAVE_KEY, snap); } catch (e) {}         // der echte Stand liegt damit sicher im Speicher (ein wartendes save() ist erledigt)
+    clearTimeout(saveT); devFrozen = true;
+    origTrack = Platform.track;
+    Platform.track = function (name, params) { (window.__events = window.__events || []).push({ name, params: params || {}, ts: Date.now(), dev: true }); };
+  }
+  function end() {                                                     // Kopie zurückspielen, Messung wieder frei
+    if (!snap) return;
+    const back = JSON.parse(snap); snap = null; devFrozen = false;
+    Platform.track = origTrack; origTrack = null;
+    S = back; Object.assign(shown, { coins: S.coins, gems: S.gems, energy: S.energy });
+    lastChapter = null; applyChapter(true, false); fillOrders(); render();
+  }
+  function setLevel(L) {
+    L = Math.max(1, Math.min(MAXL, Math.round(+L) || 1));
+    begin();
+    S.level = L; S.worldPick = null; S.tut = Math.max(S.tut, 3);
+    applyChapter(true, false);
+    S.orders = []; fillOrders(); render(); refresh();
+  }
+  const ch = () => CHAPTERS[worldIdx()];
+  function refresh() {
+    if (!panel) return;
+    const w = worldIdx(), L = S.level;
+    panel.querySelectorAll('.dv-w button').forEach((b, i) => b.classList.toggle('on', i === w));
+    const r = panel.querySelector('input'); r.value = L;
+    panel.querySelector('output').textContent = `Level ${L}`;
+    panel.querySelector('.dv-name').textContent = `Welt ${w + 1}/${CHAPTERS.length} · ${CHAPTERS[w].de}`;
+    const ro = $('#orders').getBoundingClientRect(), rb = $('#board').getBoundingClientRect();
+    panel.querySelector('.dv-info').textContent = `Fenster ${innerWidth}×${innerHeight} px · Dichte ${devicePixelRatio} · freier Streifen ${Math.floor(rb.top) - 6 - (Math.ceil(ro.bottom) + 2)} px · Möwe: ${Gull.api.why()}`;
+    panel.querySelector('.dv-top span').textContent = snap ? 'Vorschau – wird nicht gespeichert' : 'Spielstand unverändert';
+  }
+  function open() {
+    if (panel) return true;
+    closeModal();
+    panel = document.createElement('div'); panel.id = 'devPanel'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Entwickler-Vorschau');
+    panel.innerHTML = `<div class="dv-top"><b>DEV</b><span></span><button data-dv="min" aria-label="Verkleinern">▾</button><button data-dv="end">Beenden</button></div>
+      <div class="dv-name"></div>
+      <div class="dv-w">${CHAPTERS.map((c, i) => `<button data-dv="w${i}" aria-label="${esc(c.de)}">${c.ic}</button>`).join('')}</div>
+      <div class="dv-lv"><button data-dv="lm" aria-label="Level zurück">−</button><input type="range" min="1" max="${MAXL}" step="1" aria-label="Level"><button data-dv="lp" aria-label="Level weiter">+</button><output></output></div>
+      <div class="dv-btn"><button data-dv="gull">Möwe zeigen</button><button data-dv="banner">Welt-Banner</button></div>
+      <div class="dv-info"></div>`;
+    const rg = panel.querySelector('input');
+    rg.addEventListener('input', () => { panel.querySelector('output').textContent = `Level ${rg.value}`; });
+    rg.addEventListener('change', () => setLevel(rg.value));
+    panel.addEventListener('click', e => {
+      const b = e.target.closest('[data-dv]'); if (!b) return; const a = b.dataset.dv;
+      if (a === 'end') close();
+      else if (a === 'min') { panel.classList.toggle('min'); b.textContent = panel.classList.contains('min') ? '▴' : '▾'; }
+      else if (a === 'lm') setLevel(S.level - 1);
+      else if (a === 'lp') setLevel(S.level + 1);
+      else if (a === 'banner') worldBanner(ch());
+      else if (a === 'gull') { panel.querySelector('.dv-info').textContent = 'Möwe: Start in 2 s (sie wartet nach jeder Berührung kurz) …'; setTimeout(() => Gull.api.fly().then(refresh, refresh), 1800); }
+      else if (/^w\d$/.test(a)) setLevel(CHAPTERS[+a.slice(1)].lv);
+    });
+    document.body.appendChild(panel); refresh(); return true;
+  }
+  function close() { end(); if (panel) { panel.remove(); panel = null; } }
+  const tap = () => {
+    if (!allowed()) return;
+    const t0 = performance.now(); taps = taps.filter(x => t0 - x < 4000); taps.push(t0);
+    if (taps.length >= 7) { taps = []; open(); }
+  };
+  const init = () => { if (FLAG) $('#modalBody').addEventListener('click', e => { if (e.target.closest('[data-ver]')) tap(); }); };
+  const api = { state: () => ({ flag: FLAG, allowed: allowed(), open: !!panel, frozen: !!snap, level: S.level }), open: () => allowed() ? open() : false, close, setLevel: L => allowed() ? setLevel(L) : false };
+  return { init, api };
+})();
+
 window.MC = { ent: (id, o) => playEntrance(id, o), cust: l => custSVG(l), seats: () => seatEls, fill: () => { fillOrders(); render(); }, render: () => render(), close: closeModal, events: () => window.__events || [], state: () => S, audio: () => Sound.state(), world: L => { S.level = L; S.worldPick = null; applyChapter(true); render(); }, levelUp: L => { S.level = L - 1; S.xp = 0; addXP(xpNeed(L - 1)); }, scene: (i, vb, still) => Scenes.svg(i, vb, still),
   disc: (c, tr) => showDiscovery(c, tr), gift: () => addGift(), dbl: o => offerDouble(o || { coins: 80 }), shop: () => openShop(), gems: () => openGems(), noEnergy: () => openNoEnergy(),
   order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx,
-  plat: Platform, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
+  plat: Platform, snd: Sound, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
 window.MC.gull = Gull.api;
+window.MC.dev = Dev.api; Dev.init();
 
 /* ---------------- Boot ---------------- */
 S = load();

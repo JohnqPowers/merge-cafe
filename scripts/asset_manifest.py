@@ -37,6 +37,8 @@ KI_MOEWE = 'KI-Bild (OpenAI-Bildgenerierung laut Lieferung vom 25.11.2026; Recht
 KATZE = 'KI-Bild (Erklärung des Eigentümers 24.11.2026); Frames im Katzenpaket durch Skalierung, Drehung und Verschiebung abgeleitet, im Projekt aufbereitet'
 ICON = 'Bild des Eigentümers (Icon-Original, Chat-Lieferung 28.11.2026), im Projekt abgeleitet (assets/src/build-icon.py)'
 ICON_NEU = 'Bild des Eigentümers (Chat-Lieferung 28.11.2026, Icon mit Noa blond); Erzeugung und Rechte vom Eigentümer noch nicht erklärt (Optik wie die KI-Bilder der übrigen Lieferungen)'
+KI_START = 'Bild des Eigentümers (Chat-Lieferung 28.11.2026, neues Startbild); Erzeugung und Rechte vom Eigentümer noch nicht erklärt (Optik wie die KI-Bilder der übrigen Lieferungen), im Projekt aufbereitet (eingebrannte Versionsnummer getilgt, unten verlängert, auf 1220 px vergrößert, scripts/start_import.py)'
+START_ORIG = 'Bild des Eigentümers (Chat-Lieferung 28.11.2026, neues Startbild mit Noa, Katze und Spielen-Knopf); Erzeugung und Rechte vom Eigentümer noch nicht erklärt (Optik wie die KI-Bilder der übrigen Lieferungen)'
 ICON_ALT = 'KI-Bild des Eigentümers (Verzeichnis: noas_bean_trail_icon_original_1254.png), im Spiel bis 1.5.20, nur noch Archiv'
 GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile gilt
     (r'^www/art/k\d_s\d+\.webp$', 'Teil', KI),
@@ -56,6 +58,8 @@ GRUPPEN = [  # (Muster auf den Pfad, Gruppe, Herkunft); die erste passende Zeile
     (r'^assets/icon-(only|foreground|background)\.png$', 'Icon (Android)', ICON),
     (r'^assets/src/app-icon-original-2026-11-24\.png$', 'Icon-Original (alt)', ICON_ALT),
     (r'^assets/src/app-icon-original\.png$', 'Icon-Original', ICON_NEU),
+    (r'^www/art/start\.webp$', 'Startbild (Spiel)', KI_START),
+    (r'^assets/src/start-original\.png$', 'Startbild-Original', START_ORIG),
     (r'^assets/splash(-dark)?\.png$', 'Startbild', 'Herkunft nicht protokolliert (seit v1.4.0); Eigentümer bestätigt oder ersetzt'),
     (r'^assets/fonts/.*\.ttf$', 'Schrift (Original)', 'SIL OFL 1.1, Quelle: assets/fonts/QUELLE.md'),
     (r'-OFL\.txt$', 'Schrift-Lizenztext', 'SIL OFL 1.1'),
@@ -70,7 +74,9 @@ NACH_ART = 'bitgleich nachgestellt 24.11.2026 (scripts/art_import.py)'
 NACH_BODEN = 'bitgleich nachgestellt 24.11.2026 (scripts/floor_prep.py, scripts/art_import.py)'
 NACH_KATZE = 'bitgleich nachgestellt 24.11.2026 (scripts/cat_import.py)'
 NACH_STADT = 'bitgleich nachgestellt 25.11.2026 (scripts/art_import.py aus dem ZIP, Kopie des Repos)'
+NACH_KULISSE = 'bitgleich nachgestellt 28.11.2026 (scripts/art_import.py mit neuer Aufbereitung: Himmelsansatz, 1220 px, aus dem ZIP, Kopie des Repos)'
 NACH_MOEWE = 'bitgleich nachgestellt 25.11.2026 (scripts/gull_import.py aus dem ZIP, Kopie des Repos)'
+NACH_START = 'bitgleich nachgestellt 28.11.2026 (scripts/start_import.py aus assets/src/start-original.png, Kopie des Repos)'
 NACH_ICON = 'bitgleich nachgestellt 28.11.2026 (assets/src/build-icon.py, Kopie des Repos)'
 NACH_HASH_PAK = 'Prüfsumme gleich Paketliste (Einzeldatei, 28.11.2026)'
 NACH_F1 = 'Zuordnung nur nach Dateiname; ausgeliefertes f1.webp nicht bitgleich nachstellbar (vorläufiger Boden)'
@@ -160,6 +166,9 @@ def erzeugen():
     p_neu = ROOT / 'assets' / 'src' / 'app-icon-original.png'          # aktuelles Original (Lieferung 28.11.2026): steht in der Paketliste, nicht im Verzeichnis
     h_neu = hashlib.sha256(p_neu.read_bytes()).hexdigest() if p_neu.exists() else ''
     icon_neu = next((r for r in lesen_csv(PAK, 'utf-8') if h_neu and r['sha256'] == h_neu), None)
+    p_start = ROOT / 'assets' / 'src' / 'start-original.png'          # Startbild des Eigentümers (Lieferung 28.11.2026): steht in der Paketliste, nicht im Verzeichnis
+    h_start = hashlib.sha256(p_start.read_bytes()).hexdigest() if p_start.exists() else ''
+    start_up = next((r for r in lesen_csv(PAK, 'utf-8') if h_start and r['sha256'] == h_start), None)
     katze = katzen_zuordnung()
     stadt = stadtpaket_zuordnung()
     moewe = moewe_zuordnung()
@@ -192,7 +201,11 @@ def erzeugen():
             r = stadt[rel]
             quelle, paket, qsha = r['datei'], r['paket'], r['sha256']
             qstatus = 'Stadtpaket 25.11.2026 (' + ('Prüfsumme im Verzeichnis des Eigentümers' if r['im_verzeichnis'] == 'ja' else 'nicht im Verzeichnis des Eigentümers') + ')'
-            nachweis = NACH_STADT
+            nachweis = NACH_KULISSE if re.match(r'^www/art/b\d+\.webp$', rel) else NACH_STADT
+        elif gruppe in ('Startbild (Spiel)', 'Startbild-Original') and start_up:
+            quelle, paket, qsha = start_up['datei'], start_up['paket'], start_up['sha256']
+            qstatus = 'Lieferung ' + start_up['eingetragen'] + ' (' + ('Prüfsumme im Verzeichnis des Eigentümers' if start_up['im_verzeichnis'] == 'ja' else 'nicht im Verzeichnis des Eigentümers') + ')'
+            nachweis = NACH_HASH_PAK if gruppe == 'Startbild-Original' else NACH_START
         elif rel.startswith('www/art/') and stamm in lib_key:
             r = lib_key[stamm]
             quelle, paket, qsha, qstatus = r['Pfad'], r['Quelle'], r['SHA256'], r['Status']

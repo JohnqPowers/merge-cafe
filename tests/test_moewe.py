@@ -1,6 +1,6 @@
 """Möwe über Hamburg (Experiment exp/moewe-hamburg; Schalter CONFIG.features.gull, im Web-Test ?gull=0 / ?gull=1).
 Geprüft werden: Schalter aus = nichts (kein Element, kein Timer-Flug, keine Datei), Flug nur im freien Fenster zwischen Bestellungen und Brett
-(drei Fenstergrößen; Pixelvergleich: außerhalb des Bands ändert die Möwe keinen Pixel), Pause bei Fingerdruck und beim Ziehen eines Teils,
+(vier Fenstergrößen, dazu schmale Fenster ab 28 px Höhe; Pixelvergleich: außerhalb des Bands ändert die Möwe keinen Pixel), Pause bei Fingerdruck und beim Ziehen eines Teils,
 Ende bei langer Störung, reduzierte Bewegung (am Start und mitten im Flug), Wächter bei langsamen Bildern (und kein falscher Alarm bei kurzen
 Rucklern), nur Hamburg und nur nach dem Tutorial, fehlende Datei, nichts gespeichert, keine neuen Berechtigungen im Quelltext, Aufräumen nach
 vielen Flügen, Bildstreifen.
@@ -97,7 +97,7 @@ async def main():
         ok('A keine Fehler', not pg.errs, pg.errs); await pg.ctx.close()
 
         # ---------- B: Lage im freien Fenster, drei Fenstergrößen; C: Pixelvergleich und Bedienung ----------
-        for w, h in [(390, 844), (360, 800), (412, 915)]:
+        for w, h in [(390, 844), (360, 800), (412, 915), (375, 740)]:
             pg = await mk(b, w=w, h=h)
             keys0 = await pg.evaluate("Object.keys(localStorage).sort().join()")
             ok(f'B {w}x{h}: fly() startet einen Flug', await pg.evaluate("MC.gull.fly()") is True)
@@ -231,6 +231,21 @@ async def main():
         s = await pg.evaluate(GS)
         ok('K 360x640: kein freies Fenster (band = null), fly() gibt false, keine Möwendatei geladen', s['band'] is None and await pg.evaluate("MC.gull.fly()") is False and not pg.reqs, [s['band'], pg.reqs])
         ok('K keine Fehler', not pg.errs, pg.errs); await pg.ctx.close()
+
+        # ---------- M: schmales freies Fenster (Band 28 bis 63 px, wie hohe Handys mit Bildgästen und größerer Schrift): sie fliegt trotzdem und passt sich der Höhe an
+        #            (neu 1.5.22; bis 1.5.21 verlangte der Code 64 px, und auf solchen Handys blieb die Möwe ganz aus) ----------
+        for w, h in [(375, 740), (390, 760)]:
+            pg = await mk(b, w=w, h=h)
+            s0 = await pg.evaluate(GS)
+            ok(f'M {w}x{h}: freies Fenster 28 bis 63 px hoch (früher: gar keine Möwe)', bool(s0['band']) and 28 <= s0['band']['h'] < 64, s0['band'])
+            ok(f'M {w}x{h}: fly() startet trotzdem', await pg.evaluate("MC.gull.fly()") is True)
+            s1 = await pg.evaluate(GS); bh = s0['band']['h']; gw, gh = s1['size']
+            ok(f'M {w}x{h}: Möwe nutzt die Fensterhöhe (85 bis 100 % des Bands) und ist mindestens 30 px breit', .85 * bh <= gh <= bh and gw >= 30, [bh, gw, gh])
+            smp = [x for x in await pg.evaluate(SAMPLE, 20) if x]
+            ok(f'M {w}x{h}: immer im Band, nie über Bestellungen oder Brett',
+               bool(smp) and all(x['gull'][1] >= x['band'][1] - .5 and x['gull'][3] <= x['band'][3] + .5 and (x['vis'] is None or (x['vis'][3] <= x['board'][1] and x['vis'][1] >= x['orders'][3])) for x in smp), len(smp))
+            ok(f'M {w}x{h}: sie bewegt sich durchs Bild', len({round(x['gull'][0]) for x in smp}) >= 8, len({round(x['gull'][0]) for x in smp}))
+            ok(f'M {w}x{h}: keine Fehler', not pg.errs, pg.errs); await pg.ctx.close()
 
         # ---------- L: Schalter aus = nichts (URL-Parameter, CONFIG false, Eintrag fehlt) ----------
         for name, kw, lang in [('?gull=0', dict(q='?gull=0', wait=13500), True),
