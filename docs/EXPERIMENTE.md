@@ -1,6 +1,6 @@
 # Experimente: kontrollierte Weiterentwicklung
 
-Stand 25.11.2026. Grundlage sind die sieben Entwicklungsregeln des Eigentümers (`CLAUDE.md`, Abschnitt „Entwicklungsregeln“). Ziel: die laufende App nicht durch viele gleichzeitige Änderungen verschlechtern. Weiterentwickeln, nicht neu bauen.
+Stand 28.11.2026. Grundlage sind die sieben Entwicklungsregeln des Eigentümers (`CLAUDE.md`, Abschnitt „Entwicklungsregeln“). Ziel: die laufende App nicht durch viele gleichzeitige Änderungen verschlechtern. Weiterentwickeln, nicht neu bauen.
 
 ## Ablauf je Experiment
 1. **Branch von `main`:** `git switch -c exp/<kurzname>`. Auf `main` landen Experimente nie von selbst.
@@ -29,8 +29,27 @@ Referenz ist der Commit `0c1bd88`, kein Tag: Das Pushen von `v1.5.19` hat die Ag
 ## Übersicht
 | Branch | Inhalt | Schalter | Stand |
 |---|---|---|---|
-| `exp/moewe-hamburg` | Möwe fliegt im sichtbaren Hintergrund von Hamburg (Welt 1) | `CONFIG.features.gull`, `?gull=0` | angelegt 25.11.2026, nicht zusammengeführt |
+| `exp/moewe-hamburg` | Möwe fliegt im sichtbaren Hintergrund von Hamburg (Welt 1) | `CONFIG.features.gull`, `?gull=0` | Version 1.5.20 im Branch fertig und getestet (28.11.2026), **nicht zusammengeführt**, Vorschau als privater Link |
 | `exp/lieferbonus` | freiwilliger Lieferbonus nach drei erledigten Bestellungen | offen | **nicht begonnen** (Auftrag vom 25.11.2026: noch nicht umsetzen) |
+
+### Möwe über Hamburg: Ergebnis (28.11.2026)
+Version 1.5.20 im Branch `exp/moewe-hamburg`, Schalter `CONFIG.features.gull` (im Branch auf `true`, damit man sie sieht), Web-Test `?gull=0` / `?gull=1`. Nur hinzugefügt (+129 / −1 Zeilen in `www/index.html`, die eine entfernte Zeile ist die Versionszeile), neue Datei `www/art/anim/moewe_hamburg.webp` mit Herkunft in `docs/HERKUNFT_BILDER.md`.
+
+| Test | Vorher (Referenz 0c1bd88) | Nachher (Branch) | Bewertung |
+|---|---|---|---|
+| test_ausrichtung | ALLE | ALLE | gleich |
+| test_gesamt 390×844 | 24/24 | 24/24 | gleich |
+| test_gesamt 360×640 | 24/24 | 24/24 | gleich |
+| test_herkunft | ALLE | ALLE | gleich |
+| test_hintergrund | 20/20 | 20/20 | gleich |
+| test_katze | 11/11 | 11/11 | gleich |
+| test_plattform | 115/115 | 115/115 | gleich |
+| test_spielstand | ALLE | ALLE | gleich |
+| test_store | ALLE | ALLE | gleich |
+| test_wortwahl | 12/12 | 12/12 | gleich |
+| test_moewe | – | 86/86 | neu |
+
+**Vor dem Zusammenführen offen:** (1) Blick auf einem echten Handy (Akku, Bildrate, Android-WebView); (2) Entscheidung des Eigentümers, ob der Standard im Build `true` oder `false` ist (im Android-Build gibt es keinen Adressparameter, abschalten heißt eine Zeile in `CONFIG.features` und einen neuen Build); (3) Zusammenführen nur auf ausdrücklichen Auftrag (Regel 7), danach Version neu vergeben und alle Tests erneut. Der Wächter gilt nur für die laufende Sitzung und speichert nichts.
 
 ### Lieferbonus: was vor dem Start geklärt sein muss
 Berührt Belohnungen und, je nach Ausführung, Werbung (Monetarisierung): vor dem ersten Code Freigabe des Eigentümers.

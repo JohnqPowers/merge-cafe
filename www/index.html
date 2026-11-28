@@ -476,6 +476,10 @@ svg.ic.l{width:26px;height:26px}
 .sc-bg{position:absolute;top:0;left:0;right:0;margin:0 auto;display:block;width:min(100%,520px);height:100%;object-fit:cover;object-position:50% 0;pointer-events:none;-webkit-user-drag:none;user-select:none}
 /* breite Fenster (Web am Desktop/Tablet): Kulisse bleibt so breit wie die App-Spalte (520 px), der Rest ist eine verwischte Kopie desselben Bildes */
 @media (min-width:521px){.sc-hasbg::before{content:"";position:absolute;inset:-40px;background:var(--bgu) 50% 0/cover;filter:blur(28px);pointer-events:none}}
+/* Möwe über Hamburg (Experiment exp/moewe-hamburg, Schalter CONFIG.features.gull): das Band liegt zwischen Bestellungen und Brett und schneidet alles Überstehende ab, bewegt wird nur per transform */
+.gull-band{position:fixed;z-index:0;overflow:hidden;pointer-events:none;contain:layout paint}
+.gull{position:absolute;left:0;top:0;overflow:hidden;pointer-events:none;will-change:transform}
+.gull-img{position:absolute;left:0;top:0;max-width:none;display:block;pointer-events:none;-webkit-user-drag:none;user-select:none;will-change:transform}
 .cell,.cell:nth-child(odd){background:var(--hole);border-radius:12px;box-shadow:var(--holesh)}
 .cell:nth-child(even){background:var(--hole2)}
 .cell .it{font-size:min(60cqw,38px);text-shadow:0 2px 2px rgba(60,25,5,.35)}
@@ -989,7 +993,7 @@ img.fx{object-fit:contain}
    All sounds and music are synthesized at runtime (original, no assets).
    ===================================================================== */
 const CONFIG = {
-  version: '1.5.19',
+  version: '1.5.20',
   legalReady: false,   // Schalter für Werbung, Käufe und Messung in der App. Der Build setzt ihn auf true, wenn www/privacy.html und www/impressum.html keine Platzhalter [[…]] mehr enthalten (scripts/inject-config.js); sonst bleiben sie aus.
   appsflyer: { devKey: 'YOUR_APPSFLYER_DEV_KEY', iosAppId: 'YOUR_IOS_APP_ID' },
   admob: { // Google test IDs — replaced at build time from secrets
@@ -997,6 +1001,7 @@ const CONFIG = {
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
   revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro', proEnabled: false },   // Pro = dieses Entitlement im RevenueCat-Dashboard. proEnabled: false = Pro ist AUS (Entscheidung 24.11.2026: kein Abo zum Start, docs/MONETARISIERUNG.md). Die Käufe der Diamanten-Pakete laufen davon unabhängig.
+  features: { gull: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg); im Web-Test ?gull=0 / ?gull=1
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -3049,6 +3054,127 @@ $('#cat').addEventListener('click', () => {
 });
 setInterval(() => { const c = $('#cat'); if (c) c.classList.toggle('sleep', started && Date.now() - lastAct > 25000); }, 2000);
 
+/* ---------------- Möwe über Hamburg (Experiment exp/moewe-hamburg) ----------------
+   Ab und zu fliegt eine Möwe durch das freie Fenster zwischen Bestellleiste und Brett (nur Welt 1 Hamburg, erst nach dem Tutorial).
+   Gezeichnet wird sie nur in einem Band, das genau zwischen Unterkante der Bestellungen und Oberkante des Bretts liegt und alles
+   Überstehende abschneidet: über Brett und Bestellungen kann sie nicht gelangen. Sie ruht bei jedem Spielzug (Calm.quiet, Finger auf dem
+   Schirm, 1,5 s danach), unter Fenstern, bei verstecktem Fenster und bei „Bewegung reduzieren“; ein Wächter schaltet sie für die Sitzung
+   ab, wenn die Bilder zu langsam kommen. Kein Speicher, keine Berechtigung, kein Ton; bewegt wird nur per transform.
+   Schalter: CONFIG.features.gull, im Web ?gull=0 / ?gull=1. Aus heißt: kein Element, kein Timer, keine Datei wird geladen.
+   Das Bild (acht Flügelschläge in einem Streifen) und die Tabelle GULL erzeugt scripts/gull_import.py. */
+const GULL = /*GULL_DATA*/{"v":1,"file":"art/anim/moewe_hamburg.webp","n":8,"w":192,"h":168}/*END_GULL_DATA*/;
+const Gull = (() => {
+  const P = new URLSearchParams(location.search).get('gull');
+  const FLAG = P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.gull);
+  const FPS = 11, GRACE = 1500, HOLD_MAX = 5000, MIN_BAND = 64, WIN = 30, SLOW_MS = 50, SLOW_N = 8, STRIKES = 2;
+  let off = !FLAG ? 'flag' : (GULL && GULL.file ? '' : 'asset');     // '' = bereit; sonst der Grund: flag | asset | perf | error
+  let inited = false, timer = 0, band = null, win = null, strip = null, ready = null, run = null, mq = null;
+  let downs = 0, lastIn = -1e9, n = 0, slow = 0, strikes = 0;
+  const now = () => performance.now();
+  const reduce = () => !!(mq && mq.matches);
+  const busy = () => (downs > 0 && now() - lastIn < 10000) || now() - lastIn < GRACE;
+  const hold = () => document.hidden || reduce() || busy() || Calm.quiet();
+  /* freies Fenster zwischen Bestellungen und Brett in CSS-Pixeln (2 px unter den Bestellungen, 6 px über dem Brett wegen des Rahmenbilds), sonst null */
+  const where = () => {
+    const o = $('#orders'), b = $('#board'), a = $('#app'); if (!o || !b || !a) return null;
+    const ro = o.getBoundingClientRect(), rb = b.getBoundingClientRect(), ra = a.getBoundingClientRect();
+    const top = Math.ceil(ro.bottom) + 2, h = Math.floor(rb.top) - 6 - top;
+    return h >= MIN_BAND && ra.width >= 240 ? { top, h, left: Math.round(ra.left), w: Math.round(ra.width) } : null;
+  };
+  const can = () => !off && started && S.tut >= 3 && worldIdx() === 0 && !!document.querySelector('#scene .sc-hasbg') && !!where();
+  const plan = ms => { clearTimeout(timer); timer = off ? 0 : setTimeout(attempt, ms); };
+  const giveUp = why => { off = why; end(); clearTimeout(timer); timer = 0; };
+  function load() {                                                   // Bild einmal laden und dekodieren; Fehler oder falsche Maße: aus für die Sitzung
+    return ready || (ready = new Promise(res => {
+      const im = new Image(); im.className = 'gull-img'; im.alt = ''; im.draggable = false; im.src = GULL.file;
+      const ok = () => { strip = im; res(im.naturalWidth === GULL.n * GULL.w && im.naturalHeight === GULL.h); }, no = () => res(false);
+      if (im.decode) im.decode().then(ok, no); else { im.onload = ok; im.onerror = no; }
+    }).then(ok => { if (!ok) off = off || 'asset'; return ok; }));
+  }
+  function place(r) {                                                 // Stellung zur Flugzeit r.t: Weg quer durchs Band, leichtes Wippen, Flügelbild
+    const u = Math.min(1, r.t / r.dur), x = r.x0 + (r.x1 - r.x0) * u, T = 6.2832 * r.t;
+    const y = Math.max(0, Math.min(r.g.h - r.H, r.y0 + r.A1 * Math.sin(T / 3.1 + r.ph) + r.A2 * Math.sin(T * FPS / 8)));
+    win.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scaleX(${r.flip})`;
+    const f = Math.floor(r.t * FPS) % GULL.n;
+    if (f !== r.f) { r.f = f; strip.style.transform = `translate3d(${-f * r.W}px,0,0)`; }
+    return u;
+  }
+  function start() {
+    const g = where(); if (!g || run || off || !strip) return false;
+    const W = Math.max(40, Math.min(Math.round(g.w * .16), Math.floor(g.h * .55 * GULL.w / GULL.h))), H = Math.round(W * GULL.h / GULL.w);
+    const ltr = Math.random() < .5, free = g.h - H, A1 = Math.min(6, free * .12);
+    if (!band) { band = document.createElement('div'); band.className = 'gull-band'; band.setAttribute('aria-hidden', 'true'); win = document.createElement('div'); win.className = 'gull'; band.appendChild(win); win.appendChild(strip); }
+    band.style.cssText = `top:${g.top}px;left:${g.left}px;width:${g.w}px;height:${g.h}px`;
+    win.style.cssText = `width:${W}px;height:${H}px`;
+    strip.style.cssText = `width:${W * GULL.n}px;height:${H}px`;
+    run = { g, W, H, ltr, flip: ltr ? -1 : 1, x0: ltr ? -W : g.w, x1: ltr ? g.w : -W, y0: A1 + (free - 2 * A1) * (.15 + Math.random() * .5), A1, A2: Math.min(2.5, free * .05),
+            ph: Math.random() * 6.28, dur: 7 + Math.random() * 2, t: 0, last: null, hold0: 0, f: -1, chk: 0, id: 0, poll: 0 };
+    place(run);
+    if (!band.isConnected) $('#scene').after(band);
+    run.id = requestAnimationFrame(tick);
+    return true;
+  }
+  function tick(ts) {
+    const r = run; if (!r) return; r.id = 0;
+    try {
+      if (off || !band.isConnected || worldIdx() !== 0 || reduce()) return end();    // auch „Bewegung reduzieren“ mitten im Flug: sofort weg (kein Ereignis nötig, Chrome meldet es nicht zuverlässig, wenn matches vorher gelesen wurde)
+      if (hold()) {                                                   // Spielzug, Fenster, Hintergrund, reduzierte Bewegung: stehen bleiben, nur alle 150 ms nachsehen
+        if (!r.hold0) r.hold0 = now(); else if (now() - r.hold0 > HOLD_MAX) return end();     // zu lange gestört: wegfliegen lassen
+        r.last = null; r.poll = setTimeout(() => { r.poll = 0; if (run === r) tick(now()); }, 150); return;
+      }
+      r.hold0 = 0;
+      const dt = r.last == null ? 0 : ts - r.last; r.last = ts;
+      if (dt > 0 && dt < 400) {                                       // Wächter: Anteil langsamer Bilder (über 400 ms ist eine Pause, keine Last)
+        n++; if (dt > SLOW_MS) slow++;
+        if (n >= WIN) { strikes = slow >= SLOW_N ? strikes + 1 : 0; n = slow = 0; if (strikes >= STRIKES) return giveUp('perf'); }
+      }
+      if (ts - r.chk > 250) {                                         // Band nachmessen (Drehen, Größe, mehr Bestellungen): ändert es sich, endet der Flug
+        r.chk = ts; const g = where();
+        if (!g || g.top !== r.g.top || g.h !== r.g.h || g.left !== r.g.left || g.w !== r.g.w) return end();
+      }
+      r.t += Math.min(dt, 50) / 1000;
+      if (place(r) >= 1) return end();
+      r.id = requestAnimationFrame(tick);
+    } catch (e) { giveUp('error'); }
+  }
+  function end() {
+    const r = run; run = null;
+    if (r) { cancelAnimationFrame(r.id); clearTimeout(r.poll); }
+    if (band && band.isConnected) band.remove();
+    plan(16000 + Math.random() * 14000);
+  }
+  function attempt() {
+    timer = 0; if (off || run) return;
+    try {
+      if (hold() || !can()) return plan(4000 + Math.random() * 3000);
+      load().then(ok => {
+        if (!ok || off || run) return;
+        if (hold() || !can()) return plan(4000);
+        start() || plan(6000);
+      }).catch(() => giveUp('error'));
+    } catch (e) { giveUp('error'); }
+  }
+  function init() {
+    if (off || inited) return; inited = true;
+    const dn = () => { downs++; lastIn = now(); }, up = () => { downs = Math.max(0, downs - 1); lastIn = now(); };
+    document.addEventListener('pointerdown', dn, { capture: true, passive: true });
+    document.addEventListener('pointerup', up, { capture: true, passive: true });
+    document.addEventListener('pointercancel', up, { capture: true, passive: true });
+    try { mq = matchMedia('(prefers-reduced-motion: reduce)'); } catch (e) {}        // gelesen wird bei jedem Bild und vor jedem Start (kein Ereignis-Hörer nötig)
+    plan(9000 + Math.random() * 5000);
+  }
+  /* Prüf- und Vorführschnittstelle (MC.gull): fly() startet sofort einen Flug, wenn dieselben Bedingungen stimmen wie beim zufälligen Start
+     (Schalter an, Hamburg, nach dem Tutorial, Band groß genug, kein Spielzug, keine reduzierte Bewegung); sonst false und es wird nichts geladen */
+  const api = {
+    state: () => ({ flag: FLAG, off, planned: !!timer, flying: !!run, paused: !!(run && run.hold0), hold: !off && hold(), t: run ? +run.t.toFixed(2) : 0, frame: run ? run.f : -1,
+                    ltr: run ? run.ltr : null, size: run ? [run.W, run.H] : null, band: run ? run.g : (off ? null : where()), watch: { n, slow, strikes } }),
+    fly: () => (off || hold() || !can()) ? Promise.resolve(false) : load().then(ok => !!ok && !off && !run && !hold() && can() && start()),
+    stop: () => { if (run) end(); },
+    giveUp
+  };
+  return { init, api };
+})();
+
 /* ---------------- Modals ---------------- */
 let sheet = '';
 function openModal(html, kind = '') { sheet = kind; $('#modalBody').innerHTML = html; $('#modal').hidden = false; $('#modal').dataset.kind = kind; $('#hand').hidden = true; Sound.click(); $('#modal .sheet').scrollTop = 0; }
@@ -3690,6 +3816,7 @@ window.MC = { ent: (id, o) => playEntrance(id, o), cust: l => custSVG(l), seats:
   disc: (c, tr) => showDiscovery(c, tr), gift: () => addGift(), dbl: o => offerDouble(o || { coins: 80 }), shop: () => openShop(), gems: () => openGems(), noEnergy: () => openNoEnergy(),
   order: i => openOrder(i), daily: () => openDaily(), ups: () => openUpgrades(), settings: () => openSettings(), openGift: () => showGift(), noLimit: () => { lastDbl = 0; }, cat: CatFx,
   plat: Platform, pro: () => openPro('test'), own: () => openPaywall(), manage: () => manageSub() };
+window.MC.gull = Gull.api;
 
 /* ---------------- Boot ---------------- */
 S = load();
@@ -3709,6 +3836,7 @@ afterPaint(() => {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layoutScene());
 });
 Platform.init();
+Gull.init();
 setInterval(() => { const e = S.energy; tickEnergy(); if (S.energy !== e) render(); else renderTimer(); }, 1000);
 try {
   if ('serviceWorker' in navigator) {
