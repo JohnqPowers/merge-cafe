@@ -17,7 +17,8 @@ Stand: 24.11.2026, Spielversion 1.5.13. Nachweis darüber, woher jedes Bild, jed
 
 | Gruppe | Dateien | Anzahl | Herkunft | Aufbereitung | Ohne Bild im Spiel |
 |---|---|---|---|---|---|
-| App-Icon | `assets/src/app-icon-original.png` (Original); abgeleitet: `assets/icon-*.png`, `store/app-icon-512.png`, `www/icons/*` | 1 + 7 | Eigentümer, 24.11.2026 (Upload-Datei „Noa_s_Bean_Trail__Caf_zauber.png“; im Verzeichnis `noas_bean_trail_icon_original_1254.png`, gleiche Prüfsumme) | `assets/src/build-icon.py` | – |
+| App-Icon (seit 1.5.21) | `assets/src/app-icon-original.png` (Original, Noa blond); abgeleitet: `assets/icon-*.png`, `store/app-icon-512.png`, `www/icons/*` | 1 + 7 | Eigentümer, Chat-Lieferung 28.11.2026 (nicht im Verzeichnis, Prüfsumme in der Paketliste); Erzeugung und Rechte nicht erklärt | `assets/src/build-icon.py` | – |
+| App-Icon (bis 1.5.20, Archiv) | `assets/src/app-icon-original-2026-11-24.png` | 1 | Eigentümer, 24.11.2026 (Upload-Datei „Noa_s_Bean_Trail__Caf_zauber.png“; im Verzeichnis `noas_bean_trail_icon_original_1254.png`, gleiche Prüfsumme) | wird nicht mehr gebaut | – |
 | Android-Startbild | `assets/splash.png`, `assets/splash-dark.png` (identisch) | 2 | im Projekt seit v1.4.0 (Commit `fb09461`); Erzeugung nicht protokolliert, **Eigentümer bestätigt oder ersetzt** | `capacitor-assets` im Build | – |
 | Teile | `www/art/k1_*` bis `k3_*` | 22 (7 Kaffee, 8 Backwaren, 7 Frühstück) | Eigentümer, OpenAI-Bildgenerierung nach `docs/ART_BRIEF.md` (Paket `merge_cafe_alle_25_grafiken.zip`) | `scripts/art_import.py` (Freistellen, Zuschneiden, 256 px, WebP) | Emoji |
 | Automaten | `www/art/g1` bis `g3` | 3 | wie Teile | wie Teile | Emoji |

@@ -113,7 +113,7 @@ python3 -I tests/test_store.py            # Formate und Texte prüfen
 
 | Datei | Format | Inhalt |
 |---|---|---|
-| `store/app-icon-512.png` | 512×512, 32-Bit-PNG mit Alpha, unter 1024 KB | Icon des Eigentümers („Noa's Bean Trail“, Köchin mit Katze), gebaut mit `python3 -I assets/src/build-icon.py` aus `assets/src/app-icon-original.png`. Gleiche Datei wie `www/icons/icon-512.png`. |
+| `store/app-icon-512.png` | 512×512, 32-Bit-PNG mit Alpha, unter 1024 KB | Icon des Eigentümers („Noa's Bean Trail“, blonde Köchin Noa mit Katze, Stand 28.11.2026), gebaut mit `python3 -I assets/src/build-icon.py` aus `assets/src/app-icon-original.png`. Gleiche Datei wie `www/icons/icon-512.png`. |
 | `store/feature-graphic-de-1024x500.png`, `…-en-…` | 1024×500, 24-Bit-PNG ohne Alpha | Icon, Titel, Postkarten von Hamburg, Paris und Kyoto (aus `Scenes`), Gebäck-Bilder aus `www/art`. Text: nur Titel und „Verschmelzen · Backen · Reisen“ / „Merge · Bake · Travel“. |
 | `store/screenshot-<1–6>-de.png`, `…-en.png` | 1080×1920 (9:16), 24-Bit-PNG ohne Alpha, je rund 1 bis 2 MB | 1 Hamburg (Start), 2 Paris (volles Brett, drei lieferbare Aufträge), 3 Weltreise (Postkarten), 4 Kyoto (hohe Stufen), 5 Begrüßung mit Figurenwahl, 6 Tagesbonus mit „Abholen“. |
 
