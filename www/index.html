@@ -642,6 +642,25 @@ img.art{display:block;width:1.15em;height:1.15em;object-fit:contain;pointer-even
 .sp-pips i.off{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4);box-shadow:none}
 .sp-pips i.cur{width:19px;height:19px;border-width:4px;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 4px 0 rgba(90,10,50,.35)}
 
+/* ---------- Startbild (Experiment exp/startbild, CONFIG.features.startImg): Vollbild, links/rechts beschnitten; der Knopf ist eine unsichtbare Fläche über dem Bild ---------- */
+#splash.sp-pre>*:not(#spPlay){visibility:hidden}
+#splash.sp-pre #spPlay{opacity:0}
+#splash.sp-img{display:block}
+#splash.sp-img>.sp-stage{position:absolute;left:0;top:0;opacity:0;transition:opacity .25s ease-out;z-index:1}
+#splash.sp-img>.sp-stage.rdy{opacity:1}
+.sp-stage>img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.sp-ov{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.sp-ov text{font-family:var(--num);text-anchor:middle;fill:#FFF1CF;letter-spacing:.5px}
+.sp-ov .sp-sh{fill:rgba(130,25,60,.42)}
+.sp-ov .sp-w{font-family:var(--num);fill:#FFF6DE;stroke:#B02E58;stroke-width:5px;paint-order:stroke;stroke-linejoin:round}
+.sp-stage #spPlay{position:absolute;padding:0;border:0;border-radius:999px;background:transparent;box-shadow:none;text-shadow:none;color:transparent;font-size:0;animation:none;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;z-index:2}
+.sp-stage #spPlay::before{opacity:.55}
+.sp-stage #spPlay:active{transform:none;background:rgba(10,70,20,.18);box-shadow:none}
+.sp-stage #spPlay:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#splash.sp-img::before{display:none}
+@media (min-aspect-ratio:564/1000){#splash.sp-img::before{display:block;background:var(--spbg) 50% 50%/cover no-repeat;filter:blur(34px);transform:scale(1.15)}}
+@media (prefers-reduced-motion:reduce){.sp-stage{transition:none!important}}
+
 /* ---------- Bewegung reduzieren ---------- */
 @media (prefers-reduced-motion:reduce){.cell.top::before,#spPlay::before,#splash .bk i,#dailyBtn svg,.res.low .plus{animation:none!important}}
 /* Querformat auf dem Handy (oder ein sehr niedriges Fenster): Das Spiel ist fürs Hochformat gebaut, Start-Knopf und Brett wären nicht erreichbar. Statisch, ohne Animation. */
@@ -1001,7 +1020,7 @@ const CONFIG = {
     rewardedIOS: 'ca-app-pub-3940256099942544/1712485313'
   },
   revenuecat: { android: 'YOUR_RC_ANDROID_KEY', ios: 'YOUR_RC_IOS_KEY', entitlement: 'noa_s_bean_trail_pro', proEnabled: false },   // Pro = dieses Entitlement im RevenueCat-Dashboard. proEnabled: false = Pro ist AUS (Entscheidung 24.11.2026: kein Abo zum Start, docs/MONETARISIERUNG.md). Die Käufe der Diamanten-Pakete laufen davon unabhängig.
-  features: { gull: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg); im Web-Test ?gull=0 / ?gull=1
+  features: { gull: true, startImg: true },   // Experimente, je einzeln abschaltbar (docs/EXPERIMENTE.md). gull = Möwe über Hamburg (Branch exp/moewe-hamburg), startImg = neues Startbild (Branch exp/startbild); im Web-Test ?gull=0 / ?gull=1 und ?startimg=0 / ?startimg=1
   energyRegenMs: 90 * 1000,
   baseEnergy: 100
 };
@@ -1010,6 +1029,17 @@ const CONFIG = {
 'use strict';
 const COLS = 7, ROWS = 8, N = COLS * ROWS;
 const LANG = (navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
+/* Startbild (Experiment exp/startbild, Schalter CONFIG.features.startImg, im Web ?startimg=0 / ?startimg=1): Das Bild des Eigentümers ersetzt den gebauten
+   Startbildschirm (Vollbild; an hohen Handys links und rechts etwas beschnitten, an breiten Fenstern mit verwischtem Rand). Darüber liegen nur der
+   „Spielen“-Knopf als echte, unsichtbare Fläche (Lage laut START.btn), die echte Versionsnummer und für wiederkehrende Spieler eine Willkommenszeile.
+   Das Bild trägt deutschen Text; in anderen Sprachen bleibt das alte Startbild, ebenso wenn die Datei fehlt oder nicht lesbar ist.
+   Aus heißt: kein Element, kein Timer, keine Datei wird geladen. Bild und Tabelle START erzeugt scripts/start_import.py. */
+const START = /*START_DATA*/{"v":2,"file":"art/start.webp","w":1220,"h":2388,"art":2167.6,"btn":[14.878,69.87,69.819,10.803],"ver":[610.0,2066.5,31.1],"wel":[610.0,1996.5,36.3,726.0]}/*END_START_DATA*/;
+const START_ON = (() => {
+  const P = new URLSearchParams(location.search).get('startimg');
+  return (P === '0' ? false : P === '1' ? true : !!(CONFIG.features && CONFIG.features.startImg)) && LANG === 'de' && !!START.file;
+})();
+if (START_ON) document.getElementById('splash').classList.add('sp-pre');          // alte Inhalte sofort verbergen, damit nichts aufblitzt
 
 const STR = {
   de: {
@@ -3780,6 +3810,37 @@ function showOnboarding() {
 }
 
 /* ---------------- Splash / Start ---------------- */
+/* Startbild-Einbau (Schalter START_ON): Bild laden und entschlüsseln, erst dann die alten Inhalte entfernen und die Bühne einsetzen. Misslingt das, bleibt das alte Startbild. */
+function startImgBuild() {
+  const sp = $('#splash'), play = $('#spPlay'), { btn: b, ver: v, wel: wl, w: W, h: H, art: A } = START;
+  const img = new Image(); img.alt = ''; img.decoding = 'async'; img.draggable = false; img.src = START.file;
+  const fail = () => sp.classList.remove('sp-pre');
+  (img.decode ? img.decode() : new Promise((ok, no) => { img.onload = ok; img.onerror = no; })).then(() => {
+    if (!sp.isConnected || sp.classList.contains('out')) return;                    // der Spieler war schneller (sehr früher Fingerdruck)
+    const stage = document.createElement('div'); stage.className = 'sp-stage';
+    [...sp.children].forEach(c => { if (c !== play) c.remove(); });
+    const ver = 'v' + CONFIG.version, fs = (v[2] / .7).toFixed(1);
+    let svg = `<svg class="sp-ov" viewBox="0 0 ${W} ${H}" aria-hidden="true"><text class="sp-sh" x="${v[0]}" y="${(v[1] + v[2] * .09).toFixed(1)}" font-size="${fs}">${ver}</text><text id="spVer" x="${v[0]}" y="${v[1]}" font-size="${fs}">${ver}</text>`;
+    if (S.profile.done) svg += `<text class="sp-w" x="${wl[0]}" y="${wl[1]}" font-size="${wl[2]}">${esc(t('welcomeBack', { n: pname() }))}</text>`;     // wiederkehrende Spieler: eine Zeile unter dem Knopf
+    stage.append(img); stage.insertAdjacentHTML('beforeend', svg + '</svg>'); stage.append(play);
+    play.style.cssText = `left:${b[0]}%;top:${b[1]}%;width:${b[2]}%;height:${b[3]}%`; play.setAttribute('aria-label', t('play'));
+    /* Größe: Fenster höchstens so breit wie das Bild (9:16 und höher): das ganze Bild deckt das Fenster, oben ausgerichtet, links/rechts mittig beschnitten;
+       breiter: das eigentliche Bild (ohne Verlängerung unten) füllt die Höhe, an den Seiten bleibt der verwischte Rand. */
+    const fit = () => {
+      const w = sp.clientWidth, h = sp.clientHeight;
+      if (!sp.isConnected) return removeEventListener('resize', fit);
+      if (!w || !h) return;
+      const k = w / h <= W / A ? Math.max(w / W, h / H) : h / A;
+      stage.style.cssText = `width:${W * k}px;height:${H * k}px;left:${(w - W * k) / 2}px`;
+    };
+    sp.append(stage); sp.classList.add('sp-img'); sp.classList.remove('sp-pre'); sp.style.setProperty('--spbg', `url("${START.file}")`);
+    fit(); addEventListener('resize', fit);
+    const wt = stage.querySelector('.sp-w');                                         // zu lange Namen werden auf die erlaubte Breite gestaucht (gemessen, auch nach dem Laden der Schrift)
+    const chk = () => { if (!wt) return; wt.removeAttribute('textLength'); if (wt.getBBox().width > wl[3]) { wt.setAttribute('textLength', wl[3]); wt.setAttribute('lengthAdjust', 'spacingAndGlyphs'); } };
+    chk(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(chk);
+    requestAnimationFrame(() => stage.classList.add('rdy'));
+  }, fail);
+}
 function setupSplash() {
   let k = 0; // laufende Buchstabennummer über beide Zeilen
   // Zeile 1: erstes Wort ("Noa's"), Zeile 2: der Rest ("Bean Trail"); Leerzeichen bleiben normaler Text zwischen den Buchstaben
@@ -3802,6 +3863,7 @@ function setupSplash() {
     setTimeout(proDaily, 1800);
     render();
   };
+  if (START_ON) startImgBuild();
 }
 document.addEventListener('pointerdown', () => { if (started) Sound.unlock(); }, { passive: true });
 document.addEventListener('visibilitychange', () => {
